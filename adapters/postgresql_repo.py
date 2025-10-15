@@ -10,29 +10,41 @@ class PostgreSQLRepo:
     
     def __init__(self):
         self.conn_params = self._parse_database_url()
+        print(f"🔗 PostgreSQL 연결 설정:")
+        print(f"   Host: {self.conn_params.get('host')}")
+        print(f"   Port: {self.conn_params.get('port')}")  
+        print(f"   Database: {self.conn_params.get('database')}")
+        print(f"   User: {self.conn_params.get('user')}")
+        print(f"   Password: {'*' * len(str(self.conn_params.get('password', '')))}")
     
     def _parse_database_url(self):
         """DATABASE_URL 환경변수를 파싱하여 연결 정보 추출"""
         database_url = os.getenv("DATABASE_URL")
+        print(f"🔍 DATABASE_URL 환경변수: {database_url}")
+        
         if not database_url:
-            # 로컬 개발용 기본값
+            print("⚠️ DATABASE_URL이 없어서 기본값 사용")
+            # 새 Render.com 서버 정보를 기본값으로 설정
             return {
-                'host': os.getenv("POSTGRES_HOST", "localhost"),
+                'host': os.getenv("POSTGRES_HOST", "dpg-d3nhsdadbo4c73d0dehg-a.singapore-postgres.render.com"),
                 'port': os.getenv("POSTGRES_PORT", "5432"),
-                'database': os.getenv("POSTGRES_DB", "secretboard"),
-                'user': os.getenv("POSTGRES_USER", "postgres"),
-                'password': os.getenv("POSTGRES_PASSWORD", "rich")
+                'database': os.getenv("POSTGRES_DB", "secretboard_fyqs"),
+                'user': os.getenv("POSTGRES_USER", "secretboard_user"),
+                'password': os.getenv("POSTGRES_PASSWORD", "xToIsayLLO9nFmeiAPChiF96d3khj8Eq")
             }
         
+        print(f"✅ DATABASE_URL로 연결 설정 파싱 중...")
         # Render.com에서 제공하는 DATABASE_URL 파싱
         result = urlparse(database_url)
-        return {
+        parsed_config = {
             'host': result.hostname,
             'port': result.port,
             'database': result.path[1:],  # 맨 앞의 '/' 제거
             'user': result.username,
             'password': result.password
         }
+        print(f"📋 파싱된 연결 정보: host={result.hostname}, db={result.path[1:]}, user={result.username}")
+        return parsed_config
     
     def _get_connection(self):
         """데이터베이스 연결 생성"""
