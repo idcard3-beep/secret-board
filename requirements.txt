@@ -5,4 +5,4 @@ python-dotenv
 pyodbc
 pycryptodome
 psycopg2-binary
-gunicorn
+gunicorn==22.0.0
