@@ -6,6 +6,22 @@
     <link rel="stylesheet" href="/static/style.css" />
     <link rel="stylesheet" href="/static/security.css" />
     <style>
+      @media (max-width: 600px) {
+        .modal-backdrop {
+          align-items: flex-end;
+        }
+        .modal {
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
+          border-top-left-radius: 12px;
+          border-top-right-radius: 12px;
+          margin-bottom: 0;
+          margin-left: 0;
+          margin-right: 0;
+          width: 100vw;
+          max-width: 100vw;
+        }
+      }
       /* --- Modal (lightweight, accessible) --- */
       .modal-backdrop {
         position: fixed;
