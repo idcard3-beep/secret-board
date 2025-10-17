@@ -1,3 +1,7 @@
+// new_modal.js
+// 기존 제출 로직 + 모달 열기/닫기 로직 통합
+
+// ---- 제출 로직 (원본 new.js 기반) ----
 document.getElementById('ticketForm').addEventListener('submit', (e) => {
   e.preventDefault();
   console.log('🚀 MSSQL에 새 게시글 저장 시작...');
@@ -57,3 +61,79 @@ document.getElementById('ticketForm').addEventListener('submit', (e) => {
       alert(`데이터베이스 연결 오류: ${error.message || error}`);
     });
 });
+
+// ---- 모달 유틸 ----
+(function () {
+  const openButtons = document.querySelectorAll('[data-open-modal]');
+  const closeSelectors = '[data-close-modal]';
+  let lastFocused = null;
+
+  function disableScroll() {
+    document.body.dataset.prevOverflow = document.body.style.overflow || '';
+    document.body.style.overflow = 'hidden';
+  }
+  function enableScroll() {
+    document.body.style.overflow = document.body.dataset.prevOverflow || '';
+    delete document.body.dataset.prevOverflow;
+  }
+
+  function trapFocus(modalEl) {
+    const focusable = modalEl.querySelectorAll('a, button, input, textarea, select, [tabindex]:not([tabindex="-1"])');
+    if (focusable.length) focusable[0].focus();
+  }
+
+  function openModal(target) {
+    const backdrop = document.querySelector(target);
+    if (!backdrop) return;
+
+    lastFocused = document.activeElement;
+    backdrop.setAttribute('aria-hidden', 'false');
+    disableScroll();
+    // body 클릭 닫기
+    backdrop.addEventListener('mousedown', onBackdropMouseDown);
+    // ESC 닫기
+    document.addEventListener('keydown', onKeydown);
+    // 포커스 트랩
+    setTimeout(() => trapFocus(backdrop), 0);
+  }
+
+  function closeModal(backdrop) {
+    backdrop.setAttribute('aria-hidden', 'true');
+    enableScroll();
+    backdrop.removeEventListener('mousedown', onBackdropMouseDown);
+    document.removeEventListener('keydown', onKeydown);
+    if (lastFocused && typeof lastFocused.focus === 'function') {
+      lastFocused.focus();
+    }
+  }
+
+  function onBackdropMouseDown(e) {
+    const backdrop = e.currentTarget;
+    const dialog = backdrop.querySelector('.modal');
+    const clickedInside = dialog.contains(e.target);
+    if (!clickedInside) closeModal(backdrop);
+  }
+
+  function onKeydown(e) {
+    if (e.key === 'Escape') {
+      const opened = document.querySelector('.modal-backdrop[aria-hidden="false"]');
+      if (opened) closeModal(opened);
+    }
+  }
+
+  // open 버튼
+  openButtons.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const target = btn.getAttribute('data-open-modal');
+      openModal(target);
+    });
+  });
+
+  // close 버튼
+  document.querySelectorAll(closeSelectors).forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      const backdrop = e.target.closest('.modal-backdrop');
+      if (backdrop) closeModal(backdrop);
+    });
+  });
+})();
