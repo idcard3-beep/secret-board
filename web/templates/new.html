@@ -59,11 +59,15 @@
         margin: 0;
       }
       .modal__close {
-        border: 0;
-        background: transparent;
-        cursor: pointer;
-        font-size: 20px;
-        line-height: 1;
+        .agreement-row {
+          display: inline-flex;
+          gap: 8px;
+          align-items: center;
+          margin-bottom: 18px;
+        }
+        .agreement-row .btn {
+          margin-left: 0;
+        }
         padding: 4px 8px;
       }
       .modal__body {
@@ -185,29 +189,33 @@
         </div>
 
         <div class="agreement-row">
-          <strong>▶ 이용약관</strong>
-          <button
-            type="button"
-            class="btn"
-            data-open-modal="#termsModal"
-            aria-haspopup="dialog"
-            aria-controls="termsModal"
+          <strong
+            >▶ 이용약관
+            <button
+              type="button"
+              class="btn"
+              data-open-modal="#termsModal"
+              aria-haspopup="dialog"
+              aria-controls="termsModal"
+            >
+              상세보기
+            </button></strong
           >
-            상세보기
-          </button>
         </div>
 
         <div class="agreement-row">
-          <strong>▶ 개인정보 수집/이용 동의</strong>
-          <button
-            type="button"
-            class="btn"
-            data-open-modal="#privacyModal"
-            aria-haspopup="dialog"
-            aria-controls="privacyModal"
+          <strong
+            >▶ 개인정보 수집/이용 동의
+            <button
+              type="button"
+              class="btn"
+              data-open-modal="#privacyModal"
+              aria-haspopup="dialog"
+              aria-controls="privacyModal"
+            >
+              상세보기
+            </button></strong
           >
-            상세보기
-          </button>
         </div>
 
         <!-- 동의 체크박스 -->
