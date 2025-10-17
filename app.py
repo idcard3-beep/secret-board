@@ -5,6 +5,11 @@ import os
 # .env 파일 로드
 load_dotenv()
 
+# 서버 DATABASE_URL 강제 설정 (로컬에서 서버 DB 사용)
+if not os.getenv("DATABASE_URL"):
+    os.environ["DATABASE_URL"] = "postgresql://secretboard_user:xToIsayLLO9nFmeiAPChiF96d3khj8Eq@dpg-d3nhsdadbo4c73d0dehg-a.singapore-postgres.render.com/secretboard_fyqs"
+    print("🔧 DATABASE_URL 환경변수 강제 설정 완료")
+
 from api.tickets import bp as tickets_bp
 from api.messages import bp as messages_bp
 from api.admin import bp as admin_bp

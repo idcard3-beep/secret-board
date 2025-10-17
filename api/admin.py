@@ -11,6 +11,22 @@ ADMIN_SESSION_KEY = 'admin_logged_in'
 def require_admin():
     return bool(session.get(ADMIN_SESSION_KEY))
 
+def get_current_admin():
+    """현재 로그인한 관리자 정보 반환"""
+    if not session.get(ADMIN_SESSION_KEY):
+        return None
+    
+    username = session.get('admin_username')
+    if not username:
+        return None
+    
+    try:
+        admin_user = repo.get_admin_user(username)
+        return admin_user
+    except Exception as e:
+        print(f"❌ 현재 관리자 정보 조회 실패: {e}")
+        return None
+
 @bp.post('/login')
 def login():
     d = request.get_json() or {}
@@ -56,11 +72,13 @@ def login():
     # 로그인 성공
     print(f"✅ 관리자 로그인 성공: {username}")
     session[ADMIN_SESSION_KEY] = True
+    session['admin_username'] = username  # 사용자명 저장
     return jsonify({'ok': True, 'message': '로그인 성공'})
 
 @bp.post('/logout')
 def logout():
     session.pop(ADMIN_SESSION_KEY, None)
+    session.pop('admin_username', None)  # 사용자명도 제거
     return jsonify({'ok': True})
 
 @bp.get('/tickets')
@@ -205,22 +223,31 @@ def admin_reply(ticket_id):
         
         print(f"✅ 티켓 존재 확인: {existing_ticket.get('title', 'No Title')}")
         
-        # 2. 메시지 생성 (상태 업데이트 포함)
+        # 2. 현재 로그인한 관리자 정보 가져오기
+        current_admin = get_current_admin()
+        if not current_admin:
+            print("❌ 현재 관리자 정보를 가져올 수 없음")
+            return jsonify({'error': '관리자 정보를 확인할 수 없습니다.'}), 500
+        
+        admin_role = current_admin.get('role', 'ADMIN')  # 기본값 ADMIN
+        print(f"👤 현재 관리자 role: {admin_role}")
+        
+        # 3. 메시지 생성 (관리자의 실제 role 사용)
         message_data = {
             'ticket_id': ticket_id,
             'content': content,
-            'role': 'ADMIN'
+            'role': admin_role  # admin_users 테이블의 role 필드값 사용
         }
         
         print(f"📨 메시지 생성 중...")
         message_id = repo.create_message(message_data)
         print(f"✅ 메시지 생성 완료: {message_id}")
         
-        # 3. 강제로 상태 업데이트 재확인
+        # 4. 강제로 상태 업데이트 재확인
         print("🔄 강제 상태 업데이트 실행...")
         repo.mark_has_admin_reply(ticket_id)
         
-        # 4. 최종 상태 확인
+        # 5. 최종 상태 확인
         final_ticket = repo.get_ticket(ticket_id)
         if final_ticket:
             final_status = final_ticket.get('status', 'UNKNOWN')
