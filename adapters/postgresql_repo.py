@@ -385,6 +385,7 @@ class PostgreSQLRepo:
         with self._get_connection() as conn:
             with conn.cursor() as cursor:
                 # 1. 메시지 생성
+                print(f"📥 DB에 INSERT 할 role 값: {role}")
                 cursor.execute("""
                     INSERT INTO thread_messages (ticket_id, content_enc, role)
                     VALUES (%s::uuid, %s, %s)

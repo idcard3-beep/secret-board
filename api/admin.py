@@ -11,22 +11,6 @@ ADMIN_SESSION_KEY = 'admin_logged_in'
 def require_admin():
     return bool(session.get(ADMIN_SESSION_KEY))
 
-def get_current_admin():
-    """현재 로그인한 관리자 정보 반환"""
-    if not session.get(ADMIN_SESSION_KEY):
-        return None
-    
-    username = session.get('admin_username')
-    if not username:
-        return None
-    
-    try:
-        admin_user = repo.get_admin_user(username)
-        return admin_user
-    except Exception as e:
-        print(f"❌ 현재 관리자 정보 조회 실패: {e}")
-        return None
-
 @bp.post('/login')
 def login():
     d = request.get_json() or {}
@@ -73,12 +57,15 @@ def login():
     print(f"✅ 관리자 로그인 성공: {username}")
     session[ADMIN_SESSION_KEY] = True
     session['admin_username'] = username  # 사용자명 저장
+    session['admin_role'] = user.get('role', 'ADMIN')  # role 저장
+    print(f"👤 세션에 저장된 role: {session['admin_role']}")
     return jsonify({'ok': True, 'message': '로그인 성공'})
 
 @bp.post('/logout')
 def logout():
     session.pop(ADMIN_SESSION_KEY, None)
     session.pop('admin_username', None)  # 사용자명도 제거
+    session.pop('admin_role', None)  # role도 제거
     return jsonify({'ok': True})
 
 @bp.get('/tickets')
@@ -223,25 +210,48 @@ def admin_reply(ticket_id):
         
         print(f"✅ 티켓 존재 확인: {existing_ticket.get('title', 'No Title')}")
         
-        # 2. 현재 로그인한 관리자 정보 가져오기
-        current_admin = get_current_admin()
-        if not current_admin:
-            print("❌ 현재 관리자 정보를 가져올 수 없음")
-            return jsonify({'error': '관리자 정보를 확인할 수 없습니다.'}), 500
-        
-        admin_role = current_admin.get('role', 'ADMIN')  # 기본값 ADMIN
-        print(f"👤 현재 관리자 role: {admin_role}")
-        
-        # 3. 메시지 생성 (관리자의 실제 role 사용)
+        # 2. 세션에서 관리자 role 그대로 가져오기
+        try:
+            # 관리자 계정의 최신 role은 DB의 admin_users 테이블에서 가져옵니다.
+            username = session.get('admin_username')
+            admin_role = None
+            if username:
+                try:
+                    admin_user = repo.get_admin_user(username)
+                    if admin_user and 'role' in admin_user:
+                        admin_role = admin_user.get('role')
+                        print(f"👤 DB에서 admin_users.role 가져옴 - username={username}, role={admin_role}")
+                    else:
+                        print(f"⚠️ admin 사용자 조회는 되었지만 role 필드 없음 - username={username}")
+                except Exception as db_e:
+                    print(f"❌ admin 사용자 조회 중 오류: {db_e}")
+
+            # 폴백: 세션에 저장된 값이나 기본 'ADMIN' 사용
+            if admin_role is None:
+                admin_role = session.get('admin_role', 'ADMIN')
+                print(f"👤 DB에서 role을 못가져와 세션/기본값 사용: {admin_role}")
+            # ensure it's a string (no transformation of case)
+            admin_role = str(admin_role)
+        except Exception as role_e:
+            print(f"⚠️ 관리자 role 결정 중 오류, 기본값 사용: {role_e}")
+            admin_role = 'ADMIN'
+
+        # 3. 메시지 생성 (세션의 role 값을 변환 없이 그대로 저장)
         message_data = {
             'ticket_id': ticket_id,
             'content': content,
-            'role': admin_role  # admin_users 테이블의 role 필드값 사용
+            'role': admin_role
         }
         
-        print(f"📨 메시지 생성 중...")
-        message_id = repo.create_message(message_data)
-        print(f"✅ 메시지 생성 완료: {message_id}")
+        try:
+            print(f"📨 메시지 생성 중... message_data.role={message_data.get('role')}")
+            message_id = repo.create_message(message_data)
+            print(f"✅ 메시지 생성 완료: {message_id}")
+        except Exception as msg_e:
+            print(f"❌ 메시지 생성 중 오류: {msg_e}")
+            import traceback
+            print(traceback.format_exc())
+            return jsonify({'error': f'메시지 생성 중 오류: {str(msg_e)}'}), 500
         
         # 4. 강제로 상태 업데이트 재확인
         print("🔄 강제 상태 업데이트 실행...")
