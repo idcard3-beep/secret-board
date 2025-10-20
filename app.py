@@ -62,6 +62,37 @@ def page_admin_list(): return render_template("admin_list.html")
 @app.route("/admin_view")
 def page_admin_view(): return render_template("admin_view.html")
 
+# 추가 Pages - 회원가입, 로그인, 비밀번호 변경, 회원 탈퇴, 회원 정보 수정, 회원 정보 조회
+#@app.route("/main_index")
+#def page_main_index(): return render_template("main_index.html")
+
+@app.route('/main_index.html')
+def main_index(): return render_template('main_index.html')
+
+@app.route("/0101_Center_intro.html")
+def page_0101_Center_intro(): return render_template("0101_Center_intro.html")
+
+@app.route("/0102_greet.html")
+def page_0102_greet(): return render_template("0102_greet.html")
+
+@app.route("/0103_couns_expert.html")
+def page_0103_couns_expert(): return render_template("0103_couns_expert.html")
+
+@app.route("/0104_map.html")
+def page_0104_map(): return render_template("0104_map.html")
+
+@app.route("/0201_process.html")
+def page_0201_process(): return render_template("0201_process.html")
+
+@app.route("/0301_main_psychol.html")
+def page_0301_main_psychol(): return render_template("0301_main_psychol.html")
+
+@app.route("/0302_main_life.html")
+def page_0302_main_life(): return render_template("0302_main_life.html")
+#-----
+
+
+
 if __name__ == "__main__":
     os.makedirs(UPLOAD_ROOT, exist_ok=True)
     
