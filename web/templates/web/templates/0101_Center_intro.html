@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>나라톡톡 센터 소개</title>
+    <meta name="description" content="나라톡톡 심리상담센터 소개" />
+    <style>
+      /* ================== Theme Tokens ================== */
+      :root {
+        --bg: #ffffff;
+        --fg: #0f172a;
+        --muted: #556070;
+        --primary: #2563eb;
+        --secondary: #0ea5e9;
+        --card: #f8fafc;
+        --ring: #e5e7eb;
+        --ok: #10b981;
+        --warn: #f59e0b;
+        --shadow: 0 12px 36px rgba(2, 6, 23, 0.08);
+        --radius: 18px;
+        --focus: 0 0 0 3px
+          color-mix(in oklab, var(--secondary) 35%, transparent);
+      }
+      html.dark {
+        --bg: #0b1220;
+        --fg: #e5e7eb;
+        --muted: #9aa6b2;
+        --primary: #60a5fa;
+        --secondary: #38bdf8;
+        --card: #0f172a;
+        --ring: #1f2734;
+        --shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Pretendard,
+          Noto Sans KR, sans-serif;
+        letter-spacing: 0.1px;
+      }
+      a {
+        color: inherit;
+      }
+
+      /* ================== Layout ================== */
+      .progress {
+        position: fixed;
+        inset: 0 0 auto 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--primary), var(--secondary));
+        transform-origin: left center;
+        transform: scaleX(0);
+        z-index: 60;
+      }
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        backdrop-filter: saturate(180%) blur(8px);
+        background: color-mix(in oklab, var(--bg) 86%, transparent);
+        border-bottom: 1px solid var(--ring);
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 12px 20px;
+      }
+      .nav-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 800;
+        letter-spacing: 0.2px;
+      }
+      .brand .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+      }
+      .tools {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        border: 1px solid var(--ring);
+        background: var(--bg);
+        color: var(--fg);
+        padding: 10px 14px;
+        border-radius: 12px;
+        transition: 0.2s;
+        text-decoration: none;
+      }
+      .btn:hover {
+        box-shadow: var(--shadow);
+      }
+      .btn.primary {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: #fff;
+        border-color: transparent;
+      }
+      .btn.ghost {
+        background: transparent;
+      }
+      .ic {
+        width: 18px;
+        height: 18px;
+        display: inline-block;
+        flex: 0 0 18px;
+      }
+
+      main {
+        padding: 20px 0 40px;
+      }
+      .grid {
+        display: grid;
+        gap: 18px;
+        grid-template-columns: 1.05fr 0.95fr;
+      }
+      @media (max-width: 1024px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* ================== Card & Form ================== */
+      .card {
+        background: var(--card);
+        border: 1px solid var(--ring);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+      }
+      .panel {
+        padding: 20px;
+      }
+      .stack {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .two {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+      @media (max-width: 720px) {
+        .two {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      label {
+        font-weight: 600;
+        display: block;
+        margin: 4px 0 6px;
+      }
+      .muted {
+        color: var(--muted);
+        font-size: 13px;
+      }
+      input[type='text'],
+      input[type='url'],
+      input[type='tel'],
+      textarea,
+      select {
+        width: 100%;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: var(--bg);
+        border: 1px solid var(--ring);
+        color: var(--fg);
+        outline: none;
+        transition: 0.15s;
+      }
+      textarea {
+        min-height: 110px;
+        resize: vertical;
+      }
+      input:focus,
+      textarea:focus,
+      select:focus {
+        box-shadow: var(--focus);
+        border-color: color-mix(in oklab, var(--primary) 55%, var(--ring));
+      }
+      .help {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .divider {
+        height: 1px;
+        background: var(--ring);
+        margin: 10px 0;
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid var(--ring);
+        background: var(--bg);
+      }
+      .right-actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+
+      /* ================== Accordion ================== */
+      details {
+        border: 1px solid var(--ring);
+        border-radius: 14px;
+        background: var(--bg);
+        overflow: hidden;
+      }
+      details + details {
+        margin-top: 12px;
+      }
+      summary {
+        list-style: none;
+        cursor: pointer;
+        font-weight: 700;
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        user-select: none;
+      }
+      summary::-webkit-details-marker {
+        display: none;
+      }
+      details[open] summary {
+        border-bottom: 1px solid var(--ring);
+        background: color-mix(in oklab, var(--card) 88%, transparent);
+      }
+      .acc-body {
+        padding: 16px;
+      }
+
+      /* ================== Preview ================== */
+      .preview-wrap {
+        position: sticky;
+        top: 76px;
+      }
+      .hero {
+        padding: 20px;
+        border-bottom: 1px dashed var(--ring);
+        background: linear-gradient(
+          180deg,
+          color-mix(in oklab, var(--card) 92%, transparent),
+          transparent
+        );
+        border-top-left-radius: var(--radius);
+        border-top-right-radius: var(--radius);
+      }
+      .headline {
+        font-size: clamp(15px, 4.4vw, 25px);
+        line-height: 1.15;
+        margin: 0 0 8px;
+      }
+      .sub {
+        color: var(--muted);
+        font-size: clamp(14px, 2.4vw, 18px);
+        margin: 0;
+      }
+      .hero-media {
+        display: grid;
+        grid-template-columns: 1fr 160px;
+        gap: 14px;
+        align-items: center;
+      }
+      @media (max-width: 860px) {
+        .hero-media {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .logo {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        background: var(--bg);
+        border: 1px solid var(--ring);
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+      }
+      .logo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .heroimg {
+        width: 100%;
+        aspect-ratio: 16/9;
+        border: 1px solid var(--ring);
+        border-radius: 14px;
+        overflow: hidden;
+        background: #0001;
+      }
+      .heroimg img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .cta-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 12px;
+      }
+      .btn-sm {
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--ring);
+        background: var(--bg);
+      }
+      .btn-sm.primary {
+        background: linear-gradient(135deg, var(--primary), var(--secondary));
+        color: #fff;
+        border-color: transparent;
+      }
+      .section {
+        padding: 16px 20px;
+      }
+      h2 {
+        font-size: 20px;
+        margin: 0 0 10px;
+      }
+      p {
+        margin: 0 0 8px;
+      }
+
+      /* ================== Footer ================== */
+      footer {
+        padding: 26px 0 40px;
+        color: var(--muted);
+        font-size: 14px;
+      }
+    </style>
+    <link rel="stylesheet" href="/static/security.css" />
+  </head>
+  <body>
+    <div class="progress" id="progress"></div>
+
+    <header>
+      <div class="container nav-bar">
+        <div class="brand">
+          <span class="dot" aria-hidden="true"></span
+          ><span>나라톡톡 센터 소개</span>
+        </div>
+        <div class="tools">
+          <button class="btn ghost" id="expandAll">
+            <svg
+              class="ic"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            >
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+            모두 열기
+          </button>
+          <button class="btn ghost" id="collapseAll">
+            <svg
+              class="ic"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            >
+              <path d="M5 12h14" />
+            </svg>
+            모두 접기
+          </button>
+          <button class="btn" id="themeToggle" aria-label="테마 전환">
+            <svg
+              class="ic"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            >
+              <path
+                d="M12 3a9 9 0 0 0 0 18c4.97 0 9-4.03 9-9 0-4.28-3-7.86-6.98-8.78A7 7 0 1 1 12 21"
+              />
+            </svg>
+            테마
+          </button>
+          <button class="btn" id="saveBtn" style="display: none">
+            <svg
+              class="ic"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            >
+              <path d="M19 21H5a2 2 0 0 1-2-2V7l4-4h10l4 4v12a2 2 0 0 1-2 2z" />
+              <path d="M17 21v-8H7v8M7 3v4h10V3" />
+            </svg>
+            저장
+          </button>
+          <button class="btn" id="resetBtn" style="display: none">
+            <svg
+              class="ic"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            >
+              <path d="M21 12a9 9 0 1 1-3-6.7" />
+              <path d="M21 3v6h-6" />
+            </svg>
+            초기화
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="grid">
+        <!-- ================== LEFT: FORM ================== -->
+        <section class="card panel">
+          <form class="stack" id="introForm" novalidate>
+            <!-- 기본정보 -->
+            <details open>
+              <summary>
+                <svg
+                  class="ic"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                >
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M12 8v8M8 12h8" />
+                </svg>
+                기본 정보
+              </summary>
+              <div class="acc-body stack">
+                <div class="two">
+                  <div>
+                    <label for="centerName">센터명</label>
+                    <input
+                      id="centerName"
+                      type="text"
+                      required
+                      placeholder="예) 나라톡톡 심리상담센터"
+                      value="나라톡톡 심리상담센터"
+                    />
+                    <div class="help">필수 • 상단 로고 옆에 노출</div>
+                  </div>
+                  <div>
+                    <label for="tagline">한 줄 소개(슬로건)</label>
+                    <input
+                      id="tagline"
+                      type="text"
+                      maxlength="60"
+                      placeholder="과학적 심리학 × 동서양 통찰의 융합상담xx"
+                      value="과학적 심리학 × 동서양 통찰의 융합상담xxx"
+                    />
+                    <div class="help"><span id="tagCnt">0</span>/60</div>
+                  </div>
+                </div>
+                <div>
+                  <label for="summary">짧은 설명</label>
+                  <textarea
+                    id="summary"
+                    placeholder="센터의 핵심 가치를 2~3문장으로 적어주세요."
+                  >
+마음의 균형과 인생의 방향을 통합적으로 지원하는 융합 상담. 임상심리·동양역학·서양점성학 전문가가 협진합니다.</textarea
+                  >
+                </div>
+                <div class="two">
+                  <div>
+                    <label for="phone">대표 전화</label>
+                    <input
+                      id="phone"
+                      type="tel"
+                      placeholder="예) 010-0000-0000"
+                      value="010-9088-9196"
+                      pattern="^0\d{1,2}-?\d{3,4}-?\d{4}$"
+                    />
+                    <div class="help">숫자·하이픈 허용</div>
+                  </div>
+                  <div>
+                    <label for="reserveUrl">예약 URL</label>
+                    <input
+                      id="reserveUrl"
+                      type="url"
+                      placeholder="https://..."
+                      value="http://https://secret-board-04s6.onrender.com/"
+                    />
+                  </div>
+                </div>
+                <div class="two">
+                  <div>
+                    <label for="kakaoUrl">카카오 채널 URL</label>
+                    <input
+                      id="kakaoUrl"
+                      type="url"
+                      placeholder="https://open.kakao.com/..."
+                      value="https://open.kakao.com/o/gwPG9pOh"
+                    />
+                  </div>
+                  <div>
+                    <label for="area">서비스 지역</label>
+                    <input
+                      id="area"
+                      type="text"
+                      placeholder="예) 전국(원격) / 서울·경기 / 해외 상담"
+                    />
+                  </div>
+                </div>
+              </div>
+            </details>
+
+            <!-- 통합 모델 -->
+            <details open>
+              <summary>
+                <svg
+                  class="ic"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                >
+                  <path d="M3 12h18M12 3v18" />
+                  <circle cx="12" cy="12" r="9" />
+                </svg>
+                통합 모델 설명
+              </summary>
+              <div class="acc-body stack">
+                <div class="two">
+                  <div>
+                    <label for="psych">심리 축(요약)</label>
+                    <textarea id="psych">
+CBT·ACT·DBT, 객관적 검사로 정서안정·관계회복을 돕습니다.</textarea
+                    >
+                  </div>
+                  <div>
+                    <label for="east">동양 축(요약)</label>
+                    <textarea id="east">
+사주·주역·육효·만세력으로 기질과 시운의 흐름을 해석합니다.</textarea
+                    >
+                  </div>
+                </div>
+                <div>
+                  <label for="west">서양 축(요약)</label>
+                  <textarea id="west">
+천궁도·행성주기 분석으로 잠재력과 방향성을 설계합니다.</textarea
+                  >
+                </div>
+              </div>
+            </details>
+
+            <!-- 프로그램/특장점 -->
+            <details open>
+              <summary>
+                <svg
+                  class="ic"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                >
+                  <path d="M4 7h16M4 12h16M4 17h16" />
+                </svg>
+                프로그램 & 특장점
+              </summary>
+              <div class="acc-body stack">
+                <div class="two">
+                  <div>
+                    <label for="programs">프로그램(쉼표 구분)</label>
+                    <input
+                      id="programs"
+                      type="text"
+                      value="정서안정(우울·불안·번아웃), 관계회복(부부·가족·직장), 자기이해(성향·가치·강점), 인생전환(진로·이직·결혼·재운), 성장·명상(마음챙김·주역명상)"
+                    />
+                  </div>
+                  <div>
+                    <label for="ethics">윤리·안내(짧게)</label>
+                    <input
+                      id="ethics"
+                      type="text"
+                      value="비밀보장 · 과도한 예언 금지 · 필요 시 의료/법률 연계"
+                    />
+                  </div>
+                </div>
+              </div>
+            </details>
+
+            <!-- 이미지/브랜딩 -->
+            <details open>
+              <summary>
+                <svg
+                  class="ic"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                >
+                  <path
+                    d="M4 7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"
+                  />
+                  <path d="m8 13 2-2 2 2 3-3 3 3" />
+                  <circle cx="9" cy="9" r="1" />
+                </svg>
+                이미지 & 브랜딩
+              </summary>
+              <div class="acc-body stack">
+                <div class="two">
+                  <div>
+                    <label for="logo">로고 이미지</label>
+                    <input id="logo" type="file" accept="image/*" />
+                    <div class="help">정사각형 권장(최소 256×256)</div>
+                  </div>
+                  <div>
+                    <label for="hero">히어로 이미지</label>
+                    <input id="hero" type="file" accept="image/*" />
+                    <div class="help">가로형 권장(16:9)</div>
+                  </div>
+                </div>
+                <div class="two">
+                  <div>
+                    <label for="primaryColor">메인 색상</label>
+                    <input
+                      id="primaryColor"
+                      type="text"
+                      placeholder="#2563eb"
+                      value="#2563eb"
+                    />
+                  </div>
+                  <div>
+                    <label for="secondaryColor">포인트 색상</label>
+                    <input
+                      id="secondaryColor"
+                      type="text"
+                      placeholder="#0ea5e9"
+                      value="#0ea5e9"
+                    />
+                  </div>
+                </div>
+              </div>
+            </details>
+
+            <!-- 액션 -->
+            <div class="row" style="justify-content: flex-end">
+              <button type="button" class="btn primary" id="applyBtn">
+                <svg
+                  class="ic"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                >
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+                미리보기 반영
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- ================== RIGHT: PREVIEW ================== -->
+        <aside class="card preview-wrap" aria-live="polite">
+          <div class="hero">
+            <div
+              class="row"
+              style="align-items: center; justify-content: space-between"
+            >
+              <div class="row" style="align-items: center">
+                <div class="logo" id="logoBox" aria-label="센터 로고">
+                  <svg class="ic" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="12" r="10" />
+                  </svg>
+                </div>
+                <div style="margin-left: 10px">
+                  <div class="row" style="align-items: center; gap: 10px">
+                    <strong id="p_name" style="font-size: 20px"
+                      >나라톡톡 심리상담센터</strong
+                    >
+                    <span class="pill muted" id="p_area"> </span>
+                  </div>
+                  <div class="muted" id="p_tag" style="margin-top: 2px">
+                    과학적 심리학 × 동서양 통찰의 융합상담xxxx
+                  </div>
+                </div>
+              </div>
+              <div class="right-actions">
+                <!-- 예약 → 전화 → 카카오 -->
+                <a
+                  class="btn-sm primary"
+                  id="p_reserve"
+                  target="_blank"
+                  rel="noopener"
+                  href="http://https://secret-board-04s6.onrender.com/"
+                >
+                  <svg
+                    class="ic"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  >
+                    <rect x="3" y="4" width="18" height="16" rx="4" />
+                    <path d="M8 7h8M6 11h12M8 15h8" />
+                  </svg>
+                  예약
+                </a>
+                <a class="btn-sm" id="p_phone" href="tel:010-9088-9196">
+                  <svg
+                    class="ic"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  >
+                    <path
+                      d="M22 16.92v2a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.08 4.18 2 2 0 0 1 4.06 2h2a2 2 0 0 1 2 1.72c.12.9.33 1.77.64 2.6a2 2 0 0 1-.45 2.11L7.1 9.9a16 16 0 0 0 6 6l1.47-1.17a2 2 0 0 1 2.11-.45c.83.31 1.7.52 2.6.64A2 2 0 0 1 22 16.92z"
+                    />
+                  </svg>
+                  전화
+                </a>
+                <a
+                  class="btn-sm"
+                  id="p_kakao"
+                  target="_blank"
+                  rel="noopener"
+                  href="https://open.kakao.com/o/gwPG9pOh"
+                >
+                  <svg class="ic" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                      d="M12 3C6.48 3 2 6.78 2 11.22c0 2.77 1.78 5.22 4.47 6.75L5.7 21.6a.6.6 0 0 0 .85.69L10.6 20h.03c.45.06.91.09 1.37.09 5.52 0 10-3.78 10-8.22S17.52 3 12 3z"
+                    />
+                  </svg>
+                  카카오
+                </a>
+              </div>
+            </div>
+            <div class="hero-media" style="margin-top: 14px">
+              <div>
+                <h1 class="headline" id="p_headline">
+                  마음의 균형과 인생의 방향을 한 번에
+                </h1>
+                <p class="sub" id="p_summary">
+                  마음의 균형과 인생의 방향을 통합적으로 지원하는 융합 상담.
+                  임상심리·동양역학·서양점성학 전문가가 협진합니다.
+                </p>
+                <div class="row" style="margin-top: 10px">
+                  <span class="pill muted" id="p_psych"
+                    >CBT·ACT·DBT, 객관적 검사로 정서안정·관계회복을
+                    돕습니다.</span
+                  >
+                  <span class="pill muted" id="p_east"
+                    >사주·주역·육효·만세력으로 기질과 시운의 흐름을
+                    해석합니다.</span
+                  >
+                  <span class="pill muted" id="p_west"
+                    >천궁도·행성주기 분석으로 잠재력과 방향성을
+                    설계합니다.</span
+                  >
+                </div>
+              </div>
+              <div class="heroimg" id="heroBox" aria-label="히어로 이미지">
+                <!-- 이미지 프리뷰 -->
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <h2>프로그램</h2>
+            <p id="p_programs">
+              정서안정(우울·불안·번아웃), 관계회복(부부·가족·직장),
+              자기이해(성향·가치·강점), 인생전환(진로·이직·결혼·재운),
+              성장·명상(마음챙김·주역명상)
+            </p>
+            <div class="divider"></div>
+            <h2>윤리 · 안내</h2>
+            <p class="muted" id="p_ethics">
+              비밀보장 · 과도한 예언 금지 · 필요 시 의료/법률 연계
+            </p>
+          </div>
+
+          <div class="section">
+            <div class="row" style="gap: 12px; flex-wrap: wrap">
+              <span class="pill"
+                ><strong>전화</strong>&nbsp;<span id="p_phone_text"
+                  >010-9088-9196</span
+                ></span
+              >
+              <span class="pill"
+                ><strong>예약</strong>&nbsp;<span id="p_reserve_text"
+                  >https://secret-board-04s6.onrender.com</span
+                ></span
+              >
+              <span class="pill"
+                ><strong>카카오</strong>&nbsp;<span id="p_kakao_text"
+                  >오픈채널</span
+                ></span
+              >
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="divider"></div>
+        <div class="row" style="justify-content: space-between">
+          <span>© <span id="year"></span> 나라톡톡</span>
+          <span class="muted">상담센터 나라톡톡</span>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      // ================== Utilities ==================
+      const $ = (sel) => document.querySelector(sel);
+      const els = (sel) => Array.from(document.querySelectorAll(sel));
+
+      // Year
+      $('#year').textContent = new Date().getFullYear();
+
+      // Progress bar
+      const progress = $('#progress');
+      function setProgress() {
+        const h = document.documentElement;
+        const max = h.scrollHeight - h.clientHeight;
+        progress.style.transform = `scaleX(${max > 0 ? h.scrollTop / max : 0})`;
+      }
+      document.addEventListener('scroll', setProgress, { passive: true });
+      setProgress();
+
+      // Theme toggle
+      (function () {
+        const root = document.documentElement;
+        const saved = localStorage.getItem('ntt-theme');
+        if (saved === 'dark') root.classList.add('dark');
+        $('#themeToggle').addEventListener('click', () => {
+          root.classList.toggle('dark');
+          localStorage.setItem(
+            'ntt-theme',
+            root.classList.contains('dark') ? 'dark' : 'light'
+          );
+        });
+      })();
+
+      // Accordion controls
+      $('#expandAll').addEventListener('click', () =>
+        els('details').forEach((d) => (d.open = true))
+      );
+      $('#collapseAll').addEventListener('click', () =>
+        els('details').forEach((d) => (d.open = false))
+      );
+
+      // Form refs
+      const F = {
+        name: $('#centerName'),
+        tag: $('#tagline'),
+        sum: $('#summary'),
+        phone: $('#phone'),
+        reserve: $('#reserveUrl'),
+        kakao: $('#kakaoUrl'),
+        area: $('#area'),
+        psych: $('#psych'),
+        east: $('#east'),
+        west: $('#west'),
+        programs: $('#programs'),
+        ethics: $('#ethics'),
+        logo: $('#logo'),
+        hero: $('#hero'),
+        pc: $('#primaryColor'),
+        sc: $('#secondaryColor'),
+      };
+
+      // Preview refs
+      const P = {
+        name: $('#p_name'),
+        tag: $('#p_tag'),
+        summary: $('#p_summary'),
+        area: $('#p_area'),
+        psych: $('#p_psych'),
+        east: $('#p_east'),
+        west: $('#p_west'),
+        programs: $('#p_programs'),
+        ethics: $('#p_ethics'),
+        phoneBtn: $('#p_phone'),
+        reserveBtn: $('#p_reserve'),
+        kakaoBtn: $('#p_kakao'),
+        phoneText: $('#p_phone_text'),
+        reserveText: $('#p_reserve_text'),
+        kakaoText: $('#p_kakao_text'),
+        headline: $('#p_headline'),
+        logoBox: $('#logoBox'),
+        heroBox: $('#heroBox'),
+      };
+
+      // Counters
+      const tagCnt = $('#tagCnt');
+      const countTag = () => (tagCnt.textContent = String(F.tag.value.length));
+      F.tag.addEventListener('input', countTag);
+      countTag();
+
+      // URL Host extractor
+      function host(u) {
+        try {
+          return new URL(u).host.replace(/^www\./, '');
+        } catch (e) {
+          return u;
+        }
+      }
+
+      // Image preview
+      function loadImage(file, target) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (target === 'logo') {
+            P.logoBox.innerHTML = `<img alt="로고" src="${e.target.result}">`;
+          } else {
+            P.heroBox.innerHTML = `<img alt="히어로" src="${e.target.result}">`;
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+      F.logo.addEventListener('change', () =>
+        loadImage(F.logo.files[0], 'logo')
+      );
+      F.hero.addEventListener('change', () =>
+        loadImage(F.hero.files[0], 'hero')
+      );
+
+      // Apply to preview
+      function apply() {
+        // colors
+        if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(F.pc.value)) {
+          document.documentElement.style.setProperty('--primary', F.pc.value);
+        }
+        if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(F.sc.value)) {
+          document.documentElement.style.setProperty('--secondary', F.sc.value);
+        }
+
+        P.name.textContent = F.name.value || '센터명';
+        P.tag.textContent = F.tag.value || '';
+        P.summary.textContent = F.sum.value || '';
+        P.area.textContent = F.area.value || '';
+        P.psych.textContent = F.psych.value || '';
+        P.east.textContent = F.east.value || '';
+        P.west.textContent = F.west.value || '';
+        P.programs.textContent = F.programs.value || '';
+        P.ethics.textContent = F.ethics.value || '';
+
+        // Headline는 요약 첫 문장 또는 슬로건
+        P.headline.textContent =
+          F.tag.value.trim() || F.sum.value.split(/[.!?]\s/)[0] || '센터 소개';
+
+        // 연락/링크
+        const phoneClean = F.phone.value.replace(/[^0-9]/g, '');
+        if (phoneClean.length >= 9) {
+          P.phoneBtn.href = `tel:${F.phone.value}`;
+          P.phoneText.textContent = F.phone.value;
+        }
+        if (F.reserve.value) {
+          P.reserveBtn.href = F.reserve.value;
+          P.reserveText.textContent = host(F.reserve.value);
+        }
+        if (F.kakao.value) {
+          P.kakaoBtn.href = F.kakao.value;
+          P.kakaoText.textContent = host(F.kakao.value);
+        }
+
+        // Save
+        save();
+      }
+
+      // Live bind (debounced)
+      let t;
+      function deb(fn) {
+        clearTimeout(t);
+        t = setTimeout(fn, 120);
+      }
+      els(
+        '#introForm input[type="text"], #introForm input[type="url"], #introForm input[type="tel"], #introForm textarea'
+      ).forEach((el) => {
+        el.addEventListener('input', () => deb(apply));
+      });
+
+      $('#applyBtn').addEventListener('click', apply);
+
+      // Save/Load
+      const KEY = 'ntt-center-intro-v1';
+      function save() {
+        const data = {
+          name: F.name.value,
+          tag: F.tag.value,
+          sum: F.sum.value,
+          phone: F.phone.value,
+          reserve: F.reserve.value,
+          kakao: F.kakao.value,
+          area: F.area.value,
+          psych: F.psych.value,
+          east: F.east.value,
+          west: F.west.value,
+          programs: F.programs.value,
+          ethics: F.ethics.value,
+          pc: F.pc.value,
+          sc: F.sc.value,
+        };
+        localStorage.setItem(KEY, JSON.stringify(data));
+      }
+      function load() {
+        const raw = localStorage.getItem(KEY);
+        if (!raw) return;
+        try {
+          const d = JSON.parse(raw);
+          Object.entries(d).forEach(([k, v]) => {
+            if (F[k] && typeof F[k].value !== 'undefined') F[k].value = v;
+          });
+        } catch (e) {}
+      }
+      function resetData() {
+        localStorage.removeItem(KEY);
+        location.reload();
+      }
+      $('#saveBtn').addEventListener('click', () => {
+        save();
+        alert('저장되었습니다. (브라우저 로컬 저장소)');
+      });
+      $('#resetBtn').addEventListener('click', resetData);
+
+      // Init
+      load();
+      apply();
+    </script>
+    <script src="/static/security.js"></script>
+  </body>
+</html>

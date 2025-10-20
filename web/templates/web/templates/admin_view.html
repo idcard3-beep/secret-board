@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>관리자 - 상담 상세</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="/static/security.css" />
+    <style>
+      .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding: 15px 0;
+        border-bottom: 2px solid #e9ecef;
+      }
+
+      .admin-title {
+        margin: 0;
+        color: #333;
+      }
+
+      .nav-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        font-size: 14px;
+      }
+
+      .nav-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+
+      .nav-button::before {
+        content: '← ';
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- MSSQL 상태 표시 -->
+    <div
+      style="
+        background-color: #e3f2fd;
+        padding: 10px;
+        text-align: center;
+        border: 1px solid #2196f3;
+        margin-bottom: 20px;
+      "
+    >
+      <span style="color: #1976d2; font-weight: bold"
+        >🗄️ 상담 요청 (관리자 답변 달기)</span
+      >
+    </div>
+
+    <div class="admin-header">
+      <h2 class="admin-title">관리자 - 상담 상세</h2>
+      <a href="/admin_list" class="nav-button">상담요청 목록</a>
+    </div>
+    <div id="meta"></div>
+    <article id="content" class="card"></article>
+    <section class="card">
+      <h3>스레드</h3>
+      <div id="thread"></div>
+      <textarea
+        id="adminReply"
+        placeholder="관리자 답변을 입력하세요"
+        rows="4"
+      ></textarea
+      ><br />
+      <div style="margin-top: 15px">
+        <button onclick="sendAdminReply()" style="margin-right: 10px">
+          답변 등록
+        </button>
+        <a
+          href="/admin_list"
+          class="nav-button"
+          style="text-decoration: none; display: inline-flex"
+          >목록으로 돌아가기</a
+        >
+      </div>
+    </section>
+    <script src="/static/admin_view.js"></script>
+    <script src="/static/security.js"></script>
+  </body>
+</html>
