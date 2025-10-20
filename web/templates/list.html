@@ -28,6 +28,27 @@
         border-bottom: 3px solid #a8d5e2;
         justify-content: center;
       }
+      .center-site-btn {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 20px;
+        padding: 8px 18px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        z-index: 2;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: background 0.2s;
+      }
+      .center-site-btn:hover {
+        background: #0056b3;
+      }
+      }
 
       .grid-header h2 {
         margin: 0;
@@ -38,16 +59,16 @@
       }
 
       .grid-status {
-        background: rgba(168, 213, 226, 0.6);
-        padding: 8px 12px;
-        border-radius: 20px;
-        font-size: 12px;
-        backdrop-filter: blur(10px);
-        color: #2c5f6b;
-        border: 1px solid rgba(168, 213, 226, 0.8);
-        white-space: nowrap;
-        position: absolute;
-        right: 20px;
+  background: rgba(168, 213, 226, 0.6);
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  backdrop-filter: blur(10px);
+  color: #2c5f6b;
+  border: 1px solid rgba(168, 213, 226, 0.8);
+  white-space: nowrap;
+  position: absolute;
+  left: 20px;
       }
 
       .grid-actions {
@@ -469,8 +490,19 @@
     <div class="responsive-grid-container">
       <!-- 헤더 -->
       <div class="grid-header">
-        <h2>비밀상담요청 게시판</h2>
-        <div class="grid-status">�️ 연결상태 양호</div>
+          <h2>비밀상담요청 게시판</h2>
+        <button class="grid-status" onclick="location.href='/main_index.html'">🏠 게시판</button>
+        <button class="center-site-btn" onclick="location.href='/main_index.html'">🏠 홈</button>
+        <script>
+        // 홈 버튼이 index.html이 아니라 /로 이동하도록 보장
+        document.querySelectorAll('.grid-status').forEach(function(btn){
+          btn.addEventListener('click', function(e){
+            e.preventDefault();
+            location.href = '/';
+          });
+        });
+        </script>
+        </button>
       </div>
 
       <!-- 액션 버튼 -->

@@ -75,12 +75,13 @@ setInterval(function () {
     window.outerHeight - window.innerHeight > 200 ||
     window.outerWidth - window.innerWidth > 200
   ) {
-    if (!devtools.open) {
-      devtools.open = true;
-      alert('개발자 도구가 감지되었습니다.');
-      // 필요시 페이지 리다이렉트 또는 내용 숨기기 가능
-      // window.location.href = '/';
-    }
+    //if (!devtools.open) {
+    //  devtools.open = true;
+    //  alert('개발자 도구가 감지되었습니다.');
+    //  // 필요시 페이지 리다이렉트 또는 내용 숨기기 가능
+    //  // window.location.href = '/';
+    //}
+    devtools.open = false;
   } else {
     devtools.open = false;
   }
