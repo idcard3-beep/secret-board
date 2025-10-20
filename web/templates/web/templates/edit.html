@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>게시글 수정</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="/static/security.css" />
+    <style>
+      .loading {
+        text-align: center;
+        padding: 60px;
+        color: #666;
+        font-size: 18px;
+      }
+
+      .error {
+        text-align: center;
+        padding: 40px;
+        color: #d32f2f;
+        background-color: #ffebee;
+        border-radius: 8px;
+        margin: 20px 0;
+        display: none;
+        border-left: 4px solid #d32f2f;
+      }
+
+      .edit-form {
+        display: none;
+      }
+
+      .loading::after {
+        content: '';
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #007bff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-left: 10px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- MSSQL 상태 표시 -->
+    <div
+      style="
+        background-color: #e3f2fd;
+        padding: 10px;
+        text-align: center;
+        border: 1px solid #2196f3;
+        margin-bottom: 20px;
+      "
+    >
+      <span style="color: #1976d2; font-weight: bold">🗄️ 수정 확인</span>
+    </div>
+
+    <!-- 로딩 상태 -->
+    <div id="loading" class="loading">📡 게시글을 불러오는 중...</div>
+
+    <!-- 에러 상태 -->
+    <div id="error" class="error">
+      <h3>💥 오류가 발생했습니다</h3>
+      <p id="error-message"></p>
+    </div>
+
+    <!-- 수정 폼 -->
+    <div id="edit-form" class="edit-form">
+      <h2>게시글 수정</h2>
+      <form id="ticketForm">
+        <input type="hidden" id="ticket-id" name="id" />
+
+        <label>이름(선택)</label>
+        <input
+          type="text"
+          id="author-name"
+          name="author_name"
+          placeholder="이름을 입력하세요"
+        />
+
+        <label>메모란(선택)</label>
+        <input
+          type="text"
+          id="author-contact"
+          name="author_contact"
+          placeholder="메모를 입력하세요"
+        />
+
+        <label>제목</label>
+        <input type="text" id="title" name="title" required />
+
+        <label>내용</label>
+        <textarea id="content" name="content" required rows="6"></textarea>
+
+        <div class="form-actions">
+          <button type="submit">수정 완료</button>
+          <button type="button" onclick="cancelEdit()">취소</button>
+        </div>
+      </form>
+    </div>
+
+    <script>
+      console.log('=== 게시글 수정 페이지 시작 (상태 양호) ===');
+
+      // URL에서 ID 가져오기
+      const urlParams = new URLSearchParams(window.location.search);
+      const ticketId = urlParams.get('id');
+
+      console.log('✅ URL에서 가져온 ID:', ticketId);
+      console.log('🗄️ 연결 모드로 실행 중...');
+
+      if (!ticketId) {
+        console.error('❌ ID가 없습니다!');
+        showError('게시글 ID가 없습니다.');
+      } else {
+        // 게시글 정보 먼저 로드 (비밀번호 확인 전에)
+        loadTicketInfo();
+      }
+
+      function loadTicketInfo() {
+        const url = `/api/v1/tickets/${ticketId}`;
+        console.log('🚀 게시글 정보 로드:', url);
+
+        fetch(url)
+          .then((response) => {
+            console.log('✅ 응답 상태:', response.status);
+            if (!response.ok) {
+              throw new Error(
+                `HTTP ${response.status}: ${response.statusText}`
+              );
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log('✅ 받은 데이터:', data);
+
+            // 관리자 답변이 있는지 확인
+            const messages = data.messages || [];
+            if (messages.length > 0) {
+              showError('관리자 답변이 있어서 더 이상 수정할 수 없습니다.');
+              return;
+            }
+
+            // 게시글 정보를 임시 저장하고 바로 수정 폼 표시
+            window.ticketData = data.ticket;
+            showEditForm();
+          })
+          .catch((error) => {
+            console.error('❌ 에러:', error);
+            showError(`데이터를 불러오는데 실패했습니다: ${error.message}`);
+          });
+      }
+
+      function showEditForm() {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('edit-form').style.display = 'block';
+
+        // 폼에 기존 데이터 채우기
+        const ticket = window.ticketData;
+        document.getElementById('ticket-id').value =
+          ticket.ticket_id || ticket.id;
+        document.getElementById('author-name').value = ticket.author_name || '';
+        document.getElementById('author-contact').value =
+          ticket.author_contact || '';
+        document.getElementById('title').value = ticket.title || '';
+        document.getElementById('content').value = ticket.content || '';
+      }
+
+      function showError(message) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error-message').textContent = message;
+        document.getElementById('error').style.display = 'block';
+      }
+
+      function cancelEdit() {
+        if (confirm('수정을 취소하시겠습니까? 변경사항이 저장되지 않습니다.')) {
+          window.location.href = `/view?id=${ticketId}`;
+        }
+      }
+
+      // 폼 제출 처리
+      document
+        .getElementById('ticketForm')
+        .addEventListener('submit', function (e) {
+          e.preventDefault();
+
+          const formData = new FormData(this);
+          const data = {
+            author_name: formData.get('author_name'),
+            author_contact: formData.get('author_contact'),
+            title: formData.get('title'),
+            content: formData.get('content'),
+          };
+
+          console.log('📝 수정 데이터:', data);
+          console.log('🗄️ 수정 요청 전송 중...');
+
+          fetch(`/api/v1/tickets/${ticketId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                throw new Error(
+                  `HTTP ${response.status}: ${response.statusText}`
+                );
+              }
+              return response.json();
+            })
+            .then((result) => {
+              console.log('✅ 수정 완료:', result);
+              alert('게시글이 성공적으로 수정되었습니다!');
+              window.location.href = `/view?id=${ticketId}`;
+            })
+            .catch((error) => {
+              console.error('❌ 수정 에러:', error);
+              alert(`수정 중 오류가 발생했습니다: ${error.message}`);
+            });
+        });
+    </script>
+    <script src="/static/security.js"></script>
+  </body>
+</html>
