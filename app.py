@@ -14,6 +14,7 @@ from api.tickets import bp as tickets_bp
 from api.messages import bp as messages_bp
 from api.admin import bp as admin_bp
 from api.files import bp as files_bp
+from api.smembers import bp as smembers_bp
 from config.settings import UPLOAD_ROOT
 
 app = Flask(__name__, template_folder='web/templates', static_folder='web/static')
@@ -34,6 +35,8 @@ app.register_blueprint(admin_bp, url_prefix="/api/v1/admin")
 print("✅ admin_bp 등록 완료")
 app.register_blueprint(files_bp, url_prefix="/api/v1/files")
 print("✅ files_bp 등록 완료")
+app.register_blueprint(smembers_bp, url_prefix="/api/v1/smembers")
+print("✅ smembers_bp 등록 완료")
 print("✅ 모든 Blueprint 등록 완료")
 
 # Pages
@@ -62,6 +65,9 @@ def page_admin_list(): return render_template("admin_list.html")
 @app.route("/admin_view")
 def page_admin_view(): return render_template("admin_view.html")
 
+@app.route("/test_messages_api")
+def page_test_messages_api(): return render_template("test_messages_api.html")
+
 # 추가 Pages - 회원가입, 로그인, 비밀번호 변경, 회원 탈퇴, 회원 정보 수정, 회원 정보 조회
 #@app.route("/main_index")
 #def page_main_index(): return render_template("main_index.html")
@@ -89,6 +95,47 @@ def page_0301_main_psychol(): return render_template("0301_main_psychol.html")
 
 @app.route("/0302_main_life.html")
 def page_0302_main_life(): return render_template("0302_main_life.html")
+
+@app.route("/0303_name_rules.html")
+def page_0303_name_rules(): return render_template("0303_name_rules.html")
+
+@app.route("/0304_color_counguide.html")
+def page_0304_color_counguide(): return render_template("0304_color_counguide.html")
+
+@app.route("/0305_color_psychology120.html")
+def page_0305_color_psychology120(): return render_template("0305_color_psychology120.html")
+
+@app.route("/0306_color_psychology1202.html")
+def page_0306_color_psychology1202(): return render_template("0306_color_psychology1202.html")
+
+
+
+
+@app.route("/member_login.html")
+def page_member_login(): return render_template("member_login.html")
+
+@app.route("/member_cardup.html")
+def page_member_cardup(): return render_template("member_cardup.html")
+
+@app.route("/main_adminMenu.html")
+def page_main_adminMenu(): return render_template("main_adminMenu.html")
+
+@app.route("/sit005.html")
+def page_sit005(): return render_template("sit005.html")
+
+@app.route("/a02_admin_memcard.html")
+def page_a02_admin_memcard(): return render_template("a02_admin_memcard.html")
+
+
+@app.route("/a03_admin_memlist.html")
+def page_a03_admin_memlist(): return render_template("a03_admin_memlist.html")
+
+@app.route("/a05_admin_membatch.html")
+def page_a05_admin_membatch(): return render_template("a05_admin_membatch.html")
+
+@app.route("/a06_adminCard.html")
+def page_a06_adminCard(): return render_template("a06_adminCard.html")
+
 #-----
 
 
