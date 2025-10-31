@@ -1,0 +1,1865 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>관리자 — tickets & thread_messages (비번해시·role 편집)</title>
+    <style>
+      :root {
+        --bg: #f0f4f8;
+        --panel: #ffffff;
+        --muted: #6b7280;
+        --text: #1f2937;
+        --accent: #6366f1;
+        --accent-light: #818cf8;
+        --accent-weak: #eef2ff;
+        --border: #e0e7ef;
+        --good: #10b981;
+        --good-light: #34d399;
+        --warn: #f59e0b;
+        --warn-light: #fbbf24;
+        --bad: #ef4444;
+        --bad-light: #f87171;
+        --chip: #eef2ff;
+        --chip-text: #4338ca;
+        --shadow: 0 4px 16px rgba(99, 102, 241, 0.08),
+          0 2px 6px rgba(99, 102, 241, 0.04);
+        --shadow-soft: 0 2px 8px rgba(99, 102, 241, 0.06);
+        --shadow-lg: 0 12px 32px rgba(99, 102, 241, 0.12),
+          0 4px 12px rgba(99, 102, 241, 0.06);
+        --glow: 0 0 20px rgba(99, 102, 241, 0.15);
+        --radius: 16px;
+        --grid-width: 58%;
+      }
+      [data-theme='soft-dark'] {
+        --bg: #0b1220;
+        --panel: #111827;
+        --muted: #9ca3af;
+        --text: #e5e7eb;
+        --accent: #818cf8;
+        --accent-light: #a5b4fc;
+        --accent-weak: #1e293b;
+        --border: #1f2937;
+        --good: #34d399;
+        --good-light: #6ee7b7;
+        --warn: #fbbf24;
+        --warn-light: #fcd34d;
+        --bad: #f87171;
+        --bad-light: #fca5a5;
+        --chip: #1e293b;
+        --chip-text: #a5b4fc;
+        --shadow: 0 8px 24px rgba(0, 0, 0, 0.35), 0 4px 10px rgba(0, 0, 0, 0.25);
+        --shadow-soft: 0 4px 12px rgba(0, 0, 0, 0.25);
+        --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.45),
+          0 6px 16px rgba(0, 0, 0, 0.35);
+        --glow: 0 0 24px rgba(129, 140, 248, 0.25);
+      }
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+          'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+        background: radial-gradient(
+            circle at 20% 15%,
+            rgba(99, 102, 241, 0.12),
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 85%,
+            rgba(16, 185, 129, 0.1),
+            transparent 55%
+          ),
+          var(--bg);
+        color: var(--text);
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      .wrap {
+        display: grid;
+        gap: 16px;
+        padding: 16px;
+        max-width: 1400px;
+        margin: 0 auto;
+        grid-template-rows: auto 1fr auto;
+        min-height: 100dvh;
+      }
+      header {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 14px 18px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        backdrop-filter: blur(12px) saturate(180%);
+        background: linear-gradient(
+            135deg,
+            rgba(99, 102, 241, 0.08),
+            rgba(16, 185, 129, 0.06)
+          ),
+          var(--panel);
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        font-size: 16px;
+      }
+      .brand .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, var(--accent), var(--good));
+        box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+        animation: pulse 2s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.15);
+          opacity: 0.85;
+        }
+      }
+      .toolbar {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .btn {
+        appearance: none;
+        border: 1px solid var(--border);
+        background: var(--panel);
+        color: var(--text);
+        padding: 9px 16px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        box-shadow: var(--shadow-soft);
+        transition: all 0.2s ease;
+      }
+      .btn:hover {
+        border-color: var(--accent);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-lg);
+      }
+      .btn:active {
+        transform: translateY(0);
+      }
+      .btn.primary {
+        background: linear-gradient(135deg, var(--accent), var(--accent-light));
+        color: #fff;
+        border-color: transparent;
+      }
+      .btn.primary:hover {
+        box-shadow: var(--glow), var(--shadow-lg);
+      }
+      .btn.ghost {
+        background: rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(8px);
+      }
+      .btn.bad {
+        border-color: transparent;
+        background: linear-gradient(135deg, var(--bad), var(--bad-light));
+        color: #fff;
+      }
+      .btn.good {
+        border-color: transparent;
+        background: linear-gradient(135deg, var(--good), var(--good-light));
+        color: #fff;
+      }
+      .btn.warn {
+        border-color: transparent;
+        background: linear-gradient(135deg, var(--warn), var(--warn-light));
+        color: #231;
+      }
+      .btn-close {
+        appearance: none;
+        border: none;
+        background: #dc3545;
+        color: #fff;
+        padding: 8px 16px;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .btn-close:hover {
+        background: #c82333;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.4);
+      }
+      .btn-close:active {
+        transform: translateY(0);
+      }
+      .chips {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .chip {
+        background: linear-gradient(
+          135deg,
+          var(--chip),
+          rgba(99, 102, 241, 0.08)
+        );
+        color: var(--chip-text);
+        padding: 7px 12px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        border: 1px solid rgba(99, 102, 241, 0.2);
+        box-shadow: 0 2px 6px rgba(99, 102, 241, 0.1);
+      }
+      main {
+        display: grid;
+        gap: 0;
+        grid-template-columns: var(--grid-width, 48%) auto 1fr;
+      }
+      @media (max-width: 1100px) {
+        main {
+          grid-template-columns: 1fr;
+          gap: 16px;
+        }
+      }
+      .resizer {
+        width: 18px;
+        cursor: col-resize;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(99, 102, 241, 0.06),
+          transparent
+        );
+        border-left: 1px solid var(--border);
+        border-right: 1px solid var(--border);
+        position: relative;
+        transition: background 0.2s ease;
+      }
+      .resizer:hover {
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(99, 102, 241, 0.12),
+          transparent
+        );
+      }
+      .resizer::before {
+        content: '⋮';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        color: var(--muted);
+        font-size: 18px;
+        font-weight: bold;
+        pointer-events: none;
+      }
+      @media (max-width: 1100px) {
+        .resizer {
+          display: none;
+        }
+      }
+      #ticketsPanel {
+        margin-right: 0;
+      }
+      #threadsPanel {
+        margin-left: 0;
+      }
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        min-height: 360px;
+        overflow: hidden;
+        transition: box-shadow 0.3s ease;
+      }
+      .panel:hover {
+        box-shadow: var(--shadow-lg);
+      }
+      .panel header {
+        border-radius: 0;
+        border: 0;
+        box-shadow: none;
+        padding: 12px 14px;
+        gap: 10px;
+        align-items: flex-start;
+        background: linear-gradient(
+          180deg,
+          rgba(99, 102, 241, 0.04),
+          transparent
+        );
+      }
+      .panel-title {
+        font-weight: 800;
+        font-size: 16px;
+        letter-spacing: -0.5px;
+        white-space: nowrap;
+      }
+      .filters {
+        display: grid;
+        gap: 8px;
+        grid-template-columns: 1fr;
+      }
+      .filters-row {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .field {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        background: var(--panel);
+        padding: 8px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+        transition: all 0.2s ease;
+      }
+      .field:focus-within {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+      }
+      .field label {
+        font-size: 12px;
+        color: var(--muted);
+        font-weight: 600;
+      }
+      .select,
+      .input {
+        appearance: none;
+        border: 1px solid var(--border);
+        background: var(--panel);
+        color: var(--text);
+        padding: 8px 12px;
+        border-radius: 10px;
+        min-width: 140px;
+        transition: all 0.2s ease;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+      }
+      .select:focus,
+      .input:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.12);
+      }
+      .input.search {
+        flex: 1;
+        min-width: 220px;
+      }
+      .grid {
+        overflow: auto;
+        border-top: 2px solid var(--border);
+        border-bottom: 2px solid var(--border);
+        padding: 0 16px;
+      }
+      table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        table-layout: fixed;
+      }
+      thead th {
+        position: sticky;
+        top: 0;
+        background: var(--panel);
+        border-bottom: 2px solid var(--border);
+        text-align: left;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--muted);
+        padding: 10px;
+        backdrop-filter: saturate(1.2) blur(4px);
+        cursor: pointer;
+        white-space: nowrap;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      tbody td {
+        border-bottom: 1px solid var(--border);
+        padding: 10px;
+        font-size: 14px;
+        vertical-align: top;
+      }
+      tbody tr {
+        transition: all 0.2s ease;
+      }
+      tbody tr:hover {
+        background: linear-gradient(
+          90deg,
+          rgba(99, 102, 241, 0.06),
+          rgba(16, 185, 129, 0.04)
+        );
+        transform: translateX(2px);
+      }
+      .cut {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      tr:hover td {
+        background: transparent;
+      }
+      tr.selected td {
+        background: linear-gradient(
+          90deg,
+          rgba(99, 102, 241, 0.1),
+          rgba(16, 185, 129, 0.08)
+        );
+      }
+      .mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas,
+          'Liberation Mono', monospace;
+        font-size: 12px;
+      }
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 10px;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .status.new {
+        background: linear-gradient(
+          135deg,
+          rgba(10, 88, 202, 0.15),
+          rgba(10, 88, 202, 0.08)
+        );
+        color: #0a58ca;
+        border-color: rgba(10, 88, 202, 0.25);
+      }
+      .status.pending {
+        background: linear-gradient(
+          135deg,
+          rgba(245, 158, 11, 0.2),
+          rgba(245, 158, 11, 0.12)
+        );
+        color: #b45309;
+        border-color: rgba(245, 158, 11, 0.3);
+      }
+      .status.closed {
+        background: linear-gradient(
+          135deg,
+          rgba(16, 185, 129, 0.2),
+          rgba(16, 185, 129, 0.12)
+        );
+        color: #047857;
+        border-color: rgba(16, 185, 129, 0.3);
+      }
+      .muted {
+        color: var(--muted);
+      }
+      footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      dialog::backdrop {
+        background: rgba(0, 0, 0, 0.45);
+        backdrop-filter: blur(4px);
+      }
+      dialog {
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        padding: 0;
+        background: var(--panel);
+        color: var(--text);
+        box-shadow: var(--shadow-lg);
+        max-width: min(720px, 96vw);
+      }
+      .dialog-head {
+        padding: 16px 18px;
+        border-bottom: 2px solid var(--border);
+        font-weight: 800;
+        font-size: 17px;
+        letter-spacing: -0.5px;
+        background: linear-gradient(
+          180deg,
+          rgba(99, 102, 241, 0.04),
+          transparent
+        );
+      }
+      .dialog-body {
+        padding: 16px 18px;
+        display: grid;
+        gap: 12px;
+      }
+      .form-grid {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: 1fr 1fr;
+      }
+      .form-grid .full {
+        grid-column: 1/-1;
+      }
+      .form-item {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .form-item label {
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted);
+      }
+      .form-item input,
+      .form-item textarea,
+      .form-item select {
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+        background: var(--panel);
+        color: var(--text);
+        transition: all 0.2s ease;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+      }
+      .form-item input:focus,
+      .form-item textarea:focus,
+      .form-item select:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.12);
+      }
+      .dialog-foot {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        padding: 14px 16px;
+        border-top: 2px solid var(--border);
+        background: linear-gradient(
+          180deg,
+          transparent,
+          rgba(99, 102, 241, 0.03)
+        );
+      }
+      /* 추천 폭 */
+      #tblTickets th:nth-child(1),
+      #tblTickets td:nth-child(1) {
+        width: 120px;
+      }
+      #tblTickets th:nth-child(2),
+      #tblTickets td:nth-child(2) {
+        width: 92px;
+      }
+      #tblTickets th:nth-child(3),
+      #tblTickets td:nth-child(3) {
+        width: 100px;
+      }
+      #tblTickets th:nth-child(4),
+      #tblTickets td:nth-child(4) {
+        width: 120px;
+      }
+      #tblTickets th:nth-child(5),
+      #tblTickets td:nth-child(5) {
+        width: auto;
+      }
+      #tblTickets th:nth-child(6),
+      #tblTickets td:nth-child(6) {
+        width: 120px;
+      }
+      #tblTickets th:nth-child(7),
+      #tblTickets td:nth-child(7) {
+        width: 220px;
+      }
+      #tblThreads th:nth-child(1),
+      #tblThreads td:nth-child(1) {
+        width: 120px;
+      }
+      #tblThreads th:nth-child(2),
+      #tblThreads td:nth-child(2) {
+        width: 120px;
+      }
+      #tblThreads th:nth-child(3),
+      #tblThreads td:nth-child(3) {
+        width: 110px;
+      } /* role */
+      #tblThreads th:nth-child(4),
+      #tblThreads td:nth-child(4) {
+        width: auto;
+      } /* body */
+      #tblThreads th:nth-child(5),
+      #tblThreads td:nth-child(5) {
+        width: 220px;
+      } /* message_id */
+    </style>
+  </head>
+  <body data-theme="soft-light">
+    <div class="wrap">
+      <header>
+        <div class="brand">
+          <span class="dot"></span
+          ><span>관리자 페이지 · 비밀상담요청 & 관리자 답변</span>
+        </div>
+        <div class="toolbar">
+          <button class="btn" id="btnTheme">테마: 부드러운 라이트</button>
+          <span class="chips">
+            <span class="chip">정렬: 헤더 클릭</span>
+            <span class="chip">검색: 통합 키워드</span>
+          </span>
+          <button class="btn-close" id="btnClose">
+            <span>✕</span>
+            <span>닫기</span>
+          </button>
+        </div>
+      </header>
+
+      <main>
+        <!-- LEFT: tickets -->
+        <section class="panel" id="ticketsPanel">
+          <header>
+            <div class="panel-title">① 비밀상담요청</div>
+            <div class="filters" style="width: 100%">
+              <div class="filters-row">
+                <div class="field">
+                  <label>상태</label>
+                  <select class="select" id="filterStatus">
+                    <option value="">전체</option>
+                    <option value="OPEN">OPEN (미답변)</option>
+                    <option value="ANSWERED">ANSWERED (답변완료)</option>
+                    <option value="CLOSED">CLOSED (종결)</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>관리자답변유무</label>
+                  <select class="select" id="filterHasReply">
+                    <option value="">전체</option>
+                    <option value="true">있음</option>
+                    <option value="false">없음</option>
+                  </select>
+                </div>
+                <input
+                  class="input search"
+                  id="searchTickets"
+                  placeholder="통합 검색: 작성자 이름/ 제목/ 상담문의 내용/ 상담요청 ID"
+                />
+                <button class="btn good" id="btnAddTicket">티켓 추가</button>
+                <button class="btn warn" id="btnEditTicket" disabled>
+                  수정
+                </button>
+                <button class="btn bad" id="btnDelTicket" disabled>삭제</button>
+              </div>
+            </div>
+          </header>
+          <div class="grid">
+            <table id="tblTickets">
+              <thead>
+                <tr>
+                  <th data-sort="title_masked">제목</th>
+                  <th data-sort="status">상태</th>
+                  <th data-sort="has_admin_reply">답변여부</th>
+                  <th data-sort="author_name">이름</th>
+                  <th data-sort="author_contact">메모</th>
+                  <th data-sort="snsgu">자료구분</th>
+                  <th data-sort="created_at">등록일</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <footer>
+            <div>
+              좌측 선택 시 우측에 관리자 답변이 표시됩니다. (셀 1줄·말줄임)
+            </div>
+            <div id="ticketsCount">0건</div>
+          </footer>
+        </section>
+
+        <!-- RESIZER -->
+        <div class="resizer" id="resizer"></div>
+
+        <!-- RIGHT: thread_messages -->
+        <section class="panel" id="threadsPanel">
+          <header>
+            <div class="panel-title">
+              ② 관리자 답변 <span class="muted" id="threadsTitleHint"></span>
+            </div>
+            <div class="filters">
+              <div class="filters-row">
+                <input
+                  class="input search"
+                  id="searchThreads"
+                  placeholder="답변 본문/관리자ID/역할/메시지ID 검색"
+                />
+                <button class="btn good" id="btnAddMsg" disabled>
+                  답변 추가
+                </button>
+                <button class="btn warn" id="btnEditMsg" disabled>수정</button>
+                <button class="btn bad" id="btnDelMsg" disabled>삭제</button>
+              </div>
+            </div>
+          </header>
+          <div class="grid" id="threadsGrid">
+            <table id="tblThreads">
+              <thead>
+                <tr>
+                  <th data-sort="created_at">작성시간</th>
+                  <th data-sort="admin_id">관리자ID</th>
+                  <th data-sort="role">역할(role)</th>
+                  <th data-sort="body">본문</th>
+                  <th data-sort="message_id">Msg ID</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <footer>
+            <div id="threadsHint">
+              티켓을 선택하면 관련 답변이 여기에 표시됩니다.
+            </div>
+            <div id="threadsCount">0건</div>
+          </footer>
+        </section>
+      </main>
+
+      <footer>
+        <span>© talktalk-center · 관리자 전용 화면</span>
+        <span class="muted">단축키: ↑↓ 선택, Enter 수정, Del 삭제, / 검색</span>
+      </footer>
+    </div>
+
+    <!-- DIALOG: Ticket -->
+    <dialog id="dlgTicket">
+      <div class="dialog-head" id="dlgTicketTitle">티켓 추가</div>
+      <div class="dialog-body">
+        <div class="form-grid">
+          <div class="form-item">
+            <label>회원 ID (sMember_id)</label>
+            <input id="t_sMember_id" />
+          </div>
+          <div class="form-item">
+            <label>작성자 이름 (author_name)</label>
+            <input id="t_author_name" />
+          </div>
+          <div class="form-item">
+            <label>상태 (status)</label>
+            <select id="t_status">
+              <option value="OPEN">OPEN (미답변)</option>
+              <option value="ANSWERED">ANSWERED (답변완료)</option>
+              <option value="CLOSED">CLOSED (종결)</option>
+            </select>
+          </div>
+          <div class="form-item">
+            <label>제목 (title_masked)</label>
+            <input id="t_title_masked" />
+          </div>
+          <div class="form-item full">
+            <label>문의 내용 (content_enc)</label>
+            <textarea id="t_content_enc" rows="5"></textarea>
+          </div>
+
+          <!-- NEW: 게시글 비밀번호 해시 (수정시에만 노출) -->
+          <div
+            class="form-item full"
+            id="t_post_pwd_hash_row"
+            style="display: none"
+          >
+            <label
+              >게시글 비밀번호 해시 (bcrypt) —
+              <span class="muted">보통 60자</span></label
+            >
+            <input id="t_post_pwd_hash" class="mono" placeholder="$2b$..." />
+          </div>
+        </div>
+        <div class="muted">
+          * ticket_id / created_at 자동 생성. post_pwd_hash는 수정 모드에서만
+          편집.
+        </div>
+      </div>
+      <div class="dialog-foot">
+        <button class="btn ghost" data-close>취소</button>
+        <button class="btn primary" id="btnSaveTicket">저장</button>
+      </div>
+    </dialog>
+
+    <!-- DIALOG: Thread Message -->
+    <dialog id="dlgMsg">
+      <div class="dialog-head" id="dlgMsgTitle">답변 추가</div>
+      <div class="dialog-body">
+        <div class="form-grid">
+          <div class="form-item">
+            <label>관리자 ID (admin_id)</label>
+            <input id="m_admin_id" />
+          </div>
+          <div class="form-item">
+            <label>역할 (role)</label>
+            <select id="m_role">
+              <option value="SUPERADMIN">superadmin</option>
+              <option value="ADMIN">admin</option>
+              <option value="MENTOR">mentor</option>
+              <option value="STAFF">staff</option>
+              <option value="AUDITOR">auditor</option>
+              <option value="AGENT">agent</option>
+            </select>
+          </div>
+          <div class="form-item">
+            <label>가시성 (visibility)</label>
+            <select id="m_visibility">
+              <option value="private">private</option>
+              <option value="internal">internal</option>
+            </select>
+          </div>
+          <div class="form-item full">
+            <label>답변 본문 (body)</label>
+            <textarea id="m_body" rows="6"></textarea>
+          </div>
+        </div>
+        <div class="muted">
+          * message_id / created_at / ticket_id 자동 연결.
+        </div>
+      </div>
+      <div class="dialog-foot">
+        <button class="btn ghost" data-close>취소</button>
+        <button class="btn primary" id="btnSaveMsg">저장</button>
+      </div>
+    </dialog>
+
+    <script>
+      /* =========================
+   Resizer functionality
+   ========================= */
+      (function initResizer() {
+        const resizer = document.getElementById('resizer');
+        const main = document.querySelector('main');
+        let isResizing = false;
+        let startX = 0;
+        let startWidth = 0;
+
+        // Load saved width
+        const savedWidth = localStorage.getItem('a03_gridWidth');
+        if (savedWidth) {
+          document.documentElement.style.setProperty(
+            '--grid-width',
+            savedWidth
+          );
+        }
+
+        resizer.addEventListener('mousedown', (e) => {
+          isResizing = true;
+          startX = e.clientX;
+          const computed = getComputedStyle(document.documentElement);
+          const currentWidth = computed.getPropertyValue('--grid-width').trim();
+          startWidth = parseFloat(currentWidth) || 48;
+          document.body.style.cursor = 'col-resize';
+          document.body.style.userSelect = 'none';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+          if (!isResizing) return;
+          const deltaX = e.clientX - startX;
+          const mainWidth = main.offsetWidth;
+          const deltaPercent = (deltaX / mainWidth) * 100;
+          let newWidth = startWidth + deltaPercent;
+
+          // Constrain between 25% and 75%
+          newWidth = Math.max(25, Math.min(75, newWidth));
+
+          document.documentElement.style.setProperty(
+            '--grid-width',
+            newWidth + '%'
+          );
+        });
+
+        document.addEventListener('mouseup', () => {
+          if (isResizing) {
+            isResizing = false;
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+
+            // Save to localStorage
+            const currentWidth = getComputedStyle(document.documentElement)
+              .getPropertyValue('--grid-width')
+              .trim();
+            localStorage.setItem('a03_gridWidth', currentWidth);
+          }
+        });
+      })();
+
+      /* =========================
+   Minimal data layer (localStorage)
+   ========================= */
+      const LS_KEY = 'talktalk_admin_tt';
+      const state = {
+        tickets: [],
+        messages: [],
+        ui: {
+          ticketSort: { key: 'created_at', dir: 'desc' },
+          threadSort: { key: 'created_at', dir: 'desc' },
+          selectedTicketId: null,
+          selectedMsgId: null,
+          theme: 'soft-light',
+        },
+      };
+
+      function uid(prefix = 'id') {
+        return (
+          prefix +
+          '_' +
+          (crypto.randomUUID
+            ? crypto.randomUUID()
+            : Math.random().toString(36).slice(2, 10))
+        );
+      }
+      function nowISO() {
+        return new Date().toISOString();
+      }
+      function save() {
+        localStorage.setItem(
+          LS_KEY,
+          JSON.stringify({
+            tickets: state.tickets,
+            messages: state.messages,
+            ui: state.ui,
+          })
+        );
+      }
+      function load() {
+        const raw = localStorage.getItem(LS_KEY);
+        if (raw) {
+          try {
+            const obj = JSON.parse(raw);
+            state.tickets = obj.tickets || [];
+            state.messages = obj.messages || [];
+            state.ui = { ...state.ui, ...(obj.ui || {}) };
+          } catch (e) {}
+        } else {
+          seed();
+          save();
+        }
+      }
+      function seed() {
+        const names = [
+          '김민수',
+          '이서연',
+          '박지호',
+          '최윤아',
+          '정하준',
+          '한유진',
+          '서지우',
+          '오세훈',
+          '문다은',
+          '강하린',
+          '유가온',
+          '배다인',
+        ];
+        for (let i = 0; i < 12; i++) {
+          const tid = uid('tkt');
+          const mem = 'mem_' + String(1000 + i);
+          const status =
+            i % 3 === 0 ? 'new' : i % 3 === 1 ? 'pending' : 'closed';
+          const title =
+            [
+              '비밀상담 요청',
+              '불안/우울 관련',
+              '대인관계 갈등',
+              '직무 번아웃',
+              '수면 문제',
+              '자녀 양육 고민',
+            ][i % 6] +
+            '#' +
+            (i + 1);
+          const content =
+            '샘플 문의 내용입니다. 핵심 키워드 ' +
+            (i % 2 ? '우울' : '불안') +
+            ' / 상세 서술 ...';
+          state.tickets.push({
+            ticket_id: tid,
+            sMember_id: mem,
+            author_name: names[i % names.length],
+            title_masked: title,
+            content_enc: content,
+            status,
+            created_at: new Date(Date.now() - i * 3600_000 * 8).toISOString(),
+            post_pwd_hash: '', // 초기값
+          });
+          const msgCount = i % 3 === 0 ? 0 : i % 3 === 1 ? 1 : 2;
+          for (let k = 0; k < msgCount; k++) {
+            state.messages.push({
+              message_id: uid('msg'),
+              ticket_id: tid,
+              admin_id: 'admin0' + ((k % 3) + 1),
+              role: ['admin', 'counselor', 'owner'][(i + k) % 3],
+              body: `관리자 답변 #${k + 1} — 진행 안내/피드백`,
+              visibility: 'private',
+              created_at: new Date(
+                Date.now() - (i * 4 + k) * 1800_000
+              ).toISOString(),
+            });
+          }
+        }
+      }
+
+      /* =========================
+   Helpers
+   ========================= */
+      function text(t) {
+        return (t ?? '').toString();
+      }
+      function contains(hay, needle) {
+        return text(hay).toLowerCase().includes(text(needle).toLowerCase());
+      }
+      function sortBy(arr, key, dir = 'asc') {
+        return [...arr].sort((a, b) => {
+          const va = a[key],
+            vb = b[key];
+          if (va === vb) return 0;
+          return (va > vb ? 1 : -1) * (dir === 'asc' ? 1 : -1);
+        });
+      }
+      function hasReply(ticket_id) {
+        return state.messages.some((m) => m.ticket_id === ticket_id);
+      }
+
+      /* =========================
+   Rendering — Tickets
+   ========================= */
+      const tblTickets = document.querySelector('#tblTickets tbody');
+      const ticketsCount = document.getElementById('ticketsCount');
+      const filterStatus = document.getElementById('filterStatus');
+      const filterHasReply = document.getElementById('filterHasReply');
+      const searchTickets = document.getElementById('searchTickets');
+
+      function currentTicketFilter(t) {
+        if (filterStatus.value && t.status !== filterStatus.value) return false;
+        const has = hasReply(t.ticket_id);
+        if (filterHasReply.value === 'true' && !has) return false;
+        if (filterHasReply.value === 'false' && has) return false;
+        const q = searchTickets.value.trim();
+        if (q) {
+          const pool = [
+            t.author_name,
+            t.title_masked,
+            t.content_enc,
+            t.ticket_id,
+          ].join(' || ');
+          if (!contains(pool, q)) return false;
+        }
+        return true;
+      }
+      function renderTickets() {
+        const { key, dir } = state.ui.ticketSort;
+        const data = sortBy(
+          state.tickets.filter(currentTicketFilter),
+          key,
+          dir
+        );
+        tblTickets.innerHTML = '';
+        for (const t of data) {
+          const tr = document.createElement('tr');
+          if (t.ticket_id === state.ui.selectedTicketId)
+            tr.classList.add('selected');
+          tr.dataset.id = t.ticket_id;
+          tr.innerHTML = `
+      <td><span class="cut" title="${escapeHtml(
+        t.title_masked || ''
+      )}">${escapeHtml(t.title_masked || '')}</span></td>
+      <td><span class="status ${t.status} cut" title="${t.status}">${
+            t.status
+          }</span></td>
+      <td><span class="cut" title="${t.has_admin_reply ? '있음' : '없음'}">${
+            t.has_admin_reply ? '있음' : '없음'
+          }</span></td>
+      <td><span class="cut" title="${escapeHtml(
+        t.author_name || ''
+      )}">${escapeHtml(t.author_name || '')}</span></td>
+      <td><span class="cut" title="${escapeHtml(
+        t.author_contact || ''
+      )}">${escapeHtml(t.author_contact || '')}</span></td>
+      <td><span class="cut" title="${escapeHtml(t.snsgu || '')}">${escapeHtml(
+            t.snsgu || ''
+          )}</span></td>
+      <td><span class="mono cut" title="${t.created_at}">${t.created_at
+            .replace('T', ' ')
+            .slice(0, 19)}</span></td>
+    `;
+          tblTickets.appendChild(tr);
+        }
+        ticketsCount.textContent = `${data.length}건`;
+      }
+      function selectTicket(id) {
+        console.log('🎯 selectTicket 호출됨 - id:', id, 'type:', typeof id);
+
+        state.ui.selectedTicketId = id;
+        state.ui.selectedMsgId = null;
+        save();
+        renderTickets();
+        renderThreads();
+        document.getElementById('btnEditTicket').disabled = !id;
+        document.getElementById('btnDelTicket').disabled = !id;
+        document.getElementById('btnAddMsg').disabled = !id;
+        document.getElementById('btnEditMsg').disabled = true;
+        document.getElementById('btnDelMsg').disabled = true;
+        const t = state.tickets.find((x) => x.ticket_id === id);
+        document.getElementById('threadsTitleHint').textContent = t
+          ? ` ${t.title_masked}`
+          : '';
+
+        console.log('🎯 selectTicket 완료 - 선택된 티켓:', t);
+      }
+
+      /* =========================
+   Rendering — Threads
+   ========================= */
+      const tblThreads = document.querySelector('#tblThreads tbody');
+      const threadsCount = document.getElementById('threadsCount');
+      const threadsHint = document.getElementById('threadsHint');
+      const searchThreads = document.getElementById('searchThreads');
+
+      function currentThreads() {
+        const id = state.ui.selectedTicketId;
+        console.log('🔍 currentThreads - selectedTicketId:', id);
+        console.log(
+          '🔍 currentThreads - 전체 messages 개수:',
+          state.messages.length
+        );
+
+        if (!id) return [];
+
+        const all = state.messages.filter((m) => {
+          const match = String(m.ticket_id) === String(id);
+          if (match) {
+            console.log('✅ 매칭된 메시지:', m);
+          }
+          return match;
+        });
+
+        console.log('🔍 currentThreads - 필터링된 messages 개수:', all.length);
+
+        const q = searchThreads.value.trim();
+        let filtered = all;
+        if (q) {
+          filtered = all.filter((m) =>
+            contains([m.body, m.admin_id, m.role, m.message_id].join(' || '), q)
+          );
+        }
+        const { key, dir } = state.ui.threadSort;
+        return sortBy(filtered, key, dir);
+      }
+      function renderThreads() {
+        tblThreads.innerHTML = '';
+        const rows = currentThreads();
+        threadsHint.textContent = !state.ui.selectedTicketId
+          ? '티켓을 선택하면 관련 답변이 여기에 표시됩니다.'
+          : rows.length === 0
+          ? '해당 티켓의 답변이 없습니다.'
+          : '';
+        for (const m of rows) {
+          const tr = document.createElement('tr');
+          if (m.message_id === state.ui.selectedMsgId)
+            tr.classList.add('selected');
+          tr.dataset.id = m.message_id;
+          tr.innerHTML = `
+      <td><span class="mono cut" title="${m.created_at}">${m.created_at
+            .replace('T', ' ')
+            .slice(0, 19)}</span></td>
+      <td><span class="mono cut" title="${escapeHtml(m.admin_id)}">${escapeHtml(
+            m.admin_id
+          )}</span></td>
+      <td><span class="cut" title="${escapeHtml(m.role || '')}">${escapeHtml(
+            m.role || ''
+          )}</span></td>
+      <td><span class="cut" title="${escapeHtml(m.body)}">${escapeHtml(
+            m.body
+          )}</span></td>
+      <td><span class="mono cut" title="${m.message_id}">${
+            m.message_id
+          }</span></td>
+    `;
+          tblThreads.appendChild(tr);
+        }
+        threadsCount.textContent = `${rows.length}건`;
+      }
+
+      /* =========================
+   Events
+   ========================= */
+      document.querySelectorAll('#tblTickets thead th').forEach((th) => {
+        th.addEventListener('click', () => {
+          const key = th.dataset.sort;
+          if (!key) return;
+          const sort = state.ui.ticketSort;
+          sort.dir = sort.key === key && sort.dir === 'asc' ? 'desc' : 'asc';
+          sort.key = key;
+          save();
+          renderTickets();
+        });
+      });
+      document.querySelectorAll('#tblThreads thead th').forEach((th) => {
+        th.addEventListener('click', () => {
+          const key = th.dataset.sort;
+          if (!key) return;
+          const sort = state.ui.threadSort;
+          sort.dir = sort.key === key && sort.dir === 'asc' ? 'desc' : 'asc';
+          sort.key = key;
+          save();
+          renderThreads();
+        });
+      });
+      filterStatus.addEventListener('input', () => renderTickets());
+      filterHasReply.addEventListener('input', () => renderTickets());
+      searchTickets.addEventListener('input', () => renderTickets());
+      searchThreads.addEventListener('input', () => renderThreads());
+
+      document
+        .querySelector('#tblTickets tbody')
+        .addEventListener('click', (e) => {
+          const tr = e.target.closest('tr');
+          if (!tr) return;
+          selectTicket(tr.dataset.id);
+        });
+      document
+        .querySelector('#tblThreads tbody')
+        .addEventListener('click', (e) => {
+          const tr = e.target.closest('tr');
+          if (!tr) return;
+          state.ui.selectedMsgId = tr.dataset.id;
+          save();
+          renderThreads();
+          document.getElementById('btnEditMsg').disabled = false;
+          document.getElementById('btnDelMsg').disabled = false;
+        });
+
+      /* =========================
+   CRUD — Tickets (post_pwd_hash 편집)
+   ========================= */
+      const dlgTicket = document.getElementById('dlgTicket');
+      const btnAddTicket = document.getElementById('btnAddTicket');
+      const btnEditTicket = document.getElementById('btnEditTicket');
+      const btnDelTicket = document.getElementById('btnDelTicket');
+      const btnSaveTicket = document.getElementById('btnSaveTicket');
+      let editingTicketId = null;
+
+      btnAddTicket.addEventListener('click', () => {
+        editingTicketId = null;
+        document.getElementById('dlgTicketTitle').textContent = '티켓 추가';
+        setTicketForm(undefined, /*isEdit*/ false);
+        dlgTicket.showModal();
+      });
+      btnEditTicket.addEventListener('click', () => {
+        const id = state.ui.selectedTicketId;
+        if (!id) return;
+        editingTicketId = id;
+        document.getElementById('dlgTicketTitle').textContent = '티켓 수정';
+        const t = state.tickets.find((x) => x.ticket_id === id);
+
+        console.log('🔍 티켓 수정 버튼 클릭 - ticket_id:', id);
+        console.log('🔍 찾은 티켓 데이터:', t);
+        console.log('🔍 티켓 content_enc:', t?.content_enc);
+
+        setTicketForm(t, /*isEdit*/ true);
+        dlgTicket.showModal();
+      });
+      btnDelTicket.addEventListener('click', async () => {
+        const id = state.ui.selectedTicketId;
+        if (!id) return;
+        if (!confirm('선택한 티켓을 삭제할까요? (관련 답변도 함께 삭제)'))
+          return;
+
+        try {
+          console.log('🔄 티켓 삭제 API 호출:', id);
+          const response = await fetch(`/api/v1/tickets/${id}`, {
+            method: 'DELETE',
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || '티켓 삭제 실패');
+          }
+
+          console.log('✅ 티켓 삭제 완료');
+          alert('티켓이 삭제되었습니다.');
+
+          // 서버에서 최신 데이터 다시 로드
+          state.ui.selectedTicketId = null;
+          await loadFromServer();
+
+          document.getElementById('btnEditTicket').disabled = true;
+          document.getElementById('btnDelTicket').disabled = true;
+          document.getElementById('btnAddMsg').disabled = true;
+        } catch (error) {
+          console.error('❌ 티켓 삭제 오류:', error);
+          alert('삭제 중 오류가 발생했습니다: ' + error.message);
+        }
+      });
+
+      function setTicketForm(
+        t = {
+          sMember_id: '',
+          author_name: '',
+          status: 'new',
+          title_masked: '',
+          content_enc: '',
+          post_pwd_hash: '',
+        },
+        isEdit = false
+      ) {
+        console.log('🔍 setTicketForm 호출됨');
+        console.log('🔍 받은 티켓 데이터:', t);
+        console.log('🔍 content_enc 값:', t.content_enc);
+
+        document.getElementById('t_sMember_id').value = t.sMember_id || '';
+        document.getElementById('t_author_name').value = t.author_name || '';
+        document.getElementById('t_status').value = t.status || 'new';
+        document.getElementById('t_title_masked').value = t.title_masked || '';
+        document.getElementById('t_content_enc').value = t.content_enc || '';
+        document.getElementById('t_post_pwd_hash').value =
+          t.post_pwd_hash || '';
+
+        console.log(
+          '🔍 폼에 설정된 content_enc:',
+          document.getElementById('t_content_enc').value
+        );
+
+        // 수정 모드에서만 해시 입력 칸 표시
+        document.getElementById('t_post_pwd_hash_row').style.display = isEdit
+          ? ''
+          : 'none';
+      }
+      function getTicketForm(isEdit) {
+        const obj = {
+          sMember_id: document.getElementById('t_sMember_id').value.trim(),
+          author_name: document.getElementById('t_author_name').value.trim(),
+          status: document.getElementById('t_status').value,
+          title_masked: document.getElementById('t_title_masked').value.trim(),
+          content_enc: document.getElementById('t_content_enc').value.trim(),
+        };
+        if (isEdit) {
+          obj.post_pwd_hash = document
+            .getElementById('t_post_pwd_hash')
+            .value.trim();
+        }
+        return obj;
+      }
+      btnSaveTicket.addEventListener('click', async () => {
+        const isEdit = !!editingTicketId;
+        const v = getTicketForm(isEdit);
+        if (!v.sMember_id || !v.title_masked) {
+          alert('회원ID와 제목은 필수입니다.');
+          return;
+        }
+
+        try {
+          if (isEdit) {
+            // 티켓 수정 - 서버에 PUT 요청
+            console.log('🔄 티켓 수정 API 호출:', editingTicketId);
+
+            // API가 요구하는 형식으로 변환
+            const updateData = {
+              title: v.title_masked,
+              content: v.content_enc,
+              author_name: v.author_name,
+              author_contact: v.author_contact || '',
+              status: v.status,
+              post_pwd_hash: v.post_pwd_hash,
+            };
+
+            console.log('📤 수정 데이터:', updateData);
+
+            const response = await fetch(`/api/v1/tickets/${editingTicketId}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(updateData),
+            });
+
+            if (!response.ok) {
+              const error = await response.json();
+              throw new Error(error.error || '티켓 수정 실패');
+            }
+
+            console.log('✅ 티켓 수정 완료');
+            alert('티켓이 수정되었습니다.');
+          } else {
+            // 티켓 추가 - 서버에 POST 요청
+            console.log('🔄 티켓 추가 API 호출');
+
+            // API가 요구하는 형식으로 변환
+            const createData = {
+              title: v.title_masked,
+              content: v.content_enc,
+              post_password: 'admin123', // 기본 비밀번호 (필수값)
+              author_name: v.author_name,
+              author_contact: v.author_contact || '',
+              snsgu: 'A0001', // 기본값
+              agreement: 1, // 동의함
+            };
+
+            console.log('📤 추가 데이터:', createData);
+
+            const response = await fetch('/api/v1/tickets/', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(createData),
+            });
+
+            if (!response.ok) {
+              const error = await response.json();
+              throw new Error(error.error || '티켓 추가 실패');
+            }
+
+            const result = await response.json();
+            console.log('✅ 티켓 추가 완료:', result);
+            alert('티켓이 추가되었습니다.');
+          }
+
+          // 서버에서 최신 데이터 다시 로드
+          await loadFromServer();
+          dlgTicket.close();
+        } catch (error) {
+          console.error('❌ 티켓 저장 오류:', error);
+          alert('저장 중 오류가 발생했습니다: ' + error.message);
+        }
+      });
+      dlgTicket.addEventListener('click', (e) => {
+        if (e.target.matches('[data-close]')) dlgTicket.close();
+      });
+
+      /* =========================
+   CRUD — Messages (role 포함)
+   ========================= */
+      const dlgMsg = document.getElementById('dlgMsg');
+      const btnAddMsg = document.getElementById('btnAddMsg');
+      const btnEditMsg = document.getElementById('btnEditMsg');
+      const btnDelMsg = document.getElementById('btnDelMsg');
+      const btnSaveMsg = document.getElementById('btnSaveMsg');
+      let editingMsgId = null;
+
+      btnAddMsg.addEventListener('click', () => {
+        const tid = state.ui.selectedTicketId;
+        if (!tid) return;
+        editingMsgId = null;
+        document.getElementById('dlgMsgTitle').textContent = '답변 추가';
+        setMsgForm();
+        dlgMsg.showModal();
+      });
+      btnEditMsg.addEventListener('click', () => {
+        const id = state.ui.selectedMsgId;
+        if (!id) return;
+        editingMsgId = id;
+        document.getElementById('dlgMsgTitle').textContent = '답변 수정';
+        const m = state.messages.find((x) => x.message_id === id);
+        setMsgForm(m);
+        dlgMsg.showModal();
+      });
+      btnDelMsg.addEventListener('click', async () => {
+        const id = state.ui.selectedMsgId;
+        if (!id) return;
+        if (!confirm('선택한 답변을 삭제할까요?')) return;
+
+        try {
+          console.log('🔄 메시지 삭제 API 호출:', id);
+          const response = await fetch(`/api/v1/admin/messages/${id}`, {
+            method: 'DELETE',
+          });
+
+          if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || '메시지 삭제 실패');
+          }
+
+          console.log('✅ 메시지 삭제 완료');
+          alert('답변이 삭제되었습니다.');
+
+          // 서버에서 최신 데이터 다시 로드
+          state.ui.selectedMsgId = null;
+          await loadFromServer();
+
+          btnEditMsg.disabled = true;
+          btnDelMsg.disabled = true;
+        } catch (error) {
+          console.error('❌ 메시지 삭제 오류:', error);
+          alert('삭제 중 오류가 발생했습니다: ' + error.message);
+        }
+      });
+
+      function setMsgForm(
+        m = { admin_id: '', role: 'ADMIN', visibility: 'private', body: '' }
+      ) {
+        document.getElementById('m_admin_id').value = m.admin_id || '';
+        document.getElementById('m_role').value = m.role || 'ADMIN';
+        document.getElementById('m_visibility').value =
+          m.visibility || 'private';
+        document.getElementById('m_body').value = m.body || '';
+      }
+      function getMsgForm() {
+        return {
+          admin_id: document.getElementById('m_admin_id').value.trim(),
+          role: document.getElementById('m_role').value,
+          visibility: document.getElementById('m_visibility').value,
+          body: document.getElementById('m_body').value.trim(),
+        };
+      }
+      btnSaveMsg.addEventListener('click', async () => {
+        const tid = state.ui.selectedTicketId;
+        if (!tid) {
+          alert('티켓을 먼저 선택하세요.');
+          return;
+        }
+        const v = getMsgForm();
+        if (!v.admin_id || !v.body) {
+          alert('관리자ID와 본문은 필수입니다.');
+          return;
+        }
+
+        try {
+          if (editingMsgId) {
+            // 메시지 수정
+            console.log('🔄 메시지 수정 API 호출:', editingMsgId);
+            console.log('📤 전송 데이터:', { content: v.body, role: v.role });
+
+            const response = await fetch(
+              `/api/v1/admin/messages/${editingMsgId}`,
+              {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  content: v.body,
+                  role: v.role, // role 추가
+                }),
+              }
+            );
+
+            if (!response.ok) {
+              const error = await response.json();
+              throw new Error(error.error || '메시지 수정 실패');
+            }
+
+            console.log('✅ 메시지 수정 완료');
+            alert('답변이 수정되었습니다.');
+          } else {
+            // 메시지 추가 (관리자 답변)
+            console.log('🔄 관리자 답변 추가 API 호출');
+            console.log('📤 전송 데이터:', {
+              content: v.body,
+              admin_id: v.admin_id,
+              role: v.role,
+            });
+
+            const response = await fetch(`/api/v1/admin/tickets/${tid}/reply`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                content: v.body,
+                admin_id: v.admin_id,
+                role: v.role,
+              }),
+            });
+
+            if (!response.ok) {
+              const error = await response.json();
+              throw new Error(error.error || '답변 추가 실패');
+            }
+
+            console.log('✅ 관리자 답변 추가 완료');
+            alert('답변이 추가되었습니다.');
+          }
+
+          // 서버에서 최신 데이터 다시 로드
+          await loadFromServer();
+          dlgMsg.close();
+        } catch (error) {
+          console.error('❌ 메시지 저장 오류:', error);
+          alert('저장 중 오류가 발생했습니다: ' + error.message);
+        }
+      });
+      dlgMsg.addEventListener('click', (e) => {
+        if (e.target.matches('[data-close]')) dlgMsg.close();
+      });
+
+      /* =========================
+   Keyboard & Theme
+   ========================= */
+      window.addEventListener('keydown', (e) => {
+        if (document.querySelector('dialog[open]')) return;
+        if (e.key === '/') {
+          e.preventDefault();
+          (document.activeElement?.closest('#threadsPanel')
+            ? searchThreads
+            : searchTickets
+          ).focus();
+          return;
+        }
+        if (e.key === 'Delete') {
+          if (document.activeElement?.closest('#threadsPanel'))
+            btnDelMsg.click();
+          else btnDelTicket.click();
+        }
+        if (e.key === 'Enter') {
+          if (document.activeElement?.closest('#threadsPanel'))
+            btnEditMsg.click();
+          else btnEditTicket.click();
+        }
+        const inThreads = document.activeElement?.closest('#threadsPanel');
+        if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          const tbody = inThreads ? tblThreads : tblTickets;
+          const rows = [...tbody.querySelectorAll('tr')];
+          if (rows.length === 0) return;
+          const selId = inThreads
+            ? state.ui.selectedMsgId
+            : state.ui.selectedTicketId;
+          let idx = rows.findIndex((r) => r.dataset.id === selId);
+          idx =
+            idx < 0
+              ? 0
+              : e.key === 'ArrowDown'
+              ? Math.min(idx + 1, rows.length - 1)
+              : Math.max(idx - 1, 0);
+          const id = rows[idx].dataset.id;
+          if (inThreads) {
+            state.ui.selectedMsgId = id;
+            save();
+            renderThreads();
+            btnEditMsg.disabled = false;
+            btnDelMsg.disabled = false;
+          } else {
+            selectTicket(id);
+          }
+          rows[idx].scrollIntoView({ block: 'nearest' });
+        }
+      });
+      const btnTheme = document.getElementById('btnTheme');
+      btnTheme.addEventListener('click', () => {
+        const next =
+          document.body.getAttribute('data-theme') === 'soft-light'
+            ? 'soft-dark'
+            : 'soft-light';
+        document.body.setAttribute('data-theme', next);
+        state.ui.theme = next;
+        save();
+        btnTheme.textContent =
+          '테마: ' +
+          (next === 'soft-light' ? '부드러운 라이트' : '부드러운 다크');
+      });
+
+      // Close button handler
+      const btnClose = document.getElementById('btnClose');
+      btnClose.addEventListener('click', () => {
+        // iframe 내부에서 실행 중인지 확인
+        if (window.self !== window.top) {
+          // iframe 내부에서 실행 중: 부모 창으로 돌아가기
+          window.parent.postMessage('closeIframe', '*');
+        } else {
+          // 독립 창에서 실행 중: 창 닫기
+          window.close();
+        }
+      });
+
+      /* =========================
+   Utils & Boot
+   ========================= */
+      function escapeHtml(s) {
+        return text(s).replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              '&': '&amp;',
+              '<': '&lt;',
+              '>': '&gt;',
+              '"': '&quot;',
+              "'": '&#39;',
+            }[c])
+        );
+      }
+      load();
+      document.body.setAttribute('data-theme', state.ui.theme || 'soft-light');
+      btnTheme.textContent =
+        '테마: ' +
+        ((state.ui.theme || 'soft-light') === 'soft-light'
+          ? '부드러운 라이트'
+          : '부드러운 다크');
+
+      // 🔥 초기 로드 시 서버 DB에서 실제 데이터 가져오기
+      async function loadFromServer() {
+        try {
+          console.log('🔄 서버 DB에서 데이터 로드 시작...');
+
+          // 1. Tickets 데이터 가져오기
+          const ticketsResponse = await fetch('/api/v1/tickets/');
+
+          if (!ticketsResponse.ok) {
+            throw new Error(`Tickets API 오류: ${ticketsResponse.status}`);
+          }
+
+          const ticketsData = await ticketsResponse.json();
+          console.log('📦 Tickets 원본 응답:', ticketsData);
+
+          // API 응답이 배열인지 확인
+          if (Array.isArray(ticketsData)) {
+            state.tickets = ticketsData.map((ticket) => ({
+              ticket_id: ticket.ticket_id || ticket.id,
+              sMember_id: ticket.sMember_id || ticket.smember_id || '',
+              author_name: ticket.author_name || '',
+              author_nickname: ticket.author_nickname || '',
+              author_contact: ticket.author_contact || '',
+              title_masked: ticket.title_masked || ticket.title || '',
+              content_enc: ticket.content_enc || '',
+              status: ticket.status || 'OPEN',
+              has_admin_reply: ticket.has_admin_reply || false,
+              created_at: ticket.created_at || new Date().toISOString(),
+              updated_at: ticket.updated_at || null,
+              post_pwd_hash: ticket.post_pwd_hash || '',
+              author_phone: ticket.author_phone || '',
+              author_mobile: ticket.author_mobile || '',
+              author_email: ticket.author_email || '',
+              author_gender: ticket.author_gender || '',
+              birth_year: ticket.birth_year || null,
+              snsgu: ticket.snsgu || '',
+              agreement: ticket.agreement || 0,
+            }));
+            console.log('✅ Tickets 로드 완료:', state.tickets.length, '건');
+            console.log('📊 첫 번째 티켓 샘플:', state.tickets[0]);
+          } else {
+            console.warn('⚠️ Tickets 응답이 배열이 아닙니다:', ticketsData);
+            state.tickets = [];
+          }
+
+          // 2. Thread Messages 데이터 가져오기
+          console.log('🔄 Messages API 호출 시작...');
+          const messagesResponse = await fetch('/api/v1/messages/');
+
+          console.log('📡 Messages API 응답 상태:', messagesResponse.status);
+          console.log('📡 Messages API 응답 OK:', messagesResponse.ok);
+
+          if (!messagesResponse.ok) {
+            console.error(
+              '❌ Messages API 오류 - 상태 코드:',
+              messagesResponse.status
+            );
+            const errorText = await messagesResponse.text();
+            console.error('❌ 오류 내용:', errorText);
+            throw new Error(`Messages API 오류: ${messagesResponse.status}`);
+          }
+
+          const messagesData = await messagesResponse.json();
+          console.log('📦 Messages 원본 응답:', messagesData);
+          console.log('📦 Messages 응답 타입:', typeof messagesData);
+          console.log('📦 Messages 배열 여부:', Array.isArray(messagesData));
+
+          // API 응답이 배열인지 확인
+          if (Array.isArray(messagesData)) {
+            state.messages = messagesData.map((msg) => ({
+              message_id: msg.message_id || msg.msg_id || msg.id,
+              ticket_id: msg.ticket_id,
+              role: msg.role || 'admin',
+              content_enc: msg.content_enc || msg.body || '',
+              body: msg.body || msg.content_enc || '', // body 우선 사용
+              admin_id: msg.admin_id || '',
+              created_at: msg.created_at || new Date().toISOString(),
+            }));
+            console.log(
+              '✅ Thread Messages 로드 완료:',
+              state.messages.length,
+              '건'
+            );
+            if (state.messages.length > 0) {
+              console.log('📊 첫 번째 메시지 샘플:', state.messages[0]);
+            }
+          } else {
+            console.warn('⚠️ Messages 응답이 배열이 아닙니다:', messagesData);
+            state.messages = [];
+          }
+
+          // 3. 화면 렌더링
+          renderTickets();
+          renderThreads();
+          if (state.tickets.length > 0) {
+            selectTicket(state.tickets[0].ticket_id);
+          }
+
+          // 4. 서버 데이터로 localStorage 업데이트
+          save();
+
+          console.log('✅ 서버 데이터 로드 및 렌더링 완료!');
+        } catch (error) {
+          console.error('❌ 서버 데이터 로드 중 오류:', error);
+          console.error('상세 오류:', error.message);
+
+          // 오류 발생 시 기존 localStorage 데이터 사용
+          console.log('📂 localStorage 데이터 사용');
+          renderTickets();
+          renderThreads();
+          if (state.tickets.length > 0) {
+            selectTicket(state.tickets[0].ticket_id);
+          }
+        }
+      }
+
+      // 서버에서 데이터 로드 실행
+      loadFromServer();
+    </script>
+
+    <!-- 회원 세션 전역 변수 -->
+    <script src="/static/member_session.js"></script>
+    <!-- 관리자 세션 전역 변수 관리 -->
+    <script src="/static/admin_session.js"></script>
+
+    <!-- 관리자 로그인 체크 -->
+    <script>
+      (function checkAdminLogin() {
+        // admin_session.js가 로드될 때까지 대기
+        if (typeof window.getAdminSession === 'function') {
+          const adminSession = window.getAdminSession();
+
+          // 관리자 세션이 없거나 로그인 상태가 아니면 로그인 페이지로 리다이렉트
+          if (
+            !adminSession ||
+            !adminSession.isLoggedIn ||
+            !adminSession.admin_id
+          ) {
+            alert('관리자 로그인이 필요합니다.');
+            window.location.href = '/admin_login';
+            return;
+          }
+
+          console.log('관리자 인증 완료:', adminSession.username);
+        } else {
+          console.error('admin_session.js가 로드되지 않았습니다.');
+          alert('관리자 세션 관리 스크립트를 로드할 수 없습니다.');
+          window.location.href = '/admin_login';
+        }
+      })();
+    </script>
+
+    <!-- 복사방지 세션 전역 변수 관리 -->
+    <script src="/static/security.js"></script>
+    <!-- 관리자 세션 전역 변수 관리 -->
+    <script src="/static/admin_session.js"></script>
+  </body>
+</html>

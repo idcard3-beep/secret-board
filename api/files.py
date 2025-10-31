@@ -9,6 +9,40 @@ repo = get_repository()
 
 ADMIN_SESSION_KEY = 'admin_logged_in'
 
+@bp.post('/upload-signature')
+def upload_signature():
+    """서명 이미지 업로드 (회원가입용)"""
+    try:
+        f = request.files.get('file')
+        if not f:
+            return jsonify({'ok': False, 'error': '파일이 없습니다.'}), 400
+        
+        # 서명 파일 저장 폴더
+        sign_folder = os.path.join(UPLOAD_ROOT, 'sign_file')
+        os.makedirs(sign_folder, exist_ok=True)
+        
+        # 파일명 확인 (sMem_id_sMem_name.png 형식)
+        filename = f.filename
+        if not filename:
+            return jsonify({'ok': False, 'error': '파일명이 없습니다.'}), 400
+        
+        # 파일 저장
+        file_path = os.path.join(sign_folder, filename)
+        f.save(file_path)
+        
+        # 상대 경로 반환
+        relative_path = os.path.join('uploads', 'sign_file', filename).replace('\\', '/')
+        
+        return jsonify({
+            'ok': True,
+            'path': relative_path,
+            'message': '서명 이미지가 업로드되었습니다.'
+        })
+        
+    except Exception as e:
+        print(f"❌ 서명 이미지 업로드 오류: {e}")
+        return jsonify({'ok': False, 'error': str(e)}), 500
+
 @bp.post('/<ticket_id>/upload')
 def upload(ticket_id):
     token = request.cookies.get('view_token')

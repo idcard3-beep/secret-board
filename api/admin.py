@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, session
 from adapters.repository_factory import get_repository
 import bcrypt, uuid
+import psycopg2.extras
 from datetime import datetime
 
 bp = Blueprint('admin', __name__)
@@ -14,20 +15,20 @@ def require_admin():
 @bp.post('/login')
 def login():
     d = request.get_json() or {}
-    username = d.get('username', '').strip()
+    admin_id = d.get('admin_id', '').strip()
     password = d.get('password', '')
     
     # 입력값 검증
-    if not username:
+    if not admin_id:
         return jsonify({'ok': False, 'error': 'ID를 입력해주세요.'}), 400
     
     if not password:
         return jsonify({'ok': False, 'error': '비밀번호를 입력해주세요.'}), 400
     
-    # 사용자 조회
-    user = repo.get_admin_user(username)
+    # 사용자 조회 (admin_id로 조회)
+    user = repo.get_admin_user_by_id(admin_id)
     if not user:
-        print(f"❌ 관리자 사용자를 찾을 수 없음: {username}")
+        print(f"❌ 관리자 사용자를 찾을 수 없음: {admin_id}")
         return jsonify({'ok': False, 'error': '존재하지 않는 관리자 ID입니다.'}), 401
 
     # 비밀번호 확인 - 디버깅 로그 추가
@@ -50,23 +51,40 @@ def login():
         return jsonify({'ok': False, 'error': '인증 처리 중 오류가 발생했습니다.'}), 500
     
     if not password_valid:
-        print(f"❌ 비밀번호 불일치: {username}")
+        print(f"❌ 비밀번호 불일치: {admin_id}")
         return jsonify({'ok': False, 'error': '비밀번호가 일치하지 않습니다.'}), 401
 
     # 로그인 성공
-    print(f"✅ 관리자 로그인 성공: {username}")
+    username = user.get('username', '')
+    admin_status = user.get('admin_status', 'OPEN')  # admin_status 가져오기
+    print(f"✅ 관리자 로그인 성공: {admin_id} (username: {username}, status: {admin_status})")
     session[ADMIN_SESSION_KEY] = True
     session['admin_username'] = username  # 사용자명 저장
+    session['admin_id'] = admin_id  # admin_id 저장
     session['admin_role'] = user.get('role', 'ADMIN')  # role 저장
-    print(f"👤 세션에 저장된 role: {session['admin_role']}")
-    return jsonify({'ok': True, 'message': '로그인 성공'})
+    session['admin_status'] = admin_status  # admin_status 저장
+    print(f"👤 세션에 저장된 정보 - admin_id: {session.get('admin_id')}, username: {username}, role: {session['admin_role']}, status: {admin_status}")
+    
+    # 클라이언트에 관리자 정보 반환
+    return jsonify({
+        'ok': True, 
+        'message': '로그인 성공',
+        'admin': {
+            'admin_id': admin_id,
+            'username': username,
+            'role': user.get('role', 'ADMIN'),
+            'admin_status': admin_status
+        }
+    })
 
 @bp.post('/logout')
 def logout():
     session.pop(ADMIN_SESSION_KEY, None)
     session.pop('admin_username', None)  # 사용자명도 제거
+    session.pop('admin_id', None)  # admin_id도 제거
     session.pop('admin_role', None)  # role도 제거
-    return jsonify({'ok': True})
+    print(f"✅ 관리자 로그아웃 - 세션 정리 완료")
+    return jsonify({'ok': True, 'message': '로그아웃 성공'})
 
 @bp.get('/tickets')
 def admin_list():
@@ -192,7 +210,9 @@ def admin_reply(ticket_id):
     
     d = request.get_json() or {}
     content = d.get('content','')
+    client_admin_id = d.get('admin_id')  # 클라이언트에서 전송한 admin_id
     print(f"📝 답변 내용: {content}")
+    print(f"👤 클라이언트에서 전송한 admin_id: {client_admin_id}")
     
     if not content.strip():
         print("❌ 답변 내용이 비어있음")
@@ -210,8 +230,12 @@ def admin_reply(ticket_id):
         
         print(f"✅ 티켓 존재 확인: {existing_ticket.get('title', 'No Title')}")
         
-        # 2. 세션에서 관리자 role 그대로 가져오기
+        # 2. admin_id 결정 (우선순위: 클라이언트 전송 > 세션 > DB 조회)
         try:
+            # 클라이언트에서 전송한 admin_id를 최우선으로 사용
+            admin_id = client_admin_id if client_admin_id else session.get('admin_id')
+            print(f"👤 admin_id 1차 결정 (클라이언트 또는 세션): {admin_id}")
+            
             # 관리자 계정의 최신 role은 DB의 admin_users 테이블에서 가져옵니다.
             username = session.get('admin_username')
             admin_role = None
@@ -220,12 +244,20 @@ def admin_reply(ticket_id):
                     admin_user = repo.get_admin_user(username)
                     if admin_user and 'role' in admin_user:
                         admin_role = admin_user.get('role')
-                        print(f"👤 DB에서 admin_users.role 가져옴 - username={username}, role={admin_role}")
+                        # admin_id가 아직 없는 경우에만 DB에서 가져오기
+                        if not admin_id:
+                            admin_id = admin_user.get('admin_id')
+                            print(f"👤 DB에서 admin_id 가져옴: {admin_id}")
+                        print(f"👤 DB에서 admin_users 정보 가져옴 - username={username}, role={admin_role}, admin_id={admin_id}")
                     else:
                         print(f"⚠️ admin 사용자 조회는 되었지만 role 필드 없음 - username={username}")
                 except Exception as db_e:
                     print(f"❌ admin 사용자 조회 중 오류: {db_e}")
 
+            # admin_id가 여전히 없으면 경고 (하지만 계속 진행)
+            if not admin_id:
+                print(f"⚠️ 경고: admin_id를 찾을 수 없습니다. NULL로 저장됩니다.")
+            
             # 폴백: 세션에 저장된 값이나 기본 'ADMIN' 사용
             if admin_role is None:
                 admin_role = session.get('admin_role', 'ADMIN')
@@ -233,14 +265,19 @@ def admin_reply(ticket_id):
             # ensure it's a string (no transformation of case)
             admin_role = str(admin_role)
         except Exception as role_e:
-            print(f"⚠️ 관리자 role 결정 중 오류, 기본값 사용: {role_e}")
+            print(f"⚠️ 관리자 role/admin_id 결정 중 오류, 기본값 사용: {role_e}")
             admin_role = 'ADMIN'
+            if not admin_id:
+                admin_id = client_admin_id or session.get('admin_id')
 
-        # 3. 메시지 생성 (세션의 role 값을 변환 없이 그대로 저장)
+        print(f"✅ 최종 결정된 admin_id: {admin_id}, role: {admin_role}")
+
+        # 3. 메시지 생성 (admin_id 무조건 포함)
         message_data = {
             'ticket_id': ticket_id,
             'content': content,
-            'role': admin_role
+            'role': admin_role,
+            'admin_id': admin_id  # admin_id 추가
         }
         
         try:
@@ -291,3 +328,274 @@ def admin_reply(ticket_id):
         import traceback
         print(f"❌ 스택 트레이스: {traceback.format_exc()}")
         return jsonify({'error': f'답변 등록 중 오류가 발생했습니다: {str(e)}'}), 500
+
+@bp.put('/messages/<message_id>')
+def update_message(message_id):
+    """관리자 답변 메시지 수정"""
+    print(f"✏️ 메시지 수정 요청 - 메시지 ID: {message_id}")
+    print(f"🔍 message_id 타입: {type(message_id)}, 값: '{message_id}'")
+    
+    if not require_admin():
+        print("❌ 관리자 인증 실패")
+        return ('', 401)
+    
+    try:
+        d = request.get_json() or {}
+        print(f"📥 받은 JSON 데이터: {d}")
+        
+        content = d.get('content', '')
+        role = d.get('role', None)  # role 추가
+        print(f"📝 수정할 내용: {content[:50]}..." if len(content) > 50 else f"📝 수정할 내용: {content}")
+        print(f"👤 수정할 역할: {role}")
+        
+        if not content.strip():
+            print("❌ 수정할 내용이 비어있음")
+            return jsonify({'error': '내용을 입력해주세요.'}), 400
+        
+        # Repository 타입 확인
+        print(f"🔍 Repository 타입: {type(repo)}")
+        print(f"🔍 Repository에 update_message 메서드 있는지: {hasattr(repo, 'update_message')}")
+        
+        # role이 제공된 경우 함께 업데이트
+        if role:
+            print(f"🔄 role과 함께 메시지 업데이트 시도...")
+            try:
+                with repo._get_connection() as conn:
+                    with conn.cursor() as cursor:
+                        cursor.execute("""
+                            UPDATE thread_messages 
+                            SET content_enc = %s, role = %s
+                            WHERE msg_id = %s::uuid
+                        """, (content, role, str(message_id)))
+                        conn.commit()
+                        print(f"✅ role과 content 모두 업데이트 완료")
+            except Exception as update_error:
+                print(f"❌ role 업데이트 실패, content만 업데이트 시도: {update_error}")
+                repo.update_message(message_id, content)
+        else:
+            # 메시지 수정 (content만)
+            print(f"🔄 repo.update_message() 호출 전...")
+            repo.update_message(message_id, content)
+            print(f"✅ repo.update_message() 호출 후 - 메시지 수정 완료: {message_id}")
+        
+        return jsonify({
+            'ok': True,
+            'message': '메시지가 성공적으로 수정되었습니다.'
+        })
+        
+    except AttributeError as attr_e:
+        print(f"❌ AttributeError - Repository에 메서드가 없음: {attr_e}")
+        import traceback
+        print(f"❌ 스택 트레이스: {traceback.format_exc()}")
+        return jsonify({'error': f'Repository에 update_message 메서드가 없습니다: {str(attr_e)}'}), 500
+        
+    except Exception as e:
+        print(f"❌ 메시지 수정 오류: {e}")
+        print(f"❌ 오류 타입: {type(e).__name__}")
+        import traceback
+        print(f"❌ 스택 트레이스: {traceback.format_exc()}")
+        return jsonify({'error': f'메시지 수정 중 오류가 발생했습니다: {str(e)}'}), 500
+
+@bp.delete('/messages/<message_id>')
+def delete_message(message_id):
+    """관리자 답변 메시지 삭제"""
+    print(f"🗑️ 메시지 삭제 요청 - 메시지 ID: {message_id}")
+    
+    if not require_admin():
+        print("❌ 관리자 인증 실패")
+        return ('', 401)
+    
+    try:
+        # 메시지 삭제
+        repo.delete_message(message_id)
+        print(f"✅ 메시지 삭제 완료: {message_id}")
+        
+        return jsonify({
+            'ok': True,
+            'message': '메시지가 성공적으로 삭제되었습니다.'
+        })
+        
+    except Exception as e:
+        print(f"❌ 메시지 삭제 오류: {e}")
+        import traceback
+        print(f"❌ 스택 트레이스: {traceback.format_exc()}")
+        return jsonify({'error': f'메시지 삭제 중 오류가 발생했습니다: {str(e)}'}), 500
+
+@bp.get('/users')
+def get_all_admin_users():
+    """모든 관리자 계정 조회"""
+    print("📋 모든 관리자 계정 조회 요청")
+    
+    if not require_admin():
+        print("❌ 관리자 인증 실패")
+        return ('', 401)
+    
+    try:
+        # PostgreSQL에서 모든 admin_users 조회
+        with repo._get_connection() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cursor:
+                cursor.execute("""
+                    SELECT admin_id, username, pwd_hash, role, admin_status, created_at
+                    FROM admin_users
+                    ORDER BY created_at DESC
+                """)
+                
+                rows = cursor.fetchall()
+                users = [dict(row) for row in rows]
+                
+                # created_at을 문자열로 변환
+                for user in users:
+                    if user.get('created_at'):
+                        user['created_at'] = user['created_at'].isoformat()
+                
+                print(f"✅ 관리자 계정 조회 완료: {len(users)}개")
+                
+                return jsonify({
+                    'ok': True,
+                    'users': users
+                })
+                
+    except Exception as e:
+        print(f"❌ 관리자 계정 조회 오류: {e}")
+        import traceback
+        print(f"❌ 스택 트레이스: {traceback.format_exc()}")
+        return jsonify({'error': f'계정 조회 중 오류가 발생했습니다: {str(e)}'}), 500
+
+@bp.post('/users')
+def create_admin_user():
+    """관리자 계정 생성"""
+    print("👤 관리자 계정 생성 요청")
+    
+    if not require_admin():
+        print("❌ 관리자 인증 실패")
+        return ('', 401)
+    
+    try:
+        d = request.get_json() or {}
+        admin_id = d.get('admin_id', '').strip()
+        username = d.get('username', '').strip()
+        pwd_hash = d.get('pwd_hash', '').strip()
+        role = d.get('role', 'AGENT').strip()
+        admin_status = d.get('admin_status', 'OPEN').strip()
+        
+        print(f"📥 받은 데이터: admin_id={admin_id}, username={username}, role={role}, admin_status={admin_status}")
+        
+        if not admin_id or not username or not pwd_hash:
+            print("❌ 필수 필드 누락")
+            return jsonify({'error': '모든 필드를 입력해주세요.'}), 400
+        
+        # admin_id 중복 확인만 수행
+        existing = repo.get_admin_user_by_id(admin_id)
+        if existing:
+            print(f"❌ admin_id 중복: {admin_id}")
+            return jsonify({'error': 'admin_id가 이미 존재합니다.'}), 409
+        
+        # 관리자 계정 생성
+        result_id = repo.create_admin_user(username, pwd_hash, admin_id)
+        
+        if not result_id:
+            print("❌ 관리자 계정 생성 실패")
+            return jsonify({'error': '계정 생성에 실패했습니다.'}), 500
+        
+        # role과 admin_status 업데이트 (항상 수행)
+        repo.update_admin_user(admin_id, role=role, admin_status=admin_status)
+        
+        print(f"✅ 관리자 계정 생성 완료: {result_id}, role={role}, admin_status={admin_status}")
+        
+        return jsonify({
+            'ok': True,
+            'message': '관리자 계정이 성공적으로 생성되었습니다.',
+            'admin_id': result_id
+        }), 201
+        
+    except Exception as e:
+        print(f"❌ 관리자 계정 생성 오류: {e}")
+        import traceback
+        print(f"❌ 스택 트레이스: {traceback.format_exc()}")
+        return jsonify({'error': f'계정 생성 중 오류가 발생했습니다: {str(e)}'}), 500
+
+@bp.put('/users/<admin_id>')
+def update_admin_user_endpoint(admin_id):
+    """관리자 계정 정보 수정"""
+    print(f"✏️ 관리자 계정 수정 요청 - admin_id: {admin_id}")
+    
+    if not require_admin():
+        print("❌ 관리자 인증 실패")
+        return ('', 401)
+    
+    try:
+        d = request.get_json() or {}
+        username = d.get('username', '').strip() or None
+        pwd_hash = d.get('pwd_hash', '').strip() or None
+        role = d.get('role', '').strip() or None
+        admin_status = d.get('admin_status', '').strip() or None
+        
+        print(f"📥 받은 데이터: username={username}, role={role}, admin_status={admin_status}, pwd_hash={'***' if pwd_hash else None}")
+        
+        # 계정 존재 확인
+        existing = repo.get_admin_user_by_id(admin_id)
+        if not existing:
+            print(f"❌ 계정을 찾을 수 없음: {admin_id}")
+            return jsonify({'error': '계정을 찾을 수 없습니다.'}), 404
+        
+        # 계정 정보 수정
+        success = repo.update_admin_user(admin_id, username=username, password_hash=pwd_hash, role=role, admin_status=admin_status)
+        
+        if not success:
+            print("❌ 관리자 계정 수정 실패")
+            return jsonify({'error': '계정 수정에 실패했습니다.'}), 500
+        
+        print(f"✅ 관리자 계정 수정 완료: {admin_id}")
+        
+        return jsonify({
+            'ok': True,
+            'message': '관리자 계정이 성공적으로 수정되었습니다.'
+        })
+        
+    except Exception as e:
+        print(f"❌ 관리자 계정 수정 오류: {e}")
+        import traceback
+        print(f"❌ 스택 트레이스: {traceback.format_exc()}")
+        return jsonify({'error': f'계정 수정 중 오류가 발생했습니다: {str(e)}'}), 500
+
+@bp.delete('/users/<admin_id>')
+def delete_admin_user_endpoint(admin_id):
+    """관리자 계정 삭제"""
+    print(f"🗑️ 관리자 계정 삭제 요청 - admin_id: {admin_id}")
+    
+    if not require_admin():
+        print("❌ 관리자 인증 실패")
+        return ('', 401)
+    
+    try:
+        # 계정 존재 확인
+        existing = repo.get_admin_user_by_id(admin_id)
+        if not existing:
+            print(f"❌ 계정을 찾을 수 없음: {admin_id}")
+            return jsonify({'error': '계정을 찾을 수 없습니다.'}), 404
+        
+        # 계정 삭제
+        with repo._get_connection() as conn:
+            with conn.cursor() as cursor:
+                cursor.execute("""
+                    DELETE FROM admin_users
+                    WHERE admin_id = %s
+                """, (admin_id,))
+                conn.commit()
+                
+                if cursor.rowcount == 0:
+                    print(f"❌ 계정 삭제 실패: {admin_id}")
+                    return jsonify({'error': '계정 삭제에 실패했습니다.'}), 500
+        
+        print(f"✅ 관리자 계정 삭제 완료: {admin_id}")
+        
+        return jsonify({
+            'ok': True,
+            'message': '관리자 계정이 성공적으로 삭제되었습니다.'
+        })
+        
+    except Exception as e:
+        print(f"❌ 관리자 계정 삭제 오류: {e}")
+        import traceback
+        print(f"❌ 스택 트레이스: {traceback.format_exc()}")
+        return jsonify({'error': f'계정 삭제 중 오류가 발생했습니다: {str(e)}'}), 500

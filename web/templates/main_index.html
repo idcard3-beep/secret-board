@@ -46,6 +46,11 @@
         font-size: 1.4em;
         font-weight: bold;
       }
+      .auth-links {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
       .auth-links a {
         color: #fff;
         text-decoration: none;
@@ -57,6 +62,20 @@
         color: #fff;
         font-size: 1.2em;
         cursor: pointer;
+        margin-left: 5px;
+      }
+
+      /* 로그인 링크 영역 */
+      #loginLinks {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        color: #fff;
+      }
+
+      /* 회원 정보 영역 */
+      #memberInfo {
+        display: none;
       }
 
       /* 사이드 메뉴 */
@@ -236,17 +255,32 @@
         position: relative;
         width: 100%;
         max-width: 800px;
+        height: 250px;
         margin: 20px auto;
         overflow: hidden;
         border-radius: 12px;
-        aspect-ratio: 16 / 5;
+        background: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
-      .slider .slides img {
+      .slider .slides {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        position: relative;
+      }
+      .slider .slides img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        object-fit: contain;
         display: none;
-        border-radius: 12px;
+        border-radius: 8px;
       }
 
       .dots {
@@ -279,8 +313,67 @@
         padding: 15px;
         margin-top: auto;
       }
+      /* 회원 로그인 정보 표시 영역 */
+      .member-info-bar {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .member-info-text {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+        font-size: 1em; /* 로그인/회원가입과 동일한 크기 */
+      }
+      .member-info-label {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 1em;
+        font-weight: normal;
+      }
+      .member-info-id,
+      .member-info-name,
+      .member-info-nickname {
+        font-weight: normal;
+        color: #fff;
+      }
+      .member-info-separator {
+        color: rgba(255, 255, 255, 0.5);
+        margin: 0 2px;
+      }
+      .member-logout-btn {
+        background: rgba(255, 107, 107, 0.85);
+        color: white;
+        border: none;
+        padding: 5px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 0.85em;
+        font-weight: 600;
+        transition: background 0.2s ease;
+        white-space: nowrap;
+      }
+      .member-logout-btn:hover {
+        background: rgba(255, 77, 77, 1);
+      }
+
+      /* 반응형: 작은 화면에서 라벨 숨기기 */
+      @media (max-width: 768px) {
+        .member-info-bar {
+          font-size: 0.8em;
+          padding: 6px 12px;
+        }
+        .member-info-label {
+          display: none;
+        }
+        .member-info-text {
+          gap: 6px;
+        }
+      }
     </style>
     <link rel="stylesheet" href="/static/security.css" />
+    <!-- 회원 세션 전역 변수 -->
+    <script src="/static/member_session.js"></script>
   </head>
   <body>
     <!-- 헤더 -->
@@ -292,7 +385,43 @@
         <div class="logo">🌿 심리상담센터 나라톡톡</div>
       </div>
       <nav class="auth-links">
-        <a href="#">로그인</a> | <a href="#">회원가입</a>
+        <!-- 로그인 전/후 통합 영역 (현재 로그인 버튼 자리 활용) -->
+        <div id="authLinksDefault">
+          <!-- 로그인 전 링크 -->
+          <div id="loginLinks">
+            <a href="#" class="load-form" data-target="member_login.html"
+              >로그인</a
+            >
+            |
+            <a href="#" class="load-form" data-target="member_cardup.html"
+              >회원가입</a
+            >
+          </div>
+
+          <!-- 로그인 후 회원 정보 (3개 항목) - 같은 자리에 표시 -->
+          <div id="memberInfo" class="member-info-bar" style="display: none">
+            <div class="member-info-text">
+              <span class="member-info-label">ID:</span>
+              <span class="member-info-id" id="displayMemberId"></span>
+              <span class="member-info-separator">|</span>
+              <span class="member-info-label">이름:</span>
+              <span class="member-info-name" id="displayMemberName"></span>
+              <span class="member-info-separator">|</span>
+              <span class="member-info-label">닉네임:</span>
+              <span
+                class="member-info-nickname"
+                id="displayMemberNickname"
+              ></span>
+            </div>
+            <button
+              type="button"
+              class="member-logout-btn"
+              id="memberLogoutBtn"
+            >
+              로그아웃
+            </button>
+          </div>
+        </div>
         <button id="toggleMenuTop"><i class="fas fa-bars"></i></button>
       </nav>
     </header>
@@ -310,19 +439,56 @@
             <!-- 특이한 물방울형 버튼, 아이콘은 중앙에 크게 -->
           </button>
         </div>
-        <div class="side-auth">
-          <a href="#">로그인</a> | <a href="#">회원가입</a>
+
+        <!-- 회원 로그인 정보 (사이드바) -->
+        <div
+          id="sideMemberInfo"
+          class="side-auth"
+          style="
+            display: none;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px 0;
+          "
+        >
+          <div style="color: #fff; font-size: 0.95em; margin-bottom: 6px">
+            <span id="sideMemberId" style="font-weight: 600"></span>
+            (<span id="sideMemberName"></span>)
+          </div>
+          <button
+            id="sideMemberLogout"
+            style="
+              background: rgba(255, 107, 107, 0.85);
+              color: white;
+              border: none;
+              padding: 6px 16px;
+              border-radius: 6px;
+              cursor: pointer;
+              font-size: 0.85em;
+            "
+          >
+            로그아웃
+          </button>
+        </div>
+
+        <div class="side-auth" id="sideAuthDefault">
+          <a href="#" class="load-form" data-target="member_login.html"
+            >로그인</a
+          >
+          |
+          <a href="#" class="load-form" data-target="member_cardup.html"
+            >회원가입</a
+          >
         </div>
         <ul>
           <li>
-            <button class="menu-trigger">나라톡톡 센터소개</button>
+            <button class="menu-trigger">센터소개</button>
             <ul class="submenu">
               <li>
                 <a
                   href="#"
                   class="load-form"
                   data-target="0101_Center_intro.html"
-                  >센터소개</a
+                  >나라톡톡 센터소개</a
                 >
               </li>
 
@@ -360,15 +526,22 @@
                 >
               </li>
               <li>
-                <a href="#" class="load-form" data-target="new">상담예약</a>
+                <a href="#" class="load-form" data-target="new"
+                  >비밀상담요청 작성</a
+                >
               </li>
               <li>
-                <a href="#" class="load-form" data-target="list">상담확인</a>
+                <a
+                  href="https://secret-board-04s6.onrender.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >비밀상담요청 게시판</a
+                >
               </li>
             </ul>
           </li>
           <li>
-            <button class="menu-trigger">상담종류</button>
+            <button class="menu-trigger">심리.인생상담 분류</button>
             <ul class="submenu">
               <!--<li><a href="#">심리상담</a></li> -->
               <!--<li><a href="#">인생상담</a></li> -->
@@ -377,12 +550,42 @@
                   href="#"
                   class="load-form"
                   data-target="0301_main_psychol.html"
-                  >심리상담</a
+                  >심리상담 종류 및 설명</a
                 >
               </li>
               <li>
                 <a href="#" class="load-form" data-target="0302_main_life.html"
-                  >인생상담</a
+                  >인생상담 종류 및 설명</a
+                >
+              </li>
+
+              <li>
+                <a href="#" class="load-form" data-target="0303_name_rules.html"
+                  >성명학(발음과 소리, 컬러성명)개론과 오행 분석기</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="load-form"
+                  data-target="0304_color_counguide.html"
+                  >컬러 심리상담 설명</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="load-form"
+                  data-target="0305_color_psychology120.html"
+                  >컬러 심리학 필레트 120</a
+                >
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="load-form"
+                  data-target="0306_color_psychology1202.html"
+                  >컬러 심리학 심리적 의미 120</a
                 >
               </li>
             </ul>
@@ -413,6 +616,7 @@
             <ul class="submenu">
               <li><a href="#">공지사항</a></li>
               <li><a href="#">자주묻는질문</a></li>
+              <li><a href="#">분야별 상담사선생님 등록문의</a></li>
             </ul>
           </li>
         </ul>
@@ -450,6 +654,205 @@
     </footer>
 
     <script>
+      // ===== 회원 세션 관리 =====
+      function updateMemberUI() {
+        console.log('🔄 updateMemberUI 호출됨');
+
+        // member_session.js가 로드되었는지 확인
+        if (!window.getMemberSession || !window.isMemberLoggedIn) {
+          console.error('❌ member_session.js가 로드되지 않았습니다!');
+          return;
+        }
+
+        const session = window.getMemberSession();
+        const isLoggedIn = window.isMemberLoggedIn();
+
+        console.log('📊 세션 정보:', session);
+        console.log('🔐 로그인 상태:', isLoggedIn);
+
+        // 헤더 영역 - 로그인 버튼 자리를 활용
+        const loginLinks = document.getElementById('loginLinks');
+        const memberInfo = document.getElementById('memberInfo');
+        const displayMemberId = document.getElementById('displayMemberId');
+        const displayMemberName = document.getElementById('displayMemberName');
+        const displayMemberNickname = document.getElementById(
+          'displayMemberNickname'
+        );
+
+        // 요소 확인
+        console.log('🔍 loginLinks:', loginLinks);
+        console.log('🔍 memberInfo:', memberInfo);
+
+        if (!loginLinks || !memberInfo) {
+          console.error('❌ 필수 요소를 찾을 수 없습니다!');
+          return;
+        }
+
+        // 사이드바 영역
+        const sideMemberInfo = document.getElementById('sideMemberInfo');
+        const sideAuthDefault = document.getElementById('sideAuthDefault');
+        const sideMemberId = document.getElementById('sideMemberId');
+        const sideMemberName = document.getElementById('sideMemberName');
+
+        if (isLoggedIn && session.sMem_id) {
+          console.log('✅ 로그인 상태 - UI 표시');
+          console.log('   ID:', session.sMem_id);
+          console.log('   이름:', session.sMem_name);
+          console.log('   닉네임:', session.sMem_nickname);
+
+          // 로그인 버튼 숨기고, 같은 자리에 회원 정보 표시
+          loginLinks.style.display = 'none';
+          memberInfo.style.display = 'flex';
+          displayMemberId.textContent = session.sMem_id;
+          displayMemberName.textContent = session.sMem_name || '이름없음';
+          displayMemberNickname.textContent =
+            session.sMem_nickname || '닉네임없음';
+
+          console.log('   ✓ loginLinks 숨김:', loginLinks.style.display);
+          console.log('   ✓ memberInfo 표시:', memberInfo.style.display);
+
+          // 사이드바
+          sideMemberInfo.style.display = 'block';
+          sideAuthDefault.style.display = 'none';
+          sideMemberId.textContent = session.sMem_id;
+          sideMemberName.textContent = session.sMem_name || '이름없음';
+        } else {
+          console.log('❌ 로그아웃 상태 - UI 숨김');
+          // 로그아웃 상태 - 로그인 버튼 표시, 회원 정보 숨김
+          loginLinks.style.display = 'flex';
+          memberInfo.style.display = 'none';
+
+          console.log('   ✓ loginLinks 표시:', loginLinks.style.display);
+          console.log('   ✓ memberInfo 숨김:', memberInfo.style.display);
+
+          // 사이드바
+          sideMemberInfo.style.display = 'none';
+          sideAuthDefault.style.display = 'block';
+        }
+      }
+
+      function handleMemberLogout() {
+        if (confirm('로그아웃하시겠습니까?')) {
+          console.log('🚪 로그아웃 시작...');
+
+          // 1. 전역 변수 완전 초기화
+          window.clearMemberSession();
+
+          // 2. UI 업데이트
+          updateMemberUI();
+
+          // 3. iframe 초기화 (로그인 페이지가 열려있을 수 있음)
+          if (contentFrame) {
+            contentFrame.style.display = 'none';
+            contentFrame.src = '';
+          }
+
+          // 4. 홈 화면으로 복귀
+          if (homeContent) {
+            homeContent.style.display = 'block';
+          }
+
+          // 5. 전역 변수 최종 상태 확인
+          console.log('🔍 로그아웃 후 전역 변수 상태:', window.MEMBER_SESSION);
+          console.log('   isLoggedIn:', window.isMemberLoggedIn());
+
+          alert('✅ 로그아웃되었습니다.');
+        }
+      }
+
+      // 로그아웃 버튼 이벤트 (DOMContentLoaded 후에 연결)
+      function attachLogoutEvents() {
+        const memberLogoutBtn = document.getElementById('memberLogoutBtn');
+        const sideMemberLogout = document.getElementById('sideMemberLogout');
+
+        if (memberLogoutBtn) {
+          memberLogoutBtn.addEventListener('click', handleMemberLogout);
+        }
+        if (sideMemberLogout) {
+          sideMemberLogout.addEventListener('click', handleMemberLogout);
+        }
+      }
+
+      // 페이지 로드 시 회원 세션 확인
+      window.addEventListener('DOMContentLoaded', () => {
+        console.log('📄 페이지 로드 완료');
+        console.log('🔍 초기 상태 확인...');
+
+        // 요소 존재 확인
+        const loginLinks = document.getElementById('loginLinks');
+        const memberInfo = document.getElementById('memberInfo');
+        console.log('   loginLinks 요소:', loginLinks ? '✓ 존재' : '✗ 없음');
+        console.log('   memberInfo 요소:', memberInfo ? '✓ 존재' : '✗ 없음');
+
+        if (memberInfo) {
+          const computedStyle = window.getComputedStyle(memberInfo);
+          console.log('   memberInfo display:', computedStyle.display);
+          console.log('   memberInfo visibility:', computedStyle.visibility);
+        }
+
+        attachLogoutEvents();
+        // 약간의 지연 후 UI 업데이트 (member_session.js 로드 대기)
+        setTimeout(() => {
+          updateMemberUI();
+        }, 100);
+      });
+
+      // iframe에서 로그인 성공 시 이벤트 감지
+      window.addEventListener('message', (event) => {
+        console.log('📨 메시지 수신:', event.data);
+        if (event.data === 'memberLoginSuccess') {
+          console.log('✅ 로그인 성공 메시지 수신 - UI 업데이트');
+          // 세션 복원 후 UI 업데이트
+          setTimeout(() => {
+            window.restoreMemberSession();
+            updateMemberUI();
+          }, 200);
+
+          // 홈으로 이동
+          contentFrame.style.display = 'none';
+          contentFrame.src = '';
+          homeContent.style.display = 'block';
+        } else if (event.data === 'closeIframe') {
+          // iframe 닫기 메시지 수신
+          console.log('🚪 iframe 닫기 요청 수신');
+          contentFrame.style.display = 'none';
+          contentFrame.src = '';
+          homeContent.style.display = 'block';
+        }
+      });
+
+      // ===== 테스트용 헬퍼 함수 (콘솔에서 사용 가능) =====
+      window.testMemberLogin = function () {
+        console.log('🧪 테스트 로그인 시작...');
+        const testData = {
+          sMem_id: 'test123',
+          sMem_name: '홍길동',
+          sMem_nickname: '테스터',
+        };
+        window.setMemberSession(testData);
+        console.log('✓ 세션 설정 완료');
+        updateMemberUI();
+        console.log('✓ UI 업데이트 완료');
+        console.log('✅ 테스트 로그인 완료:', testData);
+        console.log('💡 상단 바를 확인하세요!');
+      };
+
+      window.testMemberLogout = function () {
+        console.log('🧪 테스트 로그아웃 시작...');
+        window.clearMemberSession();
+        console.log('✓ 세션 초기화 완료');
+        updateMemberUI();
+        console.log('✓ UI 업데이트 완료');
+        console.log('✅ 테스트 로그아웃 완료');
+      };
+
+      // ===== 강제 UI 업데이트 (디버깅용) =====
+      window.forceUpdateUI = function () {
+        console.log('🔧 강제 UI 업데이트...');
+        updateMemberUI();
+      };
+
+      // ===== 기존 코드 =====
       const sideMenu = document.getElementById('sideMenu');
       const mainContent = document.getElementById('mainContent');
       const homeContent = document.getElementById('homeContent');
@@ -581,5 +984,12 @@
         showSlide(next);
       }, 5000);
     </script>
+
+    <!-- 회원 세션 전역 변수 -->
+    <script src="/static/member_session.js"></script>
+    <!-- 관리자 세션 전역 변수 관리 -->
+    <script src="/static/admin_session.js"></script>
+    <!-- 복사방지 세션 전역 변수 관리 -->
+    <script src="/static/security.js"></script>
   </body>
 </html>

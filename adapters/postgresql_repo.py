@@ -139,7 +139,8 @@ class PostgreSQLRepo:
             ticket_id = message_data.get('ticket_id')
             content = message_data.get('content', '')
             role = message_data.get('role', 'USER')
-            return self._create_message_internal(ticket_id, content, role)
+            admin_id = message_data.get('admin_id')  # admin_id 추가
+            return self._create_message_internal(ticket_id, content, role, admin_id)
         else:
             raise ValueError("create_message에는 딕셔너리 형태의 message_data가 필요합니다")
     
@@ -278,12 +279,23 @@ class PostgreSQLRepo:
                     SELECT 
                         ticket_id::text as id,
                         title_masked as title,
+                        content_enc,
                         author_name,
+                        author_nickname,
                         author_contact,
+                        author_phone,
+                        author_mobile,
+                        author_email,
+                        author_gender,
+                        birth_year,
+                        snsgu,
+                        sMember_id,
+                        post_pwd_hash,
                         created_at,
+                        updated_at,
                         status,
                         has_admin_reply,
-                        snsgu
+                        agreement
                     FROM tickets
                     WHERE status != 'DELETED'
                     ORDER BY created_at DESC
@@ -378,22 +390,23 @@ class PostgreSQLRepo:
                 """, (ticket_id,))
                 conn.commit()
     
-    def _create_message_internal(self, ticket_id, content, role='USER'):
+    def _create_message_internal(self, ticket_id, content, role='USER', admin_id=None):
         """내부용 메시지 생성 메서드"""
-        print(f"🔄 _create_message_internal 호출: ticket_id={ticket_id}, role={role}")
+        print(f"🔄 _create_message_internal 호출: ticket_id={ticket_id}, role={role}, admin_id={admin_id}")
         
         with self._get_connection() as conn:
             with conn.cursor() as cursor:
-                # 1. 메시지 생성
-                print(f"📥 DB에 INSERT 할 role 값: {role}")
+                # 1. 메시지 생성 - admin_id 항상 포함 (NULL 허용)
+                print(f"📥 DB에 INSERT 할 값 - role: {role}, admin_id: {admin_id}")
+                
                 cursor.execute("""
-                    INSERT INTO thread_messages (ticket_id, content_enc, role)
-                    VALUES (%s::uuid, %s, %s)
+                    INSERT INTO thread_messages (ticket_id, content_enc, role, admin_id)
+                    VALUES (%s::uuid, %s, %s, %s)
                     RETURNING msg_id
-                """, (str(ticket_id), content, role))
+                """, (str(ticket_id), content, role, admin_id))
                 
                 message_id = cursor.fetchone()[0]
-                print(f"📨 메시지 생성 완료: message_id={message_id}")
+                print(f"📨 메시지 생성 완료: message_id={message_id}, admin_id={admin_id}")
                 
                 # 2. 관리자 답변인 경우 티켓 상태 강제 업데이트
                 if role == 'ADMIN':
@@ -467,9 +480,10 @@ class PostgreSQLRepo:
             with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cursor:
                 cursor.execute("""
                     SELECT 
-                        msg_id::text as id,
+                        msg_id::text as msg_id,
                         content_enc as content,
                         role,
+                        admin_id,
                         created_at
                     FROM thread_messages
                     WHERE ticket_id = %s
@@ -515,13 +529,74 @@ class PostgreSQLRepo:
         with self._get_connection() as conn:
             with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cursor:
                 cursor.execute("""
-                    SELECT admin_id, username, pwd_hash, role, created_at
+                    SELECT admin_id, username, pwd_hash, role, admin_status, created_at
                     FROM admin_users
                     WHERE username = %s
                 """, (username,))
                 
                 row = cursor.fetchone()
                 return dict(row) if row else None
+    
+    def get_admin_user_by_id(self, admin_id):
+        """admin_id로 관리자 사용자 조회"""
+        if not self._ensure_tables_exist():
+            return None
+        
+        with self._get_connection() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cursor:
+                cursor.execute("""
+                    SELECT admin_id, username, pwd_hash, role, admin_status, created_at
+                    FROM admin_users
+                    WHERE admin_id = %s
+                """, (admin_id,))
+                
+                row = cursor.fetchone()
+                return dict(row) if row else None
+    
+    def update_admin_user(self, admin_id, username=None, password_hash=None, role=None, admin_status=None):
+        """관리자 사용자 정보 수정"""
+        if not self._ensure_tables_exist():
+            raise Exception("테이블이 존재하지 않습니다")
+        
+        # 업데이트할 필드만 동적으로 구성
+        update_fields = []
+        params = []
+        
+        if username is not None:
+            update_fields.append("username = %s")
+            params.append(username)
+        
+        if password_hash is not None:
+            update_fields.append("pwd_hash = %s")
+            params.append(password_hash)
+        
+        if role is not None:
+            update_fields.append("role = %s")
+            params.append(role)
+        
+        if admin_status is not None:
+            update_fields.append("admin_status = %s")
+            params.append(admin_status)
+        
+        if not update_fields:
+            return False
+        
+        params.append(admin_id)
+        
+        with self._get_connection() as conn:
+            with conn.cursor() as cursor:
+                try:
+                    query = f"""
+                        UPDATE admin_users
+                        SET {', '.join(update_fields)}
+                        WHERE admin_id = %s
+                    """
+                    cursor.execute(query, params)
+                    conn.commit()
+                    return cursor.rowcount > 0
+                except psycopg2.IntegrityError:
+                    conn.rollback()
+                    return False
     
     def verify_admin_user(self, username, password_hash):
         """관리자 사용자 인증"""
@@ -586,3 +661,347 @@ class PostgreSQLRepo:
                 log_id = cursor.fetchone()[0]
                 conn.commit()
                 return log_id
+
+    # ===========================================
+    # 메시지 수정/삭제 메서드
+    # ===========================================
+    
+    def update_message(self, message_id, content):
+        """메시지 수정"""
+        try:
+            print(f"✏️ PostgreSQL 메시지 수정 시도: {message_id}, content length: {len(content)}")
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    # UUID 형식 시도
+                    try:
+                        cursor.execute("""
+                            UPDATE thread_messages 
+                            SET content_enc = %s
+                            WHERE msg_id = %s::uuid
+                        """, (content, str(message_id)))
+                        rows_affected = cursor.rowcount
+                    except Exception as uuid_error:
+                        print(f"⚠️ UUID 캐스팅 실패, 문자열 매칭 시도: {uuid_error}")
+                        # 문자열 매칭으로 재시도
+                        cursor.execute("""
+                            UPDATE thread_messages 
+                            SET content_enc = %s
+                            WHERE msg_id::text = %s
+                        """, (content, str(message_id)))
+                        rows_affected = cursor.rowcount
+                    
+                    conn.commit()
+                    
+                    if rows_affected > 0:
+                        print(f"✅ PostgreSQL 메시지 수정 성공: {message_id}, {rows_affected}개 행 수정됨")
+                    else:
+                        print(f"⚠️ 수정할 메시지를 찾을 수 없음: {message_id}")
+                        # 존재하는 메시지 확인
+                        cursor.execute("SELECT msg_id::text FROM thread_messages LIMIT 3")
+                        existing = cursor.fetchall()
+                        print(f"🔍 기존 메시지들 (샘플): {existing}")
+                    
+        except Exception as e:
+            print(f"❌ PostgreSQL 메시지 수정 실패: {e}")
+            import traceback
+            print(f"❌ 스택 트레이스: {traceback.format_exc()}")
+            raise
+
+    def delete_message(self, message_id):
+        """메시지 삭제"""
+        try:
+            print(f"🗑️ PostgreSQL 메시지 삭제 시도: {message_id}")
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    # UUID 형식 시도
+                    try:
+                        cursor.execute("""
+                            DELETE FROM thread_messages 
+                            WHERE msg_id = %s::uuid
+                        """, (str(message_id),))
+                        rows_affected = cursor.rowcount
+                    except Exception as uuid_error:
+                        print(f"⚠️ UUID 캐스팅 실패, 문자열 매칭 시도: {uuid_error}")
+                        # 문자열 매칭으로 재시도
+                        cursor.execute("""
+                            DELETE FROM thread_messages 
+                            WHERE msg_id::text = %s
+                        """, (str(message_id),))
+                        rows_affected = cursor.rowcount
+                    
+                    conn.commit()
+                    
+                    if rows_affected > 0:
+                        print(f"✅ PostgreSQL 메시지 삭제 성공: {message_id}, {rows_affected}개 행 삭제됨")
+                    else:
+                        print(f"⚠️ 삭제할 메시지를 찾을 수 없음: {message_id}")
+                    
+        except Exception as e:
+            print(f"❌ PostgreSQL 메시지 삭제 실패: {e}")
+            import traceback
+            print(f"❌ 스택 트레이스: {traceback.format_exc()}")
+            raise
+
+    # ===========================================
+    # sMembers 관리 메서드들
+    # ===========================================
+    
+    def _serialize_member(self, member):
+        """회원 데이터를 JSON 직렬화 가능하게 변환"""
+        if not member:
+            return None
+        result = {}
+        for key, value in member.items():
+            # memoryview, bytes를 문자열로 변환
+            if isinstance(value, (memoryview, bytes)):
+                result[key] = value.tobytes().hex() if isinstance(value, memoryview) else value.hex()
+            else:
+                result[key] = value
+        return result
+    
+    def get_smembers(self):
+        """모든 회원 정보 조회"""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                    cursor.execute("""
+                        SELECT * FROM sMembers 
+                        ORDER BY created_at DESC
+                    """)
+                    members = cursor.fetchall()
+                    print(f"✅ 회원 {len(members)}명 조회 완료")
+                    return [self._serialize_member(dict(m)) for m in members]
+        except Exception as e:
+            print(f"❌ 회원 목록 조회 실패: {e}")
+            import traceback
+            print(f"❌ 스택 트레이스: {traceback.format_exc()}")
+            raise
+
+    def get_smember_by_id(self, sm_id):
+        """특정 회원 정보 조회 (sM_id 기준)"""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                    cursor.execute("""
+                        SELECT * FROM sMembers WHERE sM_id = %s
+                    """, (sm_id,))
+                    member = cursor.fetchone()
+                    if member:
+                        print(f"✅ 회원 조회 완료: {sm_id}")
+                        return self._serialize_member(dict(member))
+                    else:
+                        print(f"⚠️ 회원을 찾을 수 없음: {sm_id}")
+                        return None
+        except Exception as e:
+            print(f"❌ 회원 조회 실패: {e}")
+            import traceback
+            print(f"❌ 스택 트레이스: {traceback.format_exc()}")
+            raise
+
+    def create_smember(self, member_data):
+        """새 회원 생성"""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                    # 필수 필드
+                    fields = []
+                    values = []
+                    placeholders = []
+                    
+                    # 모든 필드 처리
+                    field_mapping = {
+                        'sMem_id': 'sMem_id',
+                        'sMem_pwdHash': 'sMem_pwdHash',
+                        'sMem_pwd_salt': 'sMem_pwd_salt',
+                        'sMem_name': 'sMem_name',
+                        'sMem_nickname': 'sMem_nickname',
+                        'sMem_birthdt': 'sMem_birthdt',
+                        'sMem_birth_year': 'sMem_birth_year',
+                        'sMem_calendar_type': 'sMem_calendar_type',
+                        'sMem_gender': 'sMem_gender',
+                        'sMem_buss_name': 'sMem_buss_name',
+                        'sMem_comp_name': 'sMem_comp_name',
+                        'sMem_phone': 'sMem_phone',
+                        'sMem_mobile': 'sMem_mobile',
+                        'sMem_email': 'sMem_email',
+                        'zipcode': 'zipcode',
+                        'address1': 'address1',
+                        'address2': 'address2',
+                        'zipcode_s': 'zipcode_s',
+                        'address1_s': 'address1_s',
+                        'address2_s': 'address2_s',
+                        'sMem_snsgu': 'sMem_snsgu',
+                        'sMem_choice1': 'sMem_choice1',
+                        'sMem_choice2': 'sMem_choice2',
+                        'sMem_choice3': 'sMem_choice3',
+                        'sMem_choice4': 'sMem_choice4',
+                        'sMem_choice5': 'sMem_choice5',
+                        'sMem_choice6': 'sMem_choice6',
+                        'sMem_choice7': 'sMem_choice7',
+                        'sMem_choice8': 'sMem_choice8',
+                        'sMem_choice9': 'sMem_choice9',
+                        'sMem_choice10': 'sMem_choice10',
+                        'sMem_choice11': 'sMem_choice11',
+                        'sMem_choice12': 'sMem_choice12',
+                        'sMem_quest': 'sMem_quest',
+                        'sMem_content_enc': 'sMem_content_enc',
+                        'old_name': 'old_name',
+                        'new_name': 'new_name',
+                        'sMemfam_id': 'sMemfam_id',
+                        'recommender': 'recommender',
+                        'applicant': 'applicant',
+                        'signature_file': 'signature_file',
+                        'reference': 'reference',
+                        'sMem_agreement': 'sMem_agreement',
+                        'sMem_agree': 'sMem_agree',
+                        'sMem_admin_id': 'sMem_admin_id',
+                        'sMem_grade': 'sMem_grade',
+                        'sMem_status': 'sMem_status',
+                        'family_gu': 'family_gu',
+                        'adviser_role': 'adviser_role'
+                    }
+                    
+                    for key, db_field in field_mapping.items():
+                        if key in member_data:
+                            fields.append(db_field)
+                            values.append(member_data[key])
+                            placeholders.append('%s')
+                    
+                    sql = f"""
+                        INSERT INTO sMembers ({', '.join(fields)})
+                        VALUES ({', '.join(placeholders)})
+                        RETURNING *
+                    """
+                    
+                    cursor.execute(sql, values)
+                    new_member = cursor.fetchone()
+                    conn.commit()
+                    
+                    print(f"✅ 회원 생성 완료: {new_member['sm_id']}")
+                    return self._serialize_member(dict(new_member))
+                    
+        except Exception as e:
+            print(f"❌ 회원 생성 실패: {e}")
+            import traceback
+            print(f"❌ 스택 트레이스: {traceback.format_exc()}")
+            raise
+
+    def update_smember(self, sm_id, member_data):
+        """회원 정보 수정"""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                    # 수정할 필드만 업데이트
+                    update_fields = []
+                    values = []
+                    
+                    field_mapping = {
+                        'sMem_id': 'sMem_id',
+                        'sMem_pwdHash': 'sMem_pwdHash',
+                        'sMem_pwd_salt': 'sMem_pwd_salt',
+                        'sMem_name': 'sMem_name',
+                        'sMem_nickname': 'sMem_nickname',
+                        'sMem_birthdt': 'sMem_birthdt',
+                        'sMem_birth_year': 'sMem_birth_year',
+                        'sMem_calendar_type': 'sMem_calendar_type',
+                        'sMem_gender': 'sMem_gender',
+                        'sMem_buss_name': 'sMem_buss_name',
+                        'sMem_comp_name': 'sMem_comp_name',
+                        'sMem_phone': 'sMem_phone',
+                        'sMem_mobile': 'sMem_mobile',
+                        'sMem_email': 'sMem_email',
+                        'zipcode': 'zipcode',
+                        'address1': 'address1',
+                        'address2': 'address2',
+                        'zipcode_s': 'zipcode_s',
+                        'address1_s': 'address1_s',
+                        'address2_s': 'address2_s',
+                        'sMem_snsgu': 'sMem_snsgu',
+                        'sMem_choice1': 'sMem_choice1',
+                        'sMem_choice2': 'sMem_choice2',
+                        'sMem_choice3': 'sMem_choice3',
+                        'sMem_choice4': 'sMem_choice4',
+                        'sMem_choice5': 'sMem_choice5',
+                        'sMem_choice6': 'sMem_choice6',
+                        'sMem_choice7': 'sMem_choice7',
+                        'sMem_choice8': 'sMem_choice8',
+                        'sMem_choice9': 'sMem_choice9',
+                        'sMem_choice10': 'sMem_choice10',
+                        'sMem_choice11': 'sMem_choice11',
+                        'sMem_choice12': 'sMem_choice12',
+                        'sMem_quest': 'sMem_quest',
+                        'sMem_content_enc': 'sMem_content_enc',
+                        'old_name': 'old_name',
+                        'new_name': 'new_name',
+                        'sMemfam_id': 'sMemfam_id',
+                        'recommender': 'recommender',
+                        'applicant': 'applicant',
+                        'signature_file': 'signature_file',
+                        'reference': 'reference',
+                        'sMem_agreement': 'sMem_agreement',
+                        'sMem_agree': 'sMem_agree',
+                        'sMem_admin_id': 'sMem_admin_id',
+                        'sMem_grade': 'sMem_grade',
+                        'sMem_status': 'sMem_status',
+                        'family_gu': 'family_gu',
+                        'adviser_role': 'adviser_role'
+                    }
+                    
+                    for key, db_field in field_mapping.items():
+                        if key in member_data:
+                            update_fields.append(f"{db_field} = %s")
+                            values.append(member_data[key])
+                    
+                    # updated_at 추가
+                    update_fields.append("updated_at = CURRENT_TIMESTAMP")
+                    
+                    # WHERE 조건용 sm_id 추가
+                    values.append(sm_id)
+                    
+                    sql = f"""
+                        UPDATE sMembers 
+                        SET {', '.join(update_fields)}
+                        WHERE sM_id = %s
+                        RETURNING *
+                    """
+                    
+                    cursor.execute(sql, values)
+                    updated_member = cursor.fetchone()
+                    conn.commit()
+                    
+                    if updated_member:
+                        print(f"✅ 회원 수정 완료: {sm_id}")
+                        return self._serialize_member(dict(updated_member))
+                    else:
+                        print(f"⚠️ 수정할 회원을 찾을 수 없음: {sm_id}")
+                        return None
+                        
+        except Exception as e:
+            print(f"❌ 회원 수정 실패: {e}")
+            import traceback
+            print(f"❌ 스택 트레이스: {traceback.format_exc()}")
+            raise
+
+    def delete_smember(self, sm_id):
+        """회원 삭제"""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("""
+                        DELETE FROM sMembers WHERE sM_id = %s
+                    """, (sm_id,))
+                    rows_affected = cursor.rowcount
+                    conn.commit()
+                    
+                    if rows_affected > 0:
+                        print(f"✅ 회원 삭제 완료: {sm_id}")
+                        return True
+                    else:
+                        print(f"⚠️ 삭제할 회원을 찾을 수 없음: {sm_id}")
+                        return False
+                        
+        except Exception as e:
+            print(f"❌ 회원 삭제 실패: {e}")
+            import traceback
+            print(f"❌ 스택 트레이스: {traceback.format_exc()}")
+            raise

@@ -1,6 +1,32 @@
 console.log('=== 관리자 목록 페이지 시작 (반응형 그리드) ===');
 console.log('🗄️ 관리자 반응형 DB 그리드 모드로 실행 중...');
 
+// ===== 관리자 로그인 확인 =====
+(function checkAdminLogin() {
+  console.log('🔐 관리자 로그인 상태 확인 중...');
+
+  // admin_session.js의 전역 함수 사용
+  if (typeof window.getAdminSession === 'function') {
+    const adminSession = window.getAdminSession();
+    console.log('📋 관리자 세션 정보:', adminSession);
+
+    if (!adminSession || !adminSession.isLoggedIn || !adminSession.admin_id) {
+      console.warn(
+        '⚠️ 관리자 로그인 정보가 없습니다. 로그인 페이지로 이동합니다.'
+      );
+      alert('관리자 로그인이 필요합니다.');
+      window.location.href = '/admin_login';
+      return;
+    }
+
+    console.log('✅ 관리자 로그인 확인 완료:', adminSession.admin_id);
+  } else {
+    console.error('❌ admin_session.js가 로드되지 않았습니다!');
+    alert('세션 관리 스크립트 로드 오류. 페이지를 새로고침해주세요.');
+    window.location.href = '/admin_login';
+  }
+})();
+
 function load() {
   const status = document.getElementById('statusFilter').value;
   const q = status ? `?status=${encodeURIComponent(status)}` : '';
@@ -281,8 +307,36 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function logout() {
-  console.log('🚪 MSSQL에서 관리자 로그아웃 요청');
-  fetch('/api/v1/admin/logout', { method: 'POST' }).then(
-    () => (location.href = '/admin_login')
-  );
+  console.log('🚪 관리자 로그아웃 시작...');
+
+  fetch('/api/v1/admin/logout', { method: 'POST' })
+    .then((r) => r.json())
+    .then((result) => {
+      console.log('✅ 로그아웃 API 응답:', result);
+
+      // 전역 변수 완전 초기화
+      if (typeof window.clearAdminSession === 'function') {
+        window.clearAdminSession();
+        console.log('✅ 관리자 세션 전역 변수 완전 초기화 완료');
+      }
+
+      // 최종 상태 확인
+      console.log('🔍 로그아웃 후 전역 변수 상태:', window.ADMIN_SESSION);
+      console.log('   isLoggedIn:', window.ADMIN_SESSION?.isLoggedIn);
+
+      // 로그인 페이지로 이동
+      location.href = '/admin_login';
+    })
+    .catch((error) => {
+      console.error('❌ 로그아웃 API 오류:', error);
+
+      // 오류가 발생해도 전역 변수 초기화 및 로그인 페이지로 이동
+      if (typeof window.clearAdminSession === 'function') {
+        window.clearAdminSession();
+        console.log('⚠️ API 오류 발생 - 전역 변수 강제 초기화 완료');
+      }
+
+      console.log('🔍 로그아웃 후 전역 변수 상태:', window.ADMIN_SESSION);
+      location.href = '/admin_login';
+    });
 }

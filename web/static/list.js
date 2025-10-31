@@ -9,10 +9,18 @@ function loadTickets() {
   fetch('/api/v1/tickets/')
     .then((res) => {
       console.log('📡 API 응답 상태:', res.status);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
       return res.json();
     })
-    .then((items) => {
-      console.log('📋 MSSQL에서 가져온 게시글 수:', items.length);
+    .then((data) => {
+      console.log('📋 API에서 받은 데이터:', data);
+
+      // 데이터가 배열인지 확인
+      let items = Array.isArray(data) ? data : [];
+
+      console.log('📋 처리할 게시글 수:', items.length);
 
       if (items.length === 0) {
         showEmptyState();
@@ -21,10 +29,10 @@ function loadTickets() {
 
       renderDesktopTable(items);
       renderMobileCards(items);
-      console.log('✅ MSSQL 데이터 표시 완료');
+      console.log('✅ 데이터 표시 완료');
     })
     .catch((error) => {
-      console.error('❌ MSSQL 데이터 로딩 실패:', error);
+      console.error('❌ 데이터 로딩 실패:', error);
       showErrorState();
     });
 }
@@ -34,9 +42,13 @@ function renderDesktopTable(items) {
   tableBody.innerHTML = '';
 
   items.forEach((ticket, idx) => {
+    console.log(`🎫 티켓 ${idx + 1}:`, ticket);
+
     const tr = document.createElement('tr');
+    // title_masked 또는 title 필드 사용
+    const title = ticket.title_masked || ticket.title || '';
     const maskedTitle =
-      ticket.title.length > 2 ? ticket.title.slice(0, 2) + '****' : '비밀글';
+      title.length > 2 ? title.slice(0, 2) + '****' : '비밀글';
 
     tr.innerHTML = `
       <td><strong>${idx + 1}</strong></td>
@@ -72,8 +84,10 @@ function renderMobileCards(items) {
   mobileContainer.innerHTML = '';
 
   items.forEach((ticket, idx) => {
+    // title_masked 또는 title 필드 사용
+    const title = ticket.title_masked || ticket.title || '';
     const maskedTitle =
-      ticket.title.length > 2 ? ticket.title.slice(0, 2) + '****' : '비밀글';
+      title.length > 2 ? title.slice(0, 2) + '****' : '비밀글';
 
     const cardElement = document.createElement('div');
     cardElement.className = 'ticket-card';

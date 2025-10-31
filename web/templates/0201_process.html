@@ -6,26 +6,29 @@
     <title>나라톡톡 심리상담센터 | 상담 절차</title>
     <meta
       name="description"
-      content="예약→접수→초기면담→통합해석→목표설정→개입세션→통합리포트 안내→팔로업"
+      content="비밀상담요청→접수→초기면담→통합해석→목표설정→개입세션→통합리포트 안내→팔로업"
     />
     <style>
       /* ===== Simple palette (Monochrome + one accent) ===== */
       :root {
-        --bg: #ffffff; /* 배경 */
+        --bg: #fafbfc; /* 배경 */
         --fg: #111827; /* 본문 글자 (near-black) */
-        --muted: #6b7280; /* 보조 텍스트 (slate-500) */
-        --accent: #0ea5e9; /* 포인트 (cyan-500) */
-        --card: #f9fafb; /* 카드 배경 (zinc-50) */
-        --ring: #e5e7eb; /* 경계선 */
-        --radius: 16px;
-        --shadow: 0 4px 16px rgba(0, 0, 0, 0.04); /* 은은한 그림자 */
-        --focus: 0 0 0 3px rgba(14, 165, 233, 0.25);
+        --muted: #64748b; /* 보조 텍스트 (slate-500) */
+        --accent: #3b82f6; /* 포인트 (blue-500) */
+        --accent-hover: #2563eb; /* 포인트 호버 */
+        --card: #ffffff; /* 카드 배경 */
+        --ring: #e2e8f0; /* 경계선 */
+        --radius: 14px;
+        --shadow: 0 4px 16px rgba(59, 130, 246, 0.08),
+          0 2px 8px rgba(0, 0, 0, 0.04); /* 은은한 그림자 */
+        --focus: 0 0 0 3px rgba(59, 130, 246, 0.25);
       }
       html.dark {
         --bg: #0b1220;
         --fg: #e5e7eb;
         --muted: #9aa4b2;
-        --accent: #38bdf8; /* 다크에서 살짝 밝은 포인트 */
+        --accent: #60a5fa; /* 다크에서 살짝 밝은 포인트 */
+        --accent-hover: #3b82f6;
         --card: #0f172a;
         --ring: #1f2937;
         --shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
@@ -40,11 +43,15 @@
       }
       body {
         margin: 0;
-        background: var(--bg);
+        background: linear-gradient(
+          135deg,
+          var(--bg) 0%,
+          color-mix(in oklab, var(--accent) 3%, var(--bg)) 100%
+        );
         color: var(--fg);
         font: 16px/1.65 system-ui, -apple-system, Segoe UI, Roboto, Pretendard,
           Noto Sans KR, sans-serif;
-        letter-spacing: 0.1px;
+        letter-spacing: -0.01em;
       }
       a {
         color: inherit;
@@ -92,7 +99,20 @@
         width: 10px;
         height: 10px;
         border-radius: 999px;
-        background: var(--accent);
+        background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+        box-shadow: 0 0 12px color-mix(in oklab, var(--accent) 40%, transparent);
+        animation: pulse 2s ease-in-out infinite;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.15);
+          opacity: 0.85;
+        }
       }
       .nav {
         display: flex;
@@ -113,15 +133,27 @@
         text-decoration: none;
         border: 1px solid transparent;
         white-space: nowrap;
+        transition: all 0.2s ease;
       }
       .nav a:hover {
         color: var(--fg);
-        background: var(--card);
+        background: linear-gradient(
+          135deg,
+          color-mix(in oklab, var(--accent) 8%, var(--card)),
+          var(--card)
+        );
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
       }
       .nav a.active {
         color: var(--fg);
         border-color: var(--ring);
-        background: var(--card);
+        background: linear-gradient(
+          135deg,
+          color-mix(in oklab, var(--accent) 10%, var(--card)),
+          var(--card)
+        );
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.08);
       }
       .tools {
         display: flex;
@@ -138,16 +170,25 @@
         color: var(--fg);
         padding: 10px 14px;
         border-radius: 12px;
-        transition: 0.15s;
+        transition: all 0.2s ease;
         text-decoration: none;
+        font-weight: 500;
       }
       .btn:hover {
-        box-shadow: var(--shadow);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.12);
+        transform: translateY(-2px);
+        border-color: color-mix(in oklab, var(--accent) 30%, var(--ring));
       }
       .btn.primary {
-        background: var(--accent);
+        background: linear-gradient(135deg, var(--accent), var(--accent-hover));
         color: #fff;
         border-color: transparent;
+        box-shadow: 0 2px 8px
+          color-mix(in oklab, var(--accent) 25%, transparent);
+      }
+      .btn.primary:hover {
+        box-shadow: 0 6px 16px
+          color-mix(in oklab, var(--accent) 35%, transparent);
       }
       .btn.ghost {
         background: transparent;
@@ -157,17 +198,29 @@
         border-radius: 12px;
         border: 1px solid var(--ring);
         background: var(--bg);
+        transition: all 0.2s ease;
+        font-weight: 500;
+      }
+      .btn-sm:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
       }
       .btn-sm.primary {
-        background: var(--accent);
+        background: linear-gradient(135deg, var(--accent), var(--accent-hover));
         color: #fff;
         border-color: transparent;
+        box-shadow: 0 2px 8px
+          color-mix(in oklab, var(--accent) 25%, transparent);
+      }
+      .btn-sm.primary:hover {
+        box-shadow: 0 6px 16px
+          color-mix(in oklab, var(--accent) 35%, transparent);
       }
       .ic {
-        width: 18px;
-        height: 18px;
+        width: 16px;
+        height: 16px;
         display: inline-block;
-        flex: 0 0 18px;
+        flex: 0 0 16px;
       }
 
       /* ===== Hero ===== */
@@ -198,6 +251,16 @@
         padding: 6px 10px;
         border-radius: 999px;
         margin-top: 8px;
+        background: linear-gradient(
+          135deg,
+          color-mix(in oklab, var(--accent) 5%, var(--card)),
+          var(--card)
+        );
+        transition: all 0.2s ease;
+      }
+      .badge:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(59, 130, 246, 0.1);
       }
 
       /* ===== Sections / Cards ===== */
@@ -209,27 +272,39 @@
         border: 1px solid var(--ring);
         border-radius: var(--radius);
         box-shadow: var(--shadow);
+        transition: all 0.3s ease;
+      }
+      .card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(59, 130, 246, 0.12),
+          0 4px 12px rgba(0, 0, 0, 0.06);
       }
       .panel {
-        padding: 22px;
+        padding: 16px;
       }
       h2 {
-        font-size: 22px;
-        margin: 0 0 12px;
+        font-size: 20px;
+        margin: 0 0 10px;
+        background: linear-gradient(135deg, var(--fg), var(--accent));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
       }
       h3 {
-        font-size: 18px;
-        margin: 0 0 8px;
+        font-size: 16px;
+        margin: 0 0 6px;
       }
       p {
-        margin: 0 0 10px;
+        margin: 0 0 8px;
+        font-size: 14px;
+        line-height: 1.6;
       }
       .muted {
         color: var(--muted);
       }
       .row {
         display: flex;
-        gap: 12px;
+        gap: 8px;
         flex-wrap: wrap;
       }
       .divider {
@@ -240,18 +315,29 @@
       .pill {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        padding: 8px 12px;
+        gap: 6px;
+        padding: 6px 10px;
         border-radius: 999px;
         border: 1px solid var(--ring);
-        background: var(--bg);
+        background: linear-gradient(
+          135deg,
+          color-mix(in oklab, var(--accent) 8%, var(--card)),
+          var(--card)
+        );
+        transition: all 0.2s ease;
+        font-size: 12px;
+      }
+      .pill:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 6px rgba(59, 130, 246, 0.1);
+        border-color: var(--accent);
       }
 
       /* ===== Steps ===== */
       .steps {
         display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 16px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
       }
       @media (max-width: 980px) {
         .steps {
@@ -266,26 +352,39 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 12px;
+        gap: 8px;
+        margin-bottom: 8px;
       }
       .num {
         display: inline-grid;
         place-items: center;
-        width: 34px;
-        height: 34px;
-        border-radius: 10px;
-        background: var(--fg);
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: linear-gradient(135deg, var(--accent), var(--accent-hover));
         color: #fff;
         font-weight: 800;
+        font-size: 13px;
+        box-shadow: 0 2px 8px
+          color-mix(in oklab, var(--accent) 30%, transparent);
       }
       .media {
         border: 1px dashed var(--ring);
-        border-radius: 12px;
+        border-radius: 10px;
         overflow: hidden;
-        height: 190px;
-        background: #00000008;
+        height: 120px;
+        background: linear-gradient(
+          135deg,
+          color-mix(in oklab, var(--accent) 4%, var(--card)),
+          var(--card)
+        );
         display: grid;
         place-items: center;
+        transition: all 0.2s ease;
+      }
+      .media:hover {
+        border-color: var(--accent);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.08);
       }
       .media img {
         width: 100%;
@@ -294,7 +393,7 @@
       }
       .uploader {
         display: flex;
-        gap: 8px;
+        gap: 6px;
         align-items: center;
         flex-wrap: wrap;
       }
@@ -304,24 +403,46 @@
       label.upload {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        padding: 8px 10px;
+        gap: 6px;
+        padding: 6px 10px;
         border: 1px solid var(--ring);
-        border-radius: 12px;
+        border-radius: 10px;
         cursor: pointer;
+        background: linear-gradient(
+          135deg,
+          color-mix(in oklab, var(--accent) 8%, var(--card)),
+          var(--card)
+        );
+        transition: all 0.2s ease;
+        font-size: 13px;
+        font-weight: 500;
+      }
+      label.upload:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.12);
+        border-color: var(--accent);
       }
       .note {
         width: 100%;
-        padding: 12px 14px;
-        border-radius: 12px;
+        padding: 8px 10px;
+        border-radius: 10px;
         border: 1px solid var(--ring);
         background: var(--bg);
         color: var(--fg);
         outline: none;
+        transition: all 0.2s ease;
+        font-family: inherit;
+        font-size: 13px;
+        resize: vertical;
+        min-height: 60px;
       }
       .note:focus {
         box-shadow: var(--focus);
         border-color: var(--accent);
+        background: var(--card);
+      }
+      .note:hover {
+        border-color: color-mix(in oklab, var(--accent) 30%, var(--ring));
       }
 
       /* ===== Footer ===== */
@@ -345,7 +466,7 @@
         <nav class="nav" aria-label="섹션 내비게이션">
           <a href="#overview">개요</a>
           <a href="#steps">절차</a>
-          <a href="#contact">예약·문의</a>
+          <a href="#contact">비밀상담요청·문의</a>
         </nav>
         <div class="tools">
           <button class="btn ghost" id="themeToggle" aria-label="테마 전환">
@@ -388,6 +509,24 @@
             </svg>
             초기화
           </button>
+          <button
+            class="btn"
+            id="closeBtn"
+            style="background: #dc3545; color: #fff; border-color: transparent"
+          >
+            <svg
+              class="ic"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+            >
+              <path
+                d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+              />
+            </svg>
+            닫기
+          </button>
         </div>
       </div>
     </header>
@@ -398,17 +537,23 @@
         <div class="container">
           <h1 class="headline">안전하고 투명한 전문상담 절차</h1>
           <p class="sub">
-            ① 예약 → ② 접수/사전설문 → ③ 초기면담/평가 → ④
-            통합해석(심리+동·서양) → ⑤ 목표 설정 → ⑥ 개입 세션 → ⑦ 통합 리포트
-            안내 → ⑧ 팔로업/재평가
+            <span style="font-size: 0.75em"
+              >① 비밀상담요청 → ② 접수/사전설문 → ③ 초기면담/평가 → ④
+              통합해석(심리+동·서양) → ⑤ 목표 설정 → ⑥ 개입 세션 → ⑦ 통합 리포트
+              안내 → ⑧ 팔로업/재평가</span
+            >
           </p>
-          <div class="cta-row" role="group" aria-label="예약/전화/카카오">
+          <div
+            class="cta-row"
+            role="group"
+            aria-label="비밀상담요청/전화/카카오"
+          >
             <a
               class="btn-sm primary"
               href="http://secret-board-04s6.onrender.com/"
               target="_blank"
               rel="noopener"
-              aria-label="온라인 예약"
+              aria-label="온라인 비밀상담요청"
             >
               <svg
                 class="ic"
@@ -420,7 +565,7 @@
                 <rect x="3" y="4" width="18" height="16" rx="4" />
                 <path d="M8 7h8M6 11h12M8 15h8" />
               </svg>
-              예약
+              비밀상담요청
             </a>
             <a class="btn-sm" href="tel:010-9088-9196" aria-label="전화 연결">
               <svg
@@ -461,12 +606,12 @@
           <article class="card panel">
             <h2>상담 절차 (순서대로)</h2>
             <div class="steps" id="stepsGrid">
-              <!-- 1 예약 -->
+              <!-- 1 비밀상담요청 -->
               <div class="card panel step" id="s1">
                 <div class="step-head">
                   <div class="row" style="align-items: center">
                     <span class="num">1</span>
-                    <h3 style="margin: 0">예약</h3>
+                    <h3 style="margin: 0">비밀상담요청</h3>
                   </div>
                   <div class="pill muted">예상 1~3분</div>
                 </div>
@@ -503,7 +648,7 @@
                     href="http://secret-board-04s6.onrender.com/"
                     target="_blank"
                     rel="noopener"
-                    >예약 페이지</a
+                    >비밀상담요청 페이지</a
                   >
                 </div>
                 <textarea
@@ -851,12 +996,16 @@
       <section id="contact">
         <div class="container">
           <article class="card panel">
-            <h2>예약 · 문의</h2>
+            <h2>비밀상담요청 · 문의</h2>
             <p class="muted">
-              가장 빠른 상담은 온라인 예약을 권합니다. 일정 조율이 필요하면
-              채널로 편히 남겨주세요.
+              가장 빠른 상담은 온라인 비밀상담요청을 권합니다. 일정 조율이
+              필요하면 채널로 편히 남겨주세요.
             </p>
-            <div class="cta-row" role="group" aria-label="예약/전화/카카오">
+            <div
+              class="cta-row"
+              role="group"
+              aria-label="비밀상담요청/전화/카카오"
+            >
               <a
                 class="btn-sm primary"
                 href="http://secret-board-04s6.onrender.com/"
@@ -873,7 +1022,7 @@
                   <rect x="3" y="4" width="18" height="16" rx="4" />
                   <path d="M8 7h8M6 11h12M8 15h8" />
                 </svg>
-                예약
+                비밀상담요청
               </a>
               <a class="btn-sm" href="tel:010-9088-9196">
                 <svg
@@ -906,7 +1055,8 @@
             <div class="row" style="margin-top: 10px">
               <span class="pill"><strong>전화</strong> 010-9088-9196</span>
               <span class="pill"
-                ><strong>예약</strong> secret-board-04s6.onrender.com</span
+                ><strong>비밀상담요청</strong>
+                secret-board-04s6.onrender.com</span
               >
               <span class="pill"><strong>카카오</strong> 오픈채널</span>
             </div>
@@ -1050,8 +1200,25 @@
       });
       document.getElementById('resetBtn').addEventListener('click', resetData);
 
+      document.getElementById('closeBtn').addEventListener('click', () => {
+        // iframe 내부에서 실행 중인지 확인
+        if (window.self !== window.top) {
+          // iframe 내부에서 실행 중: 부모 창으로 돌아가기
+          window.parent.postMessage('closeIframe', '*');
+        } else {
+          // 독립 창에서 실행 중: 창 닫기
+          window.close();
+        }
+      });
+
       load();
     </script>
+
+    <!-- 회원 세션 전역 변수 -->
+    <script src="/static/member_session.js"></script>
+    <!-- 관리자 세션 전역 변수 관리 -->
+    <script src="/static/admin_session.js"></script>
+    <!-- 복사방지 세션 전역 변수 관리 -->
     <script src="/static/security.js"></script>
   </body>
 </html>

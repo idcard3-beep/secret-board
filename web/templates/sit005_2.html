@@ -1,0 +1,900 @@
+# We'll write a robust single-file HTML with self-test and all features, then
+provide a download link. html = r"""<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SIT005 공통코드 관리 - 단일 HTML (v2)</title>
+    <style>
+      :root {
+        --bg: #0b0c0f;
+        --panel: #12141a;
+        --text: #e6e8ef;
+        --muted: #a7b0c0;
+        --accent: #6ea8fe;
+        --good: #5bd6a3;
+        --warn: #f8c145;
+        --bad: #ff7b7b;
+        --line: #1a1f2b;
+        --input: #0f1116;
+        --btn: #151a23;
+        --btn-text: #e6e8ef;
+        --btn-hover: #1d2430;
+        --primary: #7aa2ff;
+        --radius: 14px;
+        --shadow: 0 6px 18px rgba(0, 0, 0, 0.18),
+          0 1px 0 rgba(255, 255, 255, 0.02) inset;
+      }
+      [data-theme='light'] {
+        --bg: #f7f9fc;
+        --panel: #ffffff;
+        --text: #121417;
+        --muted: #5c6b81;
+        --accent: #1f6fff;
+        --good: #1dbd83;
+        --warn: #d39b00;
+        --bad: #e05252;
+        --line: #e5e9f2;
+        --input: #f2f5fa;
+        --btn: #f1f4f9;
+        --btn-text: #1a1e24;
+        --btn-hover: #e9eef6;
+        --primary: #1f6fff;
+      }
+      [data-theme='dim'] {
+        --bg: #0e1014;
+        --panel: #141823;
+        --text: #e8ecf2;
+        --muted: #9aa6bd;
+        --accent: #85a9ff;
+        --good: #63d4b0;
+        --warn: #ffd27a;
+        --bad: #ff9090;
+        --line: #202636;
+        --input: #111523;
+        --btn: #182033;
+        --btn-text: #e8ecf2;
+        --btn-hover: #1e2740;
+        --primary: #87a8ff;
+      }
+      [data-theme='sepia'] {
+        --bg: #f5f0e6;
+        --panel: #fbf8f2;
+        --text: #3b342c;
+        --muted: #726a60;
+        --accent: #7a5c3c;
+        --good: #2e8b57;
+        --warn: #b47a00;
+        --bad: #c65353;
+        --line: #eadfce;
+        --input: #f1eadf;
+        --btn: #eee4d6;
+        --btn-text: #3b342c;
+        --btn-hover: #e7dccb;
+        --primary: #7a5c3c;
+      }
+      [data-theme='amoled'] {
+        --bg: #000;
+        --panel: #0a0a0a;
+        --text: #e9ebee;
+        --muted: #9aa3ad;
+        --accent: #7aa2ff;
+        --good: #5bd6a3;
+        --warn: #f8c145;
+        --bad: #ff7b7b;
+        --line: #111;
+        --input: #080808;
+        --btn: #0e0e0e;
+        --btn-text: #e9ebee;
+        --btn-hover: #141414;
+        --primary: #7aa2ff;
+      }
+      [data-theme='contrast'] {
+        --bg: #ffffff;
+        --panel: #ffffff;
+        --text: #000000;
+        --muted: #202020;
+        --accent: #0000ff;
+        --good: #007a00;
+        --warn: #a66f00;
+        --bad: #c10000;
+        --line: #000000;
+        --input: #ffffff;
+        --btn: #ffffff;
+        --btn-text: #000000;
+        --btn-hover: #f0f0f0;
+        --primary: #0000ff;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Pretendard,
+          Noto Sans KR, Apple SD Gothic Neo, Arial, Helvetica, sans-serif;
+        line-height: 1.55;
+        letter-spacing: 0.1px;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+        transition: background 0.35s ease, color 0.35s ease;
+      }
+      .app {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background: linear-gradient(
+          180deg,
+          var(--panel),
+          color-mix(in oklab, var(--panel), transparent 18%)
+        );
+        border-bottom: 1px solid var(--line);
+        backdrop-filter: blur(10px);
+      }
+      .topbar .inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        padding: 0.6rem 0.8rem;
+        flex-wrap: wrap;
+      }
+      .brand {
+        font-weight: 700;
+        letter-spacing: 0.3px;
+      }
+      .brand small {
+        font-weight: 500;
+        color: var(--muted);
+      }
+      .spacer {
+        flex: 1;
+      }
+
+      .btn {
+        appearance: none;
+        border: 1px solid var(--line);
+        background: var(--btn);
+        color: var(--btn-text);
+        padding: 0.55rem 0.9rem;
+        border-radius: var(--radius);
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.95rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        box-shadow: var(--shadow);
+        transition: background 0.25s ease, transform 0.05s ease;
+      }
+      .btn:hover {
+        background: var(--btn-hover);
+      }
+      .btn:active {
+        transform: translateY(1px);
+      }
+      .btn.primary {
+        background: var(--primary);
+        border-color: color-mix(in oklab, var(--primary), black 10%);
+        color: white;
+      }
+      .btn.danger {
+        background: color-mix(in oklab, var(--bad), black 10%);
+        border-color: color-mix(in oklab, var(--bad), black 20%);
+        color: #fff;
+      }
+      .btn.ghost {
+        background: transparent;
+      }
+      .icon {
+        font-style: normal;
+        display: inline-block;
+        line-height: 1;
+      }
+
+      .tools {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        align-items: center;
+      }
+      .field {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        background: var(--input);
+        border: 1px solid var(--line);
+        padding: 0.38rem 0.6rem;
+        border-radius: 0.9rem;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+      }
+      .field input,
+      .field select {
+        all: unset;
+        color: var(--text);
+      }
+      .pill {
+        font-size: 0.75rem;
+        color: var(--muted);
+        border: 1px dashed var(--line);
+        padding: 0.25rem 0.6rem;
+        border-radius: 999px;
+      }
+      select.theme {
+        background: var(--input);
+        border: 1px solid var(--line);
+        padding: 0.45rem 0.7rem;
+        border-radius: 0.7rem;
+        color: var(--text);
+      }
+
+      .content {
+        max-width: 1200px;
+        margin: 1rem auto;
+        padding: 0 0.8rem 2rem;
+      }
+      .table-wrap {
+        overflow: auto;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+      }
+      table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+      }
+      thead th {
+        position: sticky;
+        top: 0;
+        background: var(--panel);
+        border-bottom: 1px solid var(--line);
+        text-align: left;
+        padding: 0.75rem;
+        border-right: 1px solid var(--line);
+        font-size: 0.92rem;
+      }
+      thead th:last-child {
+        border-right: 0;
+      }
+      tbody td {
+        padding: 0.72rem 0.9rem;
+        border-top: 1px solid var(--line);
+        border-right: 1px solid var(--line);
+        font-size: 0.98rem;
+      }
+      tbody td:last-child {
+        border-right: 0;
+      }
+      tbody tr:hover {
+        background: color-mix(in oklab, var(--panel), white 4%);
+      }
+      tbody tr:nth-child(even) {
+        background: color-mix(in oklab, var(--panel), white 2%);
+      }
+      .actions {
+        display: flex;
+        gap: 0.4rem;
+        flex-wrap: wrap;
+      }
+      .chip {
+        font-size: 0.76rem;
+        padding: 0.22rem 0.5rem;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        color: var(--muted);
+      }
+
+      .note {
+        color: var(--muted);
+        font-size: 0.9rem;
+        margin-top: 0.8rem;
+      }
+
+      dialog {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 0;
+        background: var(--panel);
+        color: var(--text);
+        max-width: 640px;
+        width: clamp(320px, 90vw, 640px);
+        box-shadow: var(--shadow);
+        transition: opacity 0.25s ease, transform 0.25s ease;
+      }
+      dialog::backdrop {
+        background: rgba(0, 0, 0, 0.55);
+      }
+      .modal-head {
+        padding: 1rem 1rem 0.75rem;
+        border-bottom: 1px solid var(--line);
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+      }
+      .modal-body {
+        padding: 1rem;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.9rem;
+      }
+      .modal-body .full {
+        grid-column: 1/-1;
+      }
+      .modal-foot {
+        padding: 0.95rem 1rem;
+        border-top: 1px solid var(--line);
+        display: flex;
+        gap: 0.6rem;
+        justify-content: flex-end;
+      }
+      .form-row {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+      .form-row label {
+        font-size: 0.87rem;
+        color: var(--muted);
+      }
+      .form-row input {
+        background: var(--input);
+        border: 1px solid var(--line);
+        padding: 0.65rem 0.75rem;
+        border-radius: 0.7rem;
+        color: var(--text);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+      }
+      .form-row input:focus {
+        outline: 2px solid color-mix(in oklab, var(--accent), white 10%);
+        outline-offset: 2px;
+      }
+      .err {
+        color: var(--bad);
+        font-size: 0.85rem;
+      }
+
+      @media (max-width: 780px) {
+        .modal-body {
+          grid-template-columns: 1fr;
+        }
+        .tools {
+          gap: 0.4rem;
+        }
+        .btn {
+          padding: 0.5rem 0.75rem;
+        }
+        thead th,
+        tbody td {
+          padding: 0.6rem 0.65rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app" id="app" data-theme="dark">
+      <header class="topbar">
+        <div class="inner">
+          <div class="brand">
+            SIT005 공통코드 <small>DB 그리드 · 추가/수정/삭제</small>
+          </div>
+          <span class="pill" id="selftest">진단 중…</span>
+          <div class="spacer"></div>
+          <div class="tools">
+            <button class="btn primary" id="btnAdd">
+              <span class="icon">➕</span>추가
+            </button>
+            <button class="btn" id="btnExport">
+              <span class="icon">⬇️</span>CSV 내보내기
+            </button>
+            <button class="btn danger" id="btnDeleteSel">
+              <span class="icon">🗑️</span>선택 삭제
+            </button>
+            <span class="pill" id="countPill">0건</span>
+            <span class="field"
+              ><span class="icon">🔎</span
+              ><input id="q" placeholder="검색(SEC, CD, NM, REF…)"
+            /></span>
+            <select class="theme" id="themeSel" title="테마 변경">
+              <option value="dark">Dark</option>
+              <option value="dim">Dim</option>
+              <option value="amoled">AMOLED</option>
+              <option value="light">Light</option>
+              <option value="sepia">Sepia</option>
+              <option value="contrast">High Contrast</option>
+            </select>
+            <button class="btn" id="btnTheme">
+              <span class="icon">🌓</span>테마(순환)
+            </button>
+            <button class="btn ghost" id="btnReset">
+              <span class="icon">♻️</span>데모 재설정
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <main class="content">
+        <div class="table-wrap">
+          <table id="grid">
+            <thead>
+              <tr>
+                <th style="width: 44px">
+                  <input type="checkbox" id="ckAll" title="전체선택" />
+                </th>
+                <th data-key="SEC">SEC</th>
+                <th data-key="CD">CD</th>
+                <th data-key="NM">NM</th>
+                <th data-key="NO" title="numeric(14,3)">NO</th>
+                <th data-key="SECREF">SECREF</th>
+                <th data-key="SYSREF">SYSREF</th>
+                <th style="width: 140px">작업</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+        <div class="note">
+          ※ 기본키: (SEC, CD). 숫자 필드 <b>NO</b> 는 소수 3자리까지 입력 가능.
+        </div>
+      </main>
+
+      <dialog id="dlg">
+        <form method="dialog" id="frm">
+          <div class="modal-head">
+            <strong id="dlgTitle">신규 레코드</strong>
+            <span class="spacer"></span>
+            <button class="btn ghost" value="close" type="submit">닫기</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-row">
+              <label for="SEC">SEC <em>*</em></label
+              ><input id="SEC" required maxlength="10" />
+            </div>
+            <div class="form-row">
+              <label for="CD">CD <em>*</em></label
+              ><input id="CD" required maxlength="10" />
+            </div>
+            <div class="form-row full">
+              <label for="NM">NM <em>*</em></label
+              ><input id="NM" required maxlength="40" />
+            </div>
+            <div class="form-row">
+              <label for="NO">NO (numeric(14,3))</label
+              ><input id="NO" inputmode="decimal" placeholder="예: 123.456" />
+            </div>
+            <div class="form-row">
+              <label for="SECREF">SECREF</label
+              ><input id="SECREF" maxlength="40" />
+            </div>
+            <div class="form-row">
+              <label for="SYSREF">SYSREF</label
+              ><input id="SYSREF" maxlength="40" />
+            </div>
+            <div class="form-row full err" id="err"></div>
+          </div>
+          <div class="modal-foot">
+            <button class="btn" value="close" type="submit">취소</button>
+            <button class="btn primary" id="btnSave" type="button">저장</button>
+          </div>
+        </form>
+      </dialog>
+    </div>
+
+    <script>
+      (function () {
+        'use strict';
+        const KEY = 'SIT005_data_v2';
+        const KEY_THEME = 'SIT005_theme_v2';
+        const state = {
+          data: [],
+          sortKey: 'SEC',
+          sortDir: 'asc',
+          filter: '',
+          editMode: 'new',
+          editKey: null,
+        };
+
+        const el = (id) => document.getElementById(id);
+        const tbody = el('tbody');
+
+        function safe(fn, label) {
+          try {
+            return fn();
+          } catch (err) {
+            console.error(label || 'ERR', err);
+            failSelfTest(label + ': ' + err.message);
+          }
+        }
+
+        function initDemoIfEmpty() {
+          const raw = localStorage.getItem(KEY);
+          if (!raw) {
+            const demo = [
+              {
+                SEC: 'COMM',
+                CD: 'LANG',
+                NM: '언어',
+                NO: '1',
+                SECREF: 'SYS',
+                SYSREF: 'BASE',
+              },
+              {
+                SEC: 'COMM',
+                CD: 'NATL',
+                NM: '국가',
+                NO: '2.000',
+                SECREF: 'SYS',
+                SYSREF: 'BASE',
+              },
+              {
+                SEC: 'APP',
+                CD: 'THEME',
+                NM: '테마',
+                NO: '10',
+                SECREF: 'UI',
+                SYSREF: 'SKIN',
+              },
+              {
+                SEC: 'APP',
+                CD: 'ROLE',
+                NM: '권한',
+                NO: '20.100',
+                SECREF: 'AUTH',
+                SYSREF: 'ACL',
+              },
+            ];
+            localStorage.setItem(KEY, JSON.stringify(demo));
+          }
+        }
+        function load() {
+          try {
+            state.data = JSON.parse(localStorage.getItem(KEY)) || [];
+          } catch {
+            state.data = [];
+          }
+        }
+        function save() {
+          localStorage.setItem(KEY, JSON.stringify(state.data));
+        }
+
+        function number14_3(x) {
+          if (x === '' || x == null) return '';
+          const n = Number(x);
+          if (Number.isNaN(n)) return null;
+          const abs = Math.abs(n);
+          const intDigits = Math.floor(abs).toString().length;
+          if (intDigits > 14) return null;
+          return n.toFixed(3).replace(/\.000$/, '');
+        }
+
+        function setCount() {
+          el('countPill').textContent = `${filtered().length}건`;
+        }
+
+        function filtered() {
+          const q = state.filter.trim().toLowerCase();
+          let rows = state.data;
+          if (q) {
+            rows = rows.filter((r) =>
+              [r.SEC, r.CD, r.NM, r.NO, r.SECREF, r.SYSREF].some((v) =>
+                (v ?? '').toString().toLowerCase().includes(q)
+              )
+            );
+          }
+          const key = state.sortKey;
+          const dir = state.sortDir;
+          rows = rows.slice().sort((a, b) => {
+            const va = (a[key] ?? '').toString();
+            const vb = (b[key] ?? '').toString();
+            if (va < vb) return dir === 'asc' ? -1 : 1;
+            if (va > vb) return dir === 'asc' ? 1 : -1;
+            return 0;
+          });
+          return rows;
+        }
+
+        function render() {
+          const rows = filtered();
+          tbody.innerHTML = '';
+          for (const r of rows) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+          <td><input type="checkbox" class="ckRow" data-key="${r.SEC}::${
+              r.CD
+            }"></td>
+          <td><span class="chip" title="Section">${escapeHtml(
+            r.SEC
+          )}</span></td>
+          <td>${escapeHtml(r.CD)}</td>
+          <td>${escapeHtml(r.NM)}</td>
+          <td style="text-align:right">${escapeHtml(r.NO ?? '')}</td>
+          <td>${escapeHtml(r.SECREF ?? '')}</td>
+          <td>${escapeHtml(r.SYSREF ?? '')}</td>
+          <td class="actions">
+            <button class="btn" data-act="edit" data-key="${r.SEC}::${
+              r.CD
+            }">수정</button>
+            <button class="btn danger" data-act="del" data-key="${r.SEC}::${
+              r.CD
+            }">삭제</button>
+          </td>`;
+            tbody.appendChild(tr);
+          }
+          setCount();
+        }
+
+        function findIndexByKey(key) {
+          const [SEC, CD] = key.split('::');
+          return state.data.findIndex((r) => r.SEC === SEC && r.CD === CD);
+        }
+
+        function openModal(mode, record) {
+          el('dlgTitle').textContent =
+            mode === 'new'
+              ? '신규 레코드'
+              : `레코드 수정 (SEC=${record.SEC}, CD=${record.CD})`;
+          el('SEC').value = record?.SEC ?? '';
+          el('CD').value = record?.CD ?? '';
+          el('NM').value = record?.NM ?? '';
+          el('NO').value = record?.NO ?? '';
+          el('SECREF').value = record?.SECREF ?? '';
+          el('SYSREF').value = record?.SYSREF ?? '';
+          el('SEC').disabled = mode === 'edit';
+          el('CD').disabled = mode === 'edit';
+          el('err').textContent = '';
+          el('dlg').showModal();
+          el('NM').focus();
+          state.editMode = mode;
+          state.editKey =
+            mode === 'edit' ? `${record.SEC}::${record.CD}` : null;
+        }
+
+        function onSave() {
+          const SEC = el('SEC').value.trim();
+          const CD = el('CD').value.trim();
+          const NM = el('NM').value.trim();
+          let NO = el('NO').value.trim();
+          const SECREF = el('SECREF').value.trim();
+          const SYSREF = el('SYSREF').value.trim();
+
+          if (!SEC || !CD || !NM) {
+            return showErr('SEC, CD, NM은 필수입니다.');
+          }
+
+          if (NO !== '' && number14_3(NO) === null) {
+            return showErr(
+              'NO는 숫자(최대 14자리 정수 + 소수 3자리) 형식이어야 합니다.'
+            );
+          }
+          NO = number14_3(NO);
+
+          if (state.editMode === 'new') {
+            const exists = state.data.some((r) => r.SEC === SEC && r.CD === CD);
+            if (exists)
+              return showErr('동일한 기본키(SEC,CD)가 이미 존재합니다.');
+            state.data.push({ SEC, CD, NM, NO, SECREF, SYSREF });
+          } else {
+            const idx = findIndexByKey(state.editKey);
+            if (idx > -1) {
+              state.data[idx] = { SEC, CD, NM, NO, SECREF, SYSREF };
+            }
+          }
+          save();
+          el('dlg').close();
+          render();
+        }
+        function showErr(msg) {
+          el('err').textContent = msg;
+          return false;
+        }
+
+        function delByKey(key) {
+          const idx = findIndexByKey(key);
+          if (idx > -1) {
+            state.data.splice(idx, 1);
+            save();
+            render();
+          }
+        }
+
+        function toCSV(arr) {
+          const head = ['SEC', 'CD', 'NM', 'NO', 'SECREF', 'SYSREF'];
+          const lines = [head.join(',')];
+          for (const r of arr) {
+            const line = head.map((k) => csvCell(r[k] ?? ''));
+            lines.push(line.join(','));
+          }
+          return lines.join('\n');
+        }
+        function csvCell(v) {
+          const s = (v ?? '').toString();
+          if (/["\n,]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+          return s;
+        }
+        function download(filename, text) {
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(
+            new Blob([text], { type: 'text/csv;charset=utf-8;' })
+          );
+          a.download = filename;
+          a.click();
+          URL.revokeObjectURL(a.href);
+        }
+        function escapeHtml(s) {
+          return (s ?? '')
+            .toString()
+            .replace(
+              /[&<>"']/g,
+              (m) =>
+                ({
+                  '&': '&amp;',
+                  '<': '&lt;',
+                  '>': '&gt;',
+                  '"': '&quot;',
+                  "'": '&#39;',
+                }[m])
+            );
+        }
+
+        document.addEventListener('click', (e) => {
+          const t = e.target;
+          if (t.matches('#btnAdd')) {
+            safe(() => openModal('new'), 'openModal(new)');
+          }
+          if (t.matches('#btnSave')) {
+            safe(onSave, 'onSave');
+          }
+          if (t.matches('[data-act="edit"]')) {
+            const key = t.getAttribute('data-key');
+            const idx = findIndexByKey(key);
+            if (idx > -1)
+              safe(() => openModal('edit', state.data[idx]), 'openModal(edit)');
+          }
+          if (t.matches('[data-act="del"]')) {
+            const key = t.getAttribute('data-key');
+            if (confirm('해당 레코드를 삭제하시겠습니까?'))
+              safe(() => delByKey(key), 'delByKey');
+          }
+          if (t.matches('#btnDeleteSel')) {
+            const cks = [...document.querySelectorAll('.ckRow:checked')];
+            if (!cks.length) return alert('선택된 행이 없습니다.');
+            if (!confirm(`${cks.length}건 삭제하시겠습니까?`)) return;
+            const keys = cks.map((x) => x.getAttribute('data-key'));
+            for (const k of keys) safe(() => delByKey(k), 'bulkDel');
+          }
+          if (t.matches('#btnExport')) {
+            safe(
+              () =>
+                download(
+                  `SIT005_${new Date().toISOString().slice(0, 10)}.csv`,
+                  toCSV(filtered())
+                ),
+              'exportCSV'
+            );
+          }
+          if (t.matches('#btnReset')) {
+            if (
+              confirm(
+                '데모 데이터를 재설정할까요? (현재 데이터가 초기화됩니다)'
+              )
+            ) {
+              localStorage.removeItem(KEY);
+              safe(initDemoIfEmpty, 'initDemo');
+              safe(load, 'load');
+              safe(render, 'render');
+            }
+          }
+          if (t.matches('#ckAll')) {
+            document
+              .querySelectorAll('.ckRow')
+              .forEach((ch) => (ch.checked = t.checked));
+          }
+          if (t.closest('th[data-key]')) {
+            const th = t.closest('th[data-key]');
+            const key = th.getAttribute('data-key');
+            if (state.sortKey === key) {
+              state.sortDir = state.sortDir === 'asc' ? 'desc' : 'asc';
+            } else {
+              state.sortKey = key;
+              state.sortDir = 'asc';
+            }
+            safe(render, 'renderSort');
+          }
+        });
+
+        el('q').addEventListener('input', (e) => {
+          state.filter = e.target.value;
+          safe(render, 'renderFilter');
+        });
+
+        // Theme handling
+        const root = document.getElementById('app');
+        const themeSel = document.getElementById('themeSel');
+        const themeBtn = document.getElementById('btnTheme');
+        const THEMES = ['dark', 'dim', 'amoled', 'light', 'sepia', 'contrast'];
+
+        function applyTheme(v) {
+          try {
+            root.dataset.theme = v;
+            localStorage.setItem(KEY_THEME, v);
+            if (themeSel) themeSel.value = v;
+          } catch (e) {
+            console.warn('theme store error', e);
+          }
+        }
+        function cycleTheme() {
+          const cur = root.dataset.theme || 'dark';
+          const i = Math.max(0, THEMES.indexOf(cur));
+          const next = THEMES[(i + 1) % THEMES.length];
+          applyTheme(next);
+        }
+        const savedTheme = localStorage.getItem(KEY_THEME);
+        const defaultTheme =
+          savedTheme ||
+          (window.matchMedia &&
+          matchMedia('(prefers-color-scheme: light)').matches
+            ? 'light'
+            : 'dark');
+        applyTheme(defaultTheme);
+        if (themeSel) {
+          themeSel.value = root.dataset.theme;
+          themeSel.addEventListener('change', () => applyTheme(themeSel.value));
+        }
+        if (themeBtn) {
+          themeBtn.addEventListener('click', cycleTheme);
+        }
+
+        // Self test
+        function passSelfTest(msg) {
+          const s = el('selftest');
+          if (s) {
+            s.textContent = '테스트 OK';
+            s.style.color = 'var(--good)';
+            s.style.borderColor = 'var(--good)';
+          }
+          if (msg) console.log('[SELFTEST]', msg);
+        }
+        function failSelfTest(msg) {
+          const s = el('selftest');
+          if (s) {
+            s.textContent = '오류 감지';
+            s.style.color = 'var(--bad)';
+            s.style.borderColor = 'var(--bad)';
+          }
+          if (msg) console.error('[SELFTEST]', msg);
+        }
+
+        // Bootstrap
+        try {
+          initDemoIfEmpty();
+          load();
+          render();
+          setCount();
+          passSelfTest('Init completed');
+        } catch (err) {
+          failSelfTest(err.message);
+        }
+      })();
+    </script>
+
+    <!-- 회원 세션 전역 변수 -->
+    <script src="/static/member_session.js"></script>
+    <!-- 관리자 세션 전역 변수 관리 -->
+    <script src="/static/admin_session.js"></script>
+    <!-- 복사방지 세션 전역 변수 관리 -->
+    <script src="/static/security.js"></script>
+  </body>
+</html>
+""" with open("/mnt/data/SIT005_grid_admin_v2.html","w", encoding="utf-8") as f:
+f.write(html) print("Saved to /mnt/data/SIT005_grid_admin_v2.html")

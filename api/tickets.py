@@ -20,15 +20,43 @@ def list_tickets():
             # 문자열인 경우 그대로 사용
             created_at_str = str(created_at) if created_at else ""
         
+        updated_at = r.get('updated_at')
+        if isinstance(updated_at, datetime):
+            updated_at_str = updated_at.isoformat()
+        else:
+            updated_at_str = str(updated_at) if updated_at else None
+        
         items.append({
-            "ticket_id": r.get('id'), 
-            "title": r.get('title'), 
-            "status": r.get('status', 'OPEN'), 
+            "ticket_id": r.get('id'),
+            "title_masked": r.get('title'),
+            "content_enc": r.get('content_enc', ''),
+            "author_name": r.get('author_name', ''),
+            "author_nickname": r.get('author_nickname', ''),
+            "author_contact": r.get('author_contact', ''),
+            "author_phone": r.get('author_phone', ''),
+            "author_mobile": r.get('author_mobile', ''),
+            "author_email": r.get('author_email', ''),
+            "author_gender": r.get('author_gender', ''),
+            "birth_year": r.get('birth_year'),
+            "snsgu": r.get('snsgu', ''),
+            "sMember_id": r.get('sMember_id', ''),
+            "status": r.get('status', 'OPEN'),
             "created_at": created_at_str,
-            "has_admin_reply": bool(r.get('has_admin_reply', False))
+            "updated_at": updated_at_str,
+            "has_admin_reply": bool(r.get('has_admin_reply', False)),
+            "post_pwd_hash": r.get('post_pwd_hash', ''),
+            "agreement": r.get('agreement', 0)
         })
     
-    print(f"📊 API 응답 예시 - created_at: {items[0]['created_at'] if items else 'N/A'}")
+    print(f"📊 API 응답 - 총 {len(items)}건")
+    if items:
+        print(f"📊 첫 번째 티켓 샘플:")
+        print(f"   - ticket_id: {items[0].get('ticket_id')}")
+        print(f"   - title_masked: {items[0].get('title_masked')}")
+        print(f"   - content_enc: {items[0].get('content_enc')[:50] if items[0].get('content_enc') else '(비어있음)'}...")
+        print(f"   - author_name: {items[0].get('author_name')}")
+        print(f"   - author_contact: {items[0].get('author_contact')}")
+        print(f"   - snsgu: {items[0].get('snsgu')}")
     return jsonify(items)
 
 @bp.post('/')

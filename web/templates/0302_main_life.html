@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>인생상담</title>
+    <title>인생상담 종류 및 설명</title>
     <style>
       /* ======== THEME TOKENS ======== */
       :root {
@@ -71,7 +71,7 @@
           'Noto Sans KR', sans-serif;
         background: var(--bg);
         color: var(--fg);
-        line-height: 1.75;
+        line-height: 1.5;
       }
       a {
         color: inherit;
@@ -320,14 +320,14 @@
         background: var(--card);
         border: 1px solid var(--border);
         border-radius: 14px;
-        margin: 16px 0;
+        margin: 12px 0;
         box-shadow: 0 8px 24px var(--shadow);
       }
       .cat-header {
         display: flex;
         align-items: center;
         gap: 10px;
-        padding: 14px 16px;
+        padding: 10px 14px;
         cursor: pointer;
         user-select: none;
       }
@@ -346,30 +346,31 @@
         transition: max-height 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
       .cat-desc {
-        padding: 0 16px 10px;
+        padding: 0 14px 8px;
         color: var(--fg-muted);
-        font-size: 0.95rem;
+        font-size: 0.9rem;
+        line-height: 1.4;
       }
 
       .toolbar {
         display: flex;
-        gap: 10px;
+        gap: 8px;
         flex-wrap: wrap;
         align-items: center;
-        padding: 12px 16px;
+        padding: 8px 14px;
         border-top: 1px dashed var(--border);
         background: linear-gradient(180deg, transparent, var(--bg));
       }
       .chip {
         border: 1px solid var(--pill-border);
-        padding: 6px 10px;
+        padding: 4px 8px;
         border-radius: 999px;
-        font-size: 0.85rem;
+        font-size: 0.82rem;
         color: var(--fg-muted);
         background: var(--pill-bg);
       }
       .sub {
-        padding: 10px 14px 18px;
+        padding: 8px 12px 14px;
       }
       .sub-acc {
         width: 100%;
@@ -378,8 +379,8 @@
         color: var(--fg);
         border: 1px solid var(--border);
         border-radius: 10px;
-        padding: 10px 12px;
-        margin-top: 12px;
+        padding: 8px 10px;
+        margin-top: 10px;
         display: flex;
         align-items: center;
         gap: 8px;
@@ -387,11 +388,12 @@
       }
       .sub-title {
         font-weight: 700;
+        font-size: 0.92rem;
       }
       .sub-note {
         margin-left: auto;
         color: var(--muted);
-        font-size: 0.9rem;
+        font-size: 0.85rem;
       }
       .sub-chevron {
         transition: transform 0.28s ease;
@@ -410,35 +412,39 @@
         transition: max-height 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
       }
       .sub-content {
-        padding: 12px 12px 14px;
+        padding: 10px 10px 12px;
         color: var(--fg-muted);
+        line-height: 1.5;
       }
       .sub-content h4 {
-        margin: 10px 0 6px;
+        margin: 8px 0 5px;
         color: var(--accent-2);
+        font-size: 0.95rem;
       }
       .sub-content h5 {
-        margin: 8px 0 4px;
+        margin: 6px 0 4px;
         color: var(--accent-3);
+        font-size: 0.9rem;
       }
       .toc {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px;
-        margin: 4px 0 10px;
+        gap: 6px;
+        margin: 4px 0 8px;
       }
       .toc a {
-        font-size: 0.85rem;
+        font-size: 0.82rem;
         color: var(--accent-3);
         text-decoration: none;
         border: 1px dashed var(--border);
-        padding: 4px 8px;
+        padding: 3px 8px;
         border-radius: 999px;
         background: transparent;
       }
       .note {
         color: var(--muted);
-        font-size: 0.9rem;
+        font-size: 0.85rem;
+        line-height: 1.4;
       }
       .open > .chev {
         transform: rotate(180deg);
@@ -556,7 +562,7 @@
               vertical-align: middle;
             "
           >
-            인생상담
+            인생상담 안내
           </h1>
         </div>
         <div
@@ -666,6 +672,29 @@
           style="margin-left: 8px"
         >
           ❓ 도움말
+        </button>
+        <button
+          class="qbtn"
+          id="closeBtn"
+          title="닫기"
+          style="margin-left: 8px; background: #dc3545; color: #fff"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            style="
+              width: 16px;
+              height: 16px;
+              vertical-align: middle;
+              margin-right: 4px;
+            "
+          >
+            <path
+              fill="currentColor"
+              d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+            />
+          </svg>
+          <span>닫기</span>
         </button>
       </div>
       <div class="cat-pills" id="catPills" aria-label="대분류 빠른 이동"></div>
@@ -778,8 +807,8 @@
         <section id="app"><!-- DATA 렌더링 --></section>
         <footer>
           <p>
-            문의: K2 비서실 · 본 자료는 교육·참고용입니다. 전문 진단/치유는 해당
-            분야 전문가와 상담하세요.
+            본 자료는 교육·참고용입니다. 전문 진단/치유는 해당 분야 전문가와
+            상담하세요.
           </p>
         </footer>
       </main>
@@ -793,6 +822,21 @@
         if (helpBtn && helpModal) {
           helpBtn.addEventListener('click', function () {
             helpModal.style.display = 'flex';
+          });
+        }
+
+        // 닫기 버튼 클릭 시 화면 닫기
+        var closeBtn = document.getElementById('closeBtn');
+        if (closeBtn) {
+          closeBtn.addEventListener('click', function () {
+            // iframe 내부에서 실행 중인지 확인
+            if (window.self !== window.top) {
+              // iframe 내부에서 실행 중: 부모 창으로 돌아가기
+              window.parent.postMessage('closeIframe', '*');
+            } else {
+              // 독립 창에서 실행 중: 창 닫기
+              window.close();
+            }
           });
         }
       });
@@ -1696,14 +1740,37 @@
         }
       }
       function openDefaults() {
-        document
-          .querySelectorAll('.sub-acc[data-default-open]')
-          .forEach((btn) => {
-            openPanel(btn.nextElementSibling, btn);
-            const catPanel = btn.closest('.cat-panel');
+        console.log('📂 기본 펼침 항목 열기 시작');
+        const defaultBtns = document.querySelectorAll(
+          '.sub-acc[data-default-open]'
+        );
+        console.log(`🔍 기본 펼침 항목 개수: ${defaultBtns.length}`);
+
+        defaultBtns.forEach((btn) => {
+          const panel = btn.nextElementSibling;
+
+          // 서브 아코디언 펼치기
+          if (panel && panel.classList.contains('sub-panel')) {
+            panel.style.maxHeight = panel.scrollHeight + 'px';
+            btn.classList.add('open');
+            const subChev = btn.querySelector('.sub-chevron');
+            if (subChev) subChev.style.transform = 'rotate(180deg)';
+          }
+
+          // 상위 카테고리도 펼치기
+          const catPanel = btn.closest('.cat-panel');
+          if (catPanel) {
             const catHead = catPanel.previousElementSibling;
-            openPanel(catPanel, catHead);
-          });
+            if (catHead && catHead.classList.contains('cat-header')) {
+              catPanel.style.maxHeight = catPanel.scrollHeight + 'px';
+              catHead.classList.add('open');
+              const chev = catHead.querySelector('.chev');
+              if (chev) chev.style.transform = 'rotate(180deg)';
+            }
+          }
+        });
+
+        console.log('✅ 기본 펼침 항목 열기 완료');
       }
 
       const q = document.getElementById('q');
@@ -1826,44 +1893,93 @@
 
       document.getElementById('btn-expand').onclick = expandAll;
       document.getElementById('btn-collapse').onclick = collapseAll;
-      document.getElementById('btn-reset').onclick = () => {
+      document.getElementById('btn-reset').onclick = function () {
+        console.log('🔄 기본 펼침으로 리셋 시작');
+
+        // 1. 먼저 모두 접기
         collapseAll();
-        openDefaults();
+
+        // 2. 잠시 대기 후 기본 펼침 적용
+        setTimeout(() => {
+          openDefaults();
+          console.log('✅ 기본 펼침 완료');
+        }, 100);
+
+        // 3. 검색어 초기화
         q.value = '';
-        // setCount('전체 표시') 제거: 전체 표시 버튼 기능 삭제
+
+        // 4. URL 해시 제거
         history.pushState(
           '',
           document.title,
           window.location.pathname + window.location.search
         );
-        saveState();
+
+        // 5. 상태 저장
+        setTimeout(() => {
+          saveState();
+        }, 150);
       };
 
       /* 사이드바 컨트롤: 본문 모두 펼치기/접기 */
       document.getElementById('sideExpand').onclick = expandAll;
       document.getElementById('sideCollapse').onclick = collapseAll;
+
       function expandAll() {
+        console.log('🔓 모두 펼치기 시작');
         document.querySelectorAll('.category').forEach((cat) => {
-          openPanel(
-            cat.querySelector('.cat-panel'),
-            cat.querySelector('.cat-header')
-          );
-          cat
-            .querySelectorAll('.sub-acc')
-            .forEach((b) => openPanel(b.nextElementSibling, b));
+          const catPanel = cat.querySelector('.cat-panel');
+          const catHeader = cat.querySelector('.cat-header');
+
+          // 카테고리 펼치기
+          if (catPanel && catHeader) {
+            catPanel.style.maxHeight = catPanel.scrollHeight + 'px';
+            catHeader.classList.add('open');
+            const chev = catHeader.querySelector('.chev');
+            if (chev) chev.style.transform = 'rotate(180deg)';
+          }
+
+          // 모든 서브 아코디언 펼치기
+          cat.querySelectorAll('.sub-acc').forEach((btn) => {
+            const panel = btn.nextElementSibling;
+            if (panel && panel.classList.contains('sub-panel')) {
+              panel.style.maxHeight = panel.scrollHeight + 'px';
+              btn.classList.add('open');
+              const subChev = btn.querySelector('.sub-chevron');
+              if (subChev) subChev.style.transform = 'rotate(180deg)';
+            }
+          });
         });
+        console.log('✅ 모두 펼치기 완료');
         saveState();
       }
+
       function collapseAll() {
+        console.log('🔒 모두 접기 시작');
         document.querySelectorAll('.category').forEach((cat) => {
-          closePanel(
-            cat.querySelector('.cat-panel'),
-            cat.querySelector('.cat-header')
-          );
-          cat
-            .querySelectorAll('.sub-acc')
-            .forEach((b) => closePanel(b.nextElementSibling, b));
+          const catPanel = cat.querySelector('.cat-panel');
+          const catHeader = cat.querySelector('.cat-header');
+
+          // 모든 서브 아코디언 먼저 접기
+          cat.querySelectorAll('.sub-acc').forEach((btn) => {
+            const panel = btn.nextElementSibling;
+            if (panel && panel.classList.contains('sub-panel')) {
+              panel.style.maxHeight = '0';
+              btn.classList.remove('open');
+              const subChev = btn.querySelector('.sub-chevron');
+              if (subChev) subChev.style.transform = 'rotate(0deg)';
+            }
+          });
+
+          // 카테고리 접기
+          if (catPanel && catHeader) {
+            catPanel.style.maxHeight = '0';
+            catHeader.classList.remove('open');
+            const chev = catHeader.querySelector('.chev');
+            if (chev) chev.style.transform = 'rotate(0deg)';
+          }
         });
+        console.log('✅ 모두 접기 완료');
         saveState();
       }
 
@@ -2128,6 +2244,12 @@
       highlightActiveNav();
       initScrollSpy();
     </script>
+
+    <!-- 회원 세션 전역 변수 -->
+    <script src="/static/member_session.js"></script>
+    <!-- 관리자 세션 전역 변수 관리 -->
+    <script src="/static/admin_session.js"></script>
+    <!-- 복사방지 세션 전역 변수 관리 -->
     <script src="/static/security.js"></script>
   </body>
 </html>

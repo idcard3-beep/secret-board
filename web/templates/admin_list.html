@@ -470,7 +470,14 @@
       <!-- 관리자 헤더 -->
       <div class="admin-grid-header">
         <h2>🛡️ 관리자 - 상담요청 목록</h2>
-        <div class="admin-status-badge">🗄️ 상담 요청 관리</div>
+        <!-- <div class="admin-status-badge">🗄️ 시스템 관리</div> -->
+        <button
+          class="admin-status-badge"
+          onclick="location.href='main_adminMenu.html'"
+          style="cursor: pointer; border: none; padding: 8px 16px"
+        >
+          🗄️ 관리자 시스템 관리
+        </button>
       </div>
 
       <!-- 관리자 툴바 -->
@@ -521,7 +528,12 @@
       </div>
     </div>
 
+    <!-- 회원 세션 전역 변수 -->
+    <script src="/static/member_session.js"></script>
+    <!-- 관리자 세션 전역 변수 관리 (가장 먼저 로드) -->
+    <script src="/static/admin_session.js"></script>
     <script src="/static/admin_list.js"></script>
+    <!-- 복사방지 세션 전역 변수 관리 -->
     <script src="/static/security.js"></script>
   </body>
 </html>

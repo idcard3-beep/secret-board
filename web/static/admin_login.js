@@ -43,11 +43,11 @@ document.getElementById('loginForm').addEventListener('submit', function (e) {
 
   const formData = new FormData(e.target);
   const data = {
-    username: formData.get('username'),
+    admin_id: formData.get('admin_id'),
     password: formData.get('password'),
   };
 
-  console.log('🔑 로그인 시도:', { username: data.username, password: '***' });
+  console.log('🔑 로그인 시도:', { admin_id: data.admin_id, password: '***' });
 
   fetch('/api/v1/admin/login', {
     method: 'POST',
@@ -81,13 +81,52 @@ document.getElementById('loginForm').addEventListener('submit', function (e) {
 
       // 성공인 경우
       if (result.ok) {
-        console.log('✅ 로그인 성공! 관리자 페이지로 이동...');
-        showSuccess('로그인 성공! 관리자 페이지로 이동합니다...');
+        // admin_status 확인 (대소문자 구분 없이)
+        const adminStatus = (result.admin?.admin_status || '').toUpperCase();
+        console.log('📋 관리자 상태(admin_status):', adminStatus);
 
-        // 1초 후 페이지 이동
-        setTimeout(() => {
-          location.href = '/admin_list';
-        }, 1000);
+        // OPEN 상태만 로그인 허용
+        if (adminStatus === 'OPEN') {
+          console.log('✅ 로그인 성공! 관리자 페이지로 이동...');
+          showSuccess('로그인 성공! 관리자 페이지로 이동합니다...');
+
+          // 전역 변수에 관리자 정보 저장
+          if (result.admin && typeof window.setAdminSession === 'function') {
+            window.setAdminSession(result.admin);
+            console.log('✅ 관리자 세션 전역 변수 설정 완료:', result.admin);
+          } else {
+            console.warn(
+              '⚠️ admin_session.js가 로드되지 않았거나 관리자 정보가 없습니다.'
+            );
+          }
+
+          // 1초 후 페이지 이동
+          setTimeout(() => {
+            location.href = '/admin_list';
+          }, 1000);
+        } else {
+          // OPEN이 아닌 경우 - 상태에 따라 메시지 표시
+          console.warn('⚠️ 로그인 불가 - 계정 상태:', adminStatus);
+
+          let statusMessage = '';
+          if (adminStatus === 'LOCKED') {
+            statusMessage =
+              '❌ 로그인할 수 없는 계정 상태입니다.\n계정 상태: 잠김(LOCKED)\n관리자에게 문의하세요.';
+          } else if (adminStatus === 'DELETED') {
+            statusMessage =
+              '❌ 로그인할 수 없는 계정 상태입니다.\n계정 상태: 삭제됨(DELETED)\n관리자에게 문의하세요.';
+          } else {
+            statusMessage = `❌ 로그인할 수 없는 계정 상태입니다.\n계정 상태: ${adminStatus}\n관리자에게 문의하세요.`;
+          }
+
+          showError(statusMessage);
+
+          // 전역 변수 초기화
+          if (typeof window.clearAdminSession === 'function') {
+            window.clearAdminSession();
+            console.log('🔄 관리자 세션 전역 변수 초기화 완료');
+          }
+        }
       } else {
         // 실패인 경우 - 서버에서 제공하는 구체적인 에러 메시지 표시
         console.error('❌ 로그인 실패:', result.error);
@@ -95,9 +134,15 @@ document.getElementById('loginForm').addEventListener('submit', function (e) {
           result.error || '아이디 또는 비밀번호를 확인해주세요.';
         showError(errorMessage);
 
+        // 전역 변수 초기화
+        if (typeof window.clearAdminSession === 'function') {
+          window.clearAdminSession();
+          console.log('🔄 관리자 세션 전역 변수 초기화 완료');
+        }
+
         // 해당 필드에 포커스
         if (errorMessage.includes('ID') || errorMessage.includes('관리자')) {
-          document.querySelector('input[name="username"]').focus();
+          document.querySelector('input[name="admin_id"]').focus();
         } else if (errorMessage.includes('비밀번호')) {
           document.querySelector('input[name="password"]').focus();
         }
