@@ -47,9 +47,15 @@ def upload_signature():
 def upload(ticket_id):
     token = request.cookies.get('view_token')
     is_user = token and verify_view_token(token, ticket_id)
+# 권한 변경/ 잠시대기------    
+    #is_admin = session.get(ADMIN_SESSION_KEY, False)
+    #if not (is_user or is_admin):
+    #    return ('', 403)
+    #-----
     is_admin = session.get(ADMIN_SESSION_KEY, False)
-    if not (is_user or is_admin):
+    if not (is_admin):
         return ('', 403)
+#---------------------
     f = request.files.get('file')
     if not f: return jsonify({'ok':False,'error':'파일 없음'}), 400
     ext = os.path.splitext(f.filename)[1].lower()

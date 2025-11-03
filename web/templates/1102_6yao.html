@@ -808,7 +808,7 @@
 
       <!-- 4. 주역 상담가 · 인터랙티브 -->
       <section class="card">
-        <h2>주역 상담가 · 인터랙티브xxx</h2>
+        <h2>주역 상담가 · 실전 작괘법(作卦法) · 육효점(六爻占)</h2>
         <div id="consultCard">
           <!-- 인터랙티브 상담 도구가 여기에 로드됩니다 -->
         </div>
@@ -1474,7 +1474,7 @@
           // 8. yao_case — 실제 사례 템플릿
           _add('sec-yao_case','실제 사례 템플릿', d1.yao_case);
         } catch(e){ console.warn('detail extras patch failed:', e); }
-      } 0%,${gradB} 100%);border-color:${trigramColor[d.hx[0]]}44;`;const rel=d.rels.map(([a,b,t])=>t.includes('三合')||t.includes('自刑')?`<span class='pill' style="border-color:#eab308">${t}</span>`:`<span class='pill'>${t}${a?`: ${a}↔${b}`:''}</span>`).join(' ');const lines=Array.from({length:6},(_,i)=>({idx:i+1,br:d.branches[i],el:d.elems[i],st:d.stems[i]}));card.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px"><div><b>${d.no}. ${d.name}</b> <span class="hex">${d.hx}</span></div><div class="note">${d.core}</div></div><div class="grid cols-2"><div><h3 class="h2mini">괘사 原文</h3><div style="white-space:pre-wrap">${d.gua_orig}</div><div class="sep"></div><h3 class="h2mini">괘사 公譯(한글)</h3><div>${d.gua_tran_ko||'<i>공역 미주입</i>'}</div></div><div><h3 class="h2mini">효사 原文（6효）</h3><ol style="margin:6px 0 0 18px">${d.yao_orig.map(x=>`<li>${x}</li>`).join('')}</ol><div class="sep"></div><h3 class="h2mini">관계·형충파해·성국</h3><div>${rel||'<span class="note">관계 주석 없음</span>'}</div></div></div><div class="sep"></div><h3 class="h2mini">6효 본문형 — 실전형 설명</h3><ol style="margin:6px 0 0 18px">${d.modern.map(x=>`<li>${x}</li>`).join('')}</ol><div class="sep"></div><details open class="acc"><summary><b>6효 — 納支/納甲 · 용신/희신 메모</b> <span class="note">(입력 자동 저장)</span></summary>${lines.map(L=>`<div class='lineform'><div><b>${L.idx}효</b></div><div>納支: <span class='pill'>${L.br}</span> <span class='pill'>${L.el}</span></div><div>納甲: <span class='pill'>${L.st}</span></div><div><input data-memo='${d.no}:${L.idx}' placeholder="용신/희신/비고 메모"/></div></div>`).join('')}</details>`;grid.appendChild(card)});document.querySelectorAll('input[data-memo]').forEach(inp=>{const k='memo_'+inp.dataset.memo;inp.value=localStorage.getItem(k)||'';inp.addEventListener('input',()=>localStorage.setItem(k,inp.value))})} */
+      } 0%,${gradB} 100%);border-color:${trigramColor[d.hx[0]]}44;`;const rel=d.rels.map(([a,b,t])=>t.includes('三合')||t.includes('自刑')?`<span class='pill' style="border-color:#eab308">${t}</span>`:`<span class='pill'>${t}${a?`: ${a}↔${b}`:''}</span>`).join(' ');const lines=Array.from({length:6},(_,i)=>({idx:i+1,br:d.branches[i],el:d.elems[i],st:d.stems[i]}));card.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px"><div><b>${d.no}. ${d.name}</b> <span class="hex">${d.hx}</span></div><div class="note">${d.core}</div></div><div class="grid cols-2"><div><h3 class="h2mini">괘사 原文</h3><div style="white-space:pre-wrap">${d.gua_orig}</div><div class="sep"></div><h3 class="h2mini">괘사 公譯(한글)</h3><div>${d.gua_tran_ko||'<i>공역 미주입</i>'}</div></div><div><h3 class="h2mini">효사 原文（6효）</h3><ol style="margin:6px 0 0 18px">${d.yao_orig.map(x=>`<li>${x}</li>`).join('')}</ol><div class="sep"></div><h3 class="h2mini">관계·형충파해·성국</h3><div>${rel||'<span class="note">관계 주석 없음</span>'}</div></div></div><div class="sep"></div><h3 class="h2mini">6효 본문형-설명</h3><ol style="margin:6px 0 0 18px">${d.modern.map(x=>`<li>${x}</li>`).join('')}</ol><div class="sep"></div><details open class="acc"><summary><b>6효 — 納支/納甲 · 용신/희신 메모</b> <span class="note">(입력 자동 저장)</span></summary>${lines.map(L=>`<div class='lineform'><div><b>${L.idx}효</b></div><div>納支: <span class='pill'>${L.br}</span> <span class='pill'>${L.el}</span></div><div>納甲: <span class='pill'>${L.st}</span></div><div><input data-memo='${d.no}:${L.idx}' placeholder="용신/희신/비고 메모"/></div></div>`).join('')}</details>`;grid.appendChild(card)});document.querySelectorAll('input[data-memo]').forEach(inp=>{const k='memo_'+inp.dataset.memo;inp.value=localStorage.getItem(k)||'';inp.addEventListener('input',()=>localStorage.setItem(k,inp.value))})} */
       function buildDetails(DATA, ruleKey) {
         const grid = document.getElementById('detailGrid');
         grid.innerHTML = '';
@@ -1529,7 +1529,7 @@
             .join('')}
           </ol><div class="sep"></div><h3 class="h2mini">관계·형충파해·성국</h3><div>${
             rel || '<span class="note">관계 주석 없음</span>'
-          }</div></div></div><div class="sep"></div><h3 class="h2mini">6효 본문형 — 실전형 설명</h3><ol style="margin:6px 0 0 18px">${d.modern
+          }</div></div></div><div class="sep"></div><h3 class="h2mini">6효 본문형-설명</h3><ol style="margin:6px 0 0 18px">${d.modern
             .map((x) => `<li>${x}</li>`)
             .join(
               ''
@@ -7598,10 +7598,10 @@
           </div>
         </div>
         <div class="card right-panel" id="detailCard" style="flex: 0 0 calc(80% - 10px) !important; max-width: calc(80% - 10px) !important; min-width: 0 !important;">
-          <h2>증산복역과 복서정종 이론 왕필본 상세설명</h2>
+          <h2>증산복역과 복서정종 이론 왕필본 바탕 상세설명</h2>
           <div class="tabs">
-            <button class="tab active" data-tab="gua_orig">개괄-원문</button>
-            <button class="tab" data-tab="gua_tran_ko">개괘-한글</button>
+            <button class="tab active" data-tab="gua_orig">괘사-원문</button>
+            <button class="tab" data-tab="gua_tran_ko">괘사-한글</button>
             <button class="tab" data-tab="yao_orig">6효-원문</button>
             <button class="tab" data-tab="yao_tran_ko">6효-한글</button>
             <button class="tab" data-tab="yao_psychology">6효-심리</button>
@@ -7625,7 +7625,7 @@
               <button id="edit" class="btn">편집</button>
               <button id="save" class="btn pri" disabled>저장</button>
             </div>
-            <small class="muted">편집 후 저장하면 로컬 코퍼스에 반영됩니다.</small>
+            <small class="muted">※참고사항: 일반적인 설명입니다.</small>
           </div>
         </div>
       </div>
@@ -8201,10 +8201,10 @@
     </script>
 
     <!-- 회원 세션 전역 변수 -->
-    <script src="/static/member_session.js"></script>
+    <!--  <script src="/static/member_session.js"></script> -->
     <!-- 관리자 세션 전역 변수 관리 -->
-    <script src="/static/admin_session.js"></script>
+    <!--<script src="/static/admin_session.js"></script> -->
     <!-- 복사방지 세션 전역 변수 관리 -->
-    <script src="/static/security.js"></script>
+    <!--  <script src="/static/security.js"></script> -->
   </body>
 </html>
