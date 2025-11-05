@@ -109,13 +109,19 @@ def page_0305_color_psychology120(): return render_template("0305_color_psycholo
 def page_0306_color_psychology1202(): return render_template("0306_color_psychology1202.html")
 
 @app.route("/1102_6yao.html")
-def page_1102_6yao(): 
-    # 세션에서 사용자 정보 확인
-    user_role = session.get('role', 'USER')  # 기본값은 'USER'
-    is_admin = user_role == 'ADMIN'
-    return render_template("1102_6yao.html", user_role=user_role, is_admin=is_admin)
+def page_1102_6yao(): return render_template("1102_6yao.html")
 
+@app.route("/1102_6yao_test.html")
+def page_1102_6yao_test(): return render_template("1102_6yao_test.html")
 
+@app.route("/1102_6yao_debug.html")
+def page_1102_6yao_debug(): return render_template("1102_6yao_debug.html")
+
+#def page_1102_6yao(): 
+#    # 세션에서 사용자 정보 확인
+#    user_role = session.get('role', 'USER')  # 기본값은 'USER'
+#    is_admin = user_role == 'ADMIN'
+#    return render_template("1102_6yao.html", user_role=user_role, is_admin=is_admin)
 
 
 @app.route("/member_login.html")
