@@ -189,7 +189,7 @@
 
         <div class="form-actions">
           <button type="submit">로그인</button>
-          <button type="button" onclick="location.href='/'">취소</button>
+          <button type="button" onclick="handleCancel()">취소</button>
         </div>
       </form>
     </div>
@@ -206,6 +206,41 @@
           passwordField.type = 'password';
           eyeIcon.innerHTML = '';
           eyeIcon.classList.remove('hidden');
+        }
+      }
+
+      // 취소 버튼 처리 함수
+      function handleCancel() {
+        console.log('🚪 관리자 로그인 취소 버튼 클릭');
+
+        // 1. 관리자 세션 전역 변수 완전 초기화
+        if (typeof window.clearAdminSession === 'function') {
+          window.clearAdminSession();
+          console.log('✅ 관리자 세션 전역 변수 초기화 완료');
+        } else {
+          console.warn('⚠️ clearAdminSession 함수를 찾을 수 없습니다');
+        }
+
+        // 2. 팝업 창인 경우 부모 창에 취소 메시지 전송 후 닫기
+        if (window.opener) {
+          console.log('🔔 부모 창에 로그인 취소 메시지 전송');
+          try {
+            window.opener.postMessage(
+              {
+                type: 'ADMIN_LOGIN_CANCELLED',
+              },
+              '*'
+            );
+          } catch (e) {
+            console.warn('⚠️ 부모 창 메시지 전송 실패:', e);
+          }
+
+          // 팝업 창 닫기
+          window.close();
+        } else {
+          // 일반 페이지에서 접근한 경우 홈으로 이동
+          console.log('🏠 홈 페이지로 이동');
+          location.href = '/';
         }
       }
     </script>

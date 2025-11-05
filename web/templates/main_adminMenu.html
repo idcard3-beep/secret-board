@@ -714,6 +714,56 @@
       window.addEventListener('hashchange', syncNav);
       syncNav();
 
+      // ===== 권한 체크 시스템 =====
+
+      // 현재 사용자의 권한(role) 확인 함수
+      function getCurrentUserRole() {
+        // 1. admin_session.js에서 관리자 로그인 상태 확인
+        if (window.getAdminSession && window.getAdminSession().isLoggedIn) {
+          const adminSession = window.getAdminSession();
+          console.log('🔐 관리자 세션 감지:', adminSession);
+          return adminSession.role || 'ADMIN';
+        }
+
+        // 2. member_session.js에서 회원 로그인 상태 확인 (있다면)
+        if (
+          window.getMemberSession &&
+          window.isMemberLoggedIn &&
+          window.isMemberLoggedIn()
+        ) {
+          const memberSession = window.getMemberSession();
+          console.log('👤 회원 세션 감지:', memberSession);
+          // 회원 세션에 role 정보가 있다면 사용
+          return memberSession.role || 'USER';
+        }
+
+        // 3. 기본값
+        return 'USER';
+      }
+
+      // ADMIN 권한 체크 함수
+      function checkAdminPermission(actionName) {
+        const currentRole = getCurrentUserRole();
+        console.log(
+          `🔍 권한 체크 - 작업: ${actionName}, 현재 권한: ${currentRole}`
+        );
+
+        if (currentRole !== 'ADMIN') {
+          alert(
+            `❌ 접근 권한이 없습니다.\n\n` +
+              `🔒 요청 작업: ${actionName}\n` +
+              `👤 현재 권한: ${currentRole}\n` +
+              `✅ 필요 권한: ADMIN\n\n` +
+              `관리자 권한(ADMIN)이 필요합니다.\n` +
+              `관리자 로그인을 진행해주세요.`
+          );
+          return false;
+        }
+
+        console.log(`✅ 권한 승인 - ${actionName} 작업 허용`);
+        return true;
+      }
+
       // 카드의 "열기" 버튼 → 해당 섹션으로 스크롤 (기능 유지)
       document.querySelectorAll('[data-go]').forEach((btn) => {
         btn.addEventListener('click', () => {
@@ -737,6 +787,7 @@
       const openBcodeBtn = document.getElementById('openBcodeBtn');
       if (openBcodeBtn) {
         openBcodeBtn.addEventListener('click', function () {
+          if (!checkAdminPermission('기초 코드관리')) return;
           console.log('기초 코드관리 버튼 클릭됨!');
           window.location.href = '/sit005.html';
         });
@@ -746,6 +797,7 @@
       const openMemlistBtn = document.getElementById('openMemlistBtn');
       if (openMemlistBtn) {
         openMemlistBtn.addEventListener('click', function () {
+          if (!checkAdminPermission('회원 비밀상담요청 관리')) return;
           console.log('회원 비밀상담요청 관리 버튼 클릭됨!');
           window.location.href = '/a03_admin_memlist.html';
         });
@@ -755,6 +807,7 @@
       const openMemcardBtn = document.getElementById('openMemcardBtn');
       if (openMemcardBtn) {
         openMemcardBtn.addEventListener('click', function () {
+          if (!checkAdminPermission('멤버회원 정보관리')) return;
           console.log('멤버회원 정보관리 버튼 클릭됨!');
           window.location.href = '/a02_admin_memcard.html';
         });
@@ -764,6 +817,7 @@
       const openMembatchBtn = document.getElementById('openMembatchBtn');
       if (openMembatchBtn) {
         openMembatchBtn.addEventListener('click', function () {
+          if (!checkAdminPermission('일괄관리')) return;
           console.log('일괄관리 버튼 클릭됨!');
           window.location.href = '/a05_admin_membatch.html';
         });
@@ -773,6 +827,7 @@
       const openAdminCardBtn = document.getElementById('openAdminCardBtn');
       if (openAdminCardBtn) {
         openAdminCardBtn.addEventListener('click', function () {
+          if (!checkAdminPermission('관리자 계정관리')) return;
           console.log('관리자 계정관리 버튼 클릭됨!');
           window.location.href = '/a06_adminCard.html';
         });
@@ -782,19 +837,30 @@
       const openAnswersBtn = document.getElementById('openAnswersBtn');
       if (openAnswersBtn) {
         openAnswersBtn.addEventListener('click', function () {
+          if (!checkAdminPermission('관리자 답변관리')) return;
           console.log('관리자 답변관리 버튼 클릭됨!');
           window.location.href = '/a03_admin_memlist.html';
         });
       }
 
-      // 닫기 버튼
+      // 닫기 버튼 - 권한 체크 없이 바로 화면 닫기
       const closeBtn = document.getElementById('closeBtn');
       if (closeBtn) {
         closeBtn.addEventListener('click', function () {
-          if (window.history.length > 1) {
+          // 브라우저 탭/창 닫기 시도
+          if (window.opener) {
+            // 팝업창인 경우
+            window.close();
+          } else if (window.history.length > 1) {
+            // 이전 페이지가 있는 경우
             window.history.back();
           } else {
-            window.location.href = '/main_index.html';
+            // 새 탭이거나 직접 접근한 경우
+            window.close();
+            // window.close()가 작동하지 않는 경우 홈으로 이동
+            setTimeout(() => {
+              window.location.href = '/main_index.html';
+            }, 100);
           }
         });
       }

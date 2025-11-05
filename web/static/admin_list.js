@@ -27,6 +27,81 @@ console.log('🗄️ 관리자 반응형 DB 그리드 모드로 실행 중...');
   }
 })();
 
+// ===== 실시간 관리자 세션 감지 =====
+function checkAdminSessionRealTime() {
+  console.log('🔄 실시간 관리자 세션 확인 중...');
+
+  if (typeof window.getAdminSession === 'function') {
+    const adminSession = window.getAdminSession();
+
+    if (!adminSession || !adminSession.isLoggedIn || !adminSession.admin_id) {
+      console.warn(
+        '⚠️ 관리자 세션이 만료되었습니다. 로그인 페이지로 이동합니다.'
+      );
+      alert('관리자 세션이 만료되었습니다. 다시 로그인해주세요.');
+      window.location.href = '/admin_login';
+      return false;
+    }
+
+    console.log('✅ 관리자 세션 유효:', adminSession.admin_id);
+    return true;
+  }
+
+  return false;
+}
+
+// 페이지 포커스 시 세션 재확인 (다른 탭에서 로그아웃 후 돌아올 때)
+window.addEventListener('focus', () => {
+  console.log('📄 페이지 포커스 - 세션 재확인');
+  checkAdminSessionRealTime();
+});
+
+// localStorage 변경 감지 (다른 탭에서 로그아웃 시)
+window.addEventListener('storage', function (e) {
+  if (e.key === 'admin_session') {
+    console.log('🔔 관리자 세션 변경 감지');
+    setTimeout(() => {
+      checkAdminSessionRealTime();
+    }, 100);
+  }
+});
+
+// 주기적 세션 확인 (30초마다)
+setInterval(() => {
+  checkAdminSessionRealTime();
+}, 30000);
+
+// ===== 관리자 세션 상태 확인 함수 (버튼용) =====
+function checkAdminStatus() {
+  console.log('🔍 관리자 세션 상태 수동 확인');
+
+  if (typeof window.getAdminSession === 'function') {
+    const adminSession = window.getAdminSession();
+    console.log('📋 현재 관리자 세션:', adminSession);
+
+    if (adminSession && adminSession.isLoggedIn && adminSession.admin_id) {
+      alert(
+        `✅ 관리자 세션 활성화\n\n` +
+          `🆔 ID: ${adminSession.admin_id}\n` +
+          `👤 사용자명: ${adminSession.username || '정보없음'}\n` +
+          `🔑 권한: ${adminSession.role || 'ADMIN'}\n` +
+          `⏰ 로그인 상태: 활성화`
+      );
+    } else {
+      alert(
+        `❌ 관리자 세션 없음\n\n` +
+          `로그인이 필요합니다.\n` +
+          `로그인 페이지로 이동하시겠습니까?`
+      ) && (window.location.href = '/admin_login');
+    }
+  } else {
+    alert('❌ 세션 관리 시스템 오류\nadmin_session.js가 로드되지 않았습니다.');
+  }
+}
+
+// 전역 함수로 등록 (HTML에서 onclick으로 호출 가능)
+window.checkAdminStatus = checkAdminStatus;
+
 function load() {
   const status = document.getElementById('statusFilter').value;
   const q = status ? `?status=${encodeURIComponent(status)}` : '';

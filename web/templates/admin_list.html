@@ -491,7 +491,19 @@
             <option value="CLOSED">🟡 마감</option>
           </select>
         </div>
-        <button class="admin-logout-btn" onclick="logout()">🚪 로그아웃</button>
+        <div style="display: flex; gap: 8px; align-items: center">
+          <button
+            id="btnAdminStatus"
+            class="admin-logout-btn"
+            style="background: #16a34a"
+            onclick="checkAdminStatus()"
+          >
+            🔐 세션확인
+          </button>
+          <button class="admin-logout-btn" onclick="logout()">
+            🚪 로그아웃
+          </button>
+        </div>
       </div>
 
       <!-- 데스크탑/테블릿 테이블 뷰 -->

@@ -12,6 +12,25 @@ ADMIN_SESSION_KEY = 'admin_logged_in'
 def require_admin():
     return bool(session.get(ADMIN_SESSION_KEY))
 
+@bp.get('/check-role')
+def check_role():
+    """현재 세션의 role 확인"""
+    admin_role = session.get('admin_role', 'USER')
+    user_role = session.get('role', 'USER')
+    is_admin = session.get(ADMIN_SESSION_KEY, False)
+    
+    # 관리자 세션이 활성화되어 있으면 admin_role 사용, 아니면 user_role 사용
+    current_role = admin_role if is_admin else user_role
+    
+    print(f"🔍 권한 체크 요청 - admin_role: {admin_role}, user_role: {user_role}, is_admin: {is_admin}, current_role: {current_role}")
+    
+    return jsonify({
+        'role': current_role,
+        'is_admin': is_admin,
+        'admin_role': admin_role,
+        'user_role': user_role
+    })
+
 @bp.post('/login')
 def login():
     d = request.get_json() or {}

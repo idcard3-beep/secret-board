@@ -100,10 +100,46 @@ document.getElementById('loginForm').addEventListener('submit', function (e) {
             );
           }
 
-          // 1초 후 페이지 이동
-          setTimeout(() => {
-            location.href = '/admin_list';
-          }, 1000);
+          // 팝업 창인 경우 부모 창에 로그인 성공 메시지 전송
+          if (window.opener) {
+            console.log('🔔 부모 창에 로그인 성공 메시지 전송');
+
+            const messageData = {
+              type: 'ADMIN_LOGIN_SUCCESS',
+              admin: result.admin,
+              timestamp: Date.now(),
+            };
+
+            // 여러 번 메시지 전송으로 확실하게 전달
+            try {
+              window.opener.postMessage(messageData, '*');
+              console.log('✅ 1차 메시지 전송 완료');
+
+              // 0.1초 후 재전송
+              setTimeout(() => {
+                window.opener.postMessage(messageData, '*');
+                console.log('✅ 2차 메시지 전송 완료');
+              }, 100);
+
+              // 0.3초 후 재전송
+              setTimeout(() => {
+                window.opener.postMessage(messageData, '*');
+                console.log('✅ 3차 메시지 전송 완료');
+              }, 300);
+            } catch (e) {
+              console.warn('⚠️ 부모 창 메시지 전송 실패:', e);
+            }
+
+            // 팝업 창 닫기 (더 짧게)
+            setTimeout(() => {
+              window.close();
+            }, 600);
+          } else {
+            // 일반 페이지에서 로그인한 경우 관리자 목록으로 이동
+            setTimeout(() => {
+              location.href = '/admin_list';
+            }, 1000);
+          }
         } else {
           // OPEN이 아닌 경우 - 상태에 따라 메시지 표시
           console.warn('⚠️ 로그인 불가 - 계정 상태:', adminStatus);
