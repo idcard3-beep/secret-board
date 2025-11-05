@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test</title>
+  </head>
+  <body>
+    <h1>페이지 테스트</h1>
+    <p>이 텍스트가 보이면 기본 HTML은 정상입니다.</p>
+
+    <script>
+      console.log('🔍 스크립트 실행 테스트');
+
+      // 간단한 DOM 요소 추가 테스트
+      const testDiv = document.createElement('div');
+      testDiv.innerHTML =
+        '<h2>JavaScript로 생성된 콘텐츠</h2><p>이 내용이 보이면 JavaScript도 정상입니다.</p>';
+      testDiv.style.background = '#f0f0f0';
+      testDiv.style.padding = '20px';
+      testDiv.style.margin = '20px 0';
+
+      document.body.appendChild(testDiv);
+
+      console.log('✅ DOM 요소 추가 완료');
+    </script>
+  </body>
+</html>
