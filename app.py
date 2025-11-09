@@ -1,4 +1,4 @@
-from flask import Flask, render_template, session
+from flask import Flask, render_template, session, send_from_directory
 from dotenv import load_dotenv
 import os
 
@@ -171,6 +171,13 @@ def page_a05_admin_membatch(): return render_template("a05_admin_membatch.html")
 
 @app.route("/a06_adminCard.html")
 def page_a06_adminCard(): return render_template("a06_adminCard.html")
+
+# uploads 폴더 정적 파일 서빙
+@app.route('/uploads/<path:filename>')
+def uploaded_file(filename):
+    """uploads 폴더의 파일을 서빙합니다 (이미지, 첨부파일 등)"""
+    uploads_dir = os.path.join(app.root_path, 'uploads')
+    return send_from_directory(uploads_dir, filename)
 
 #-----
 
