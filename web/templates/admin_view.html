@@ -1,30 +1,225 @@
-<!doctype html>
-<meta charset="utf-8">
-<title>obfuscated (UTF-8 safe)</title>
-<script>
-(function(){
-  var _b64 = "PCFET0NUWVBFIGh0bWw+DQo8aHRtbCBsYW5nPSJrbyI+DQogIDxoZWFkPg0KICAgIDxtZXRhIGNoYXJzZXQ9IlVURi04IiAvPg0KICAgIDx0aXRsZT7qtIDrpqzsnpAgLSDsg4Hri7Qg7IOB7IS4PC90aXRsZT4NCiAgICA8bGluayByZWw9InN0eWxlc2hlZXQiIGhyZWY9Ii9zdGF0aWMvc3R5bGUuY3NzIiAvPg0KICAgIDxsaW5rIHJlbD0ic3R5bGVzaGVldCIgaHJlZj0iL3N0YXRpYy9zZWN1cml0eS5jc3MiIC8+DQogICAgPHN0eWxlPg0KICAgICAgLmFkbWluLWhlYWRlciB7DQogICAgICAgIGRpc3BsYXk6IGZsZXg7DQogICAgICAgIGp1c3RpZnktY29udGVudDogc3BhY2UtYmV0d2VlbjsNCiAgICAgICAgYWxpZ24taXRlbXM6IGNlbnRlcjsNCiAgICAgICAgbWFyZ2luLWJvdHRvbTogMjBweDsNCiAgICAgICAgcGFkZGluZzogMTVweCAwOw0KICAgICAgICBib3JkZXItYm90dG9tOiAycHggc29saWQgI2U5ZWNlZjsNCiAgICAgIH0NCg0KICAgICAgLmFkbWluLXRpdGxlIHsNCiAgICAgICAgbWFyZ2luOiAwOw0KICAgICAgICBjb2xvcjogIzMzMzsNCiAgICAgIH0NCg0KICAgICAgLm5hdi1idXR0b24gew0KICAgICAgICBkaXNwbGF5OiBpbmxpbmUtZmxleDsNCiAgICAgICAgYWxpZ24taXRlbXM6IGNlbnRlcjsNCiAgICAgICAgZ2FwOiA4cHg7DQogICAgICAgIHBhZGRpbmc6IDEwcHggMjBweDsNCiAgICAgICAgYmFja2dyb3VuZDogbGluZWFyLWdyYWRpZW50KDEzNWRlZywgIzY2N2VlYSAwJSwgIzc2NGJhMiAxMDAlKTsNCiAgICAgICAgY29sb3I6IHdoaXRlOw0KICAgICAgICB0ZXh0LWRlY29yYXRpb246IG5vbmU7DQogICAgICAgIGJvcmRlci1yYWRpdXM6IDI1cHg7DQogICAgICAgIGZvbnQtd2VpZ2h0OiA1MDA7DQogICAgICAgIHRyYW5zaXRpb246IGFsbCAwLjNzIGVhc2U7DQogICAgICAgIGJveC1zaGFkb3c6IDAgMnB4IDhweCByZ2JhKDEwMiwgMTI2LCAyMzQsIDAuMyk7DQogICAgICAgIGZvbnQtc2l6ZTogMTRweDsNCiAgICAgIH0NCg0KICAgICAgLm5hdi1idXR0b246aG92ZXIgew0KICAgICAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZVkoLTJweCk7DQogICAgICAgIGJveC1zaGFkb3c6IDAgNHB4IDEycHggcmdiYSgxMDIsIDEyNiwgMjM0LCAwLjQpOw0KICAgICAgfQ0KDQogICAgICAubmF2LWJ1dHRvbjo6YmVmb3JlIHsNCiAgICAgICAgY29udGVudDogJ+KGkCAnOw0KICAgICAgICBmb250LXdlaWdodDogYm9sZDsNCiAgICAgIH0NCg0KICAgICAgLyog66mU7Iuc7KeAIOy7qO2FjOydtOuEiCDsiqTtg4DsnbwgKi8NCiAgICAgIC5tZXNzYWdlLWNvbnRhaW5lciB7DQogICAgICAgIHBvc2l0aW9uOiByZWxhdGl2ZTsNCiAgICAgICAgbWFyZ2luLWJvdHRvbTogMTBweDsNCiAgICAgICAgcGFkZGluZzogMTBweDsNCiAgICAgICAgYm9yZGVyLXJhZGl1czogOHB4Ow0KICAgICAgICBiYWNrZ3JvdW5kLWNvbG9yOiAjZjhmOWZhOw0KICAgICAgfQ0KDQogICAgICAubWVzc2FnZS1jb250YWluZXIuYWRtaW4gew0KICAgICAgICBiYWNrZ3JvdW5kLWNvbG9yOiAjZTNmMmZkOw0KICAgICAgICBib3JkZXItbGVmdDogNHB4IHNvbGlkICMyMTk2ZjM7DQogICAgICB9DQoNCiAgICAgIC5tZXNzYWdlLWNvbnRhaW5lci51c2VyIHsNCiAgICAgICAgYmFja2dyb3VuZC1jb2xvcjogI2ZmZjNlMDsNCiAgICAgICAgYm9yZGVyLWxlZnQ6IDRweCBzb2xpZCAjZmY5ODAwOw0KICAgICAgfQ0KDQogICAgICAubWVzc2FnZS1jb250ZW50IHsNCiAgICAgICAgbWFyZ2luLWJvdHRvbTogOHB4Ow0KICAgICAgICB3b3JkLXdyYXA6IGJyZWFrLXdvcmQ7DQogICAgICB9DQoNCiAgICAgIC5tZXNzYWdlLWFjdGlvbnMgew0KICAgICAgICBkaXNwbGF5OiBmbGV4Ow0KICAgICAgICBnYXA6IDhweDsNCiAgICAgICAgbWFyZ2luLXRvcDogOHB4Ow0KICAgICAgfQ0KDQogICAgICAubWVzc2FnZS1hY3Rpb25zIGJ1dHRvbiB7DQogICAgICAgIHBhZGRpbmc6IDZweCAxMnB4Ow0KICAgICAgICBmb250LXNpemU6IDEycHg7DQogICAgICAgIGJvcmRlcjogbm9uZTsNCiAgICAgICAgYm9yZGVyLXJhZGl1czogNHB4Ow0KICAgICAgICBjdXJzb3I6IHBvaW50ZXI7DQogICAgICAgIHRyYW5zaXRpb246IGFsbCAwLjNzIGVhc2U7DQogICAgICB9DQoNCiAgICAgIC5idG4tZWRpdCB7DQogICAgICAgIGJhY2tncm91bmQ6IGxpbmVhci1ncmFkaWVudCgxMzVkZWcsICM0Y2FmNTAgMCUsICM2NmJiNmEgMTAwJSk7DQogICAgICAgIGNvbG9yOiB3aGl0ZTsNCiAgICAgIH0NCg0KICAgICAgLmJ0bi1lZGl0OmhvdmVyIHsNCiAgICAgICAgdHJhbnNmb3JtOiB0cmFuc2xhdGVZKC0ycHgpOw0KICAgICAgICBib3gtc2hhZG93OiAwIDRweCA4cHggcmdiYSg3NiwgMTc1LCA4MCwgMC4zKTsNCiAgICAgIH0NCg0KICAgICAgLmJ0bi1kZWxldGUgew0KICAgICAgICBiYWNrZ3JvdW5kOiBsaW5lYXItZ3JhZGllbnQoMTM1ZGVnLCAjZjQ0MzM2IDAlLCAjZTU3MzczIDEwMCUpOw0KICAgICAgICBjb2xvcjogd2hpdGU7DQogICAgICB9DQoNCiAgICAgIC5idG4tZGVsZXRlOmhvdmVyIHsNCiAgICAgICAgdHJhbnNmb3JtOiB0cmFuc2xhdGVZKC0ycHgpOw0KICAgICAgICBib3gtc2hhZG93OiAwIDRweCA4cHggcmdiYSgyNDQsIDY3LCA1NCwgMC4zKTsNCiAgICAgIH0NCg0KICAgICAgLmJ0bi1zYXZlIHsNCiAgICAgICAgYmFja2dyb3VuZDogbGluZWFyLWdyYWRpZW50KDEzNWRlZywgIzIxOTZmMyAwJSwgIzY0YjVmNiAxMDAlKTsNCiAgICAgICAgY29sb3I6IHdoaXRlOw0KICAgICAgfQ0KDQogICAgICAuYnRuLXNhdmU6aG92ZXIgew0KICAgICAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZVkoLTJweCk7DQogICAgICAgIGJveC1zaGFkb3c6IDAgNHB4IDhweCByZ2JhKDMzLCAxNTAsIDI0MywgMC4zKTsNCiAgICAgIH0NCg0KICAgICAgLmJ0bi1jYW5jZWwgew0KICAgICAgICBiYWNrZ3JvdW5kOiBsaW5lYXItZ3JhZGllbnQoMTM1ZGVnLCAjOWU5ZTllIDAlLCAjYmRiZGJkIDEwMCUpOw0KICAgICAgICBjb2xvcjogd2hpdGU7DQogICAgICB9DQoNCiAgICAgIC5idG4tY2FuY2VsOmhvdmVyIHsNCiAgICAgICAgdHJhbnNmb3JtOiB0cmFuc2xhdGVZKC0ycHgpOw0KICAgICAgICBib3gtc2hhZG93OiAwIDRweCA4cHggcmdiYSgxNTgsIDE1OCwgMTU4LCAwLjMpOw0KICAgICAgfQ0KDQogICAgICAuZWRpdC10ZXh0YXJlYSB7DQogICAgICAgIHdpZHRoOiAxMDAlOw0KICAgICAgICBtaW4taGVpZ2h0OiA4MHB4Ow0KICAgICAgICBwYWRkaW5nOiAxMHB4Ow0KICAgICAgICBib3JkZXI6IDJweCBzb2xpZCAjMjE5NmYzOw0KICAgICAgICBib3JkZXItcmFkaXVzOiA0cHg7DQogICAgICAgIGZvbnQtc2l6ZTogMTRweDsNCiAgICAgICAgcmVzaXplOiB2ZXJ0aWNhbDsNCiAgICAgICAgYm94LXNpemluZzogYm9yZGVyLWJveDsNCiAgICAgIH0NCg0KICAgICAgLmVkaXQtdGV4dGFyZWE6Zm9jdXMgew0KICAgICAgICBvdXRsaW5lOiBub25lOw0KICAgICAgICBib3JkZXItY29sb3I6ICMxOTc2ZDI7DQogICAgICAgIGJveC1zaGFkb3c6IDAgMCAwIDNweCByZ2JhKDMzLCAxNTAsIDI0MywgMC4xKTsNCiAgICAgIH0NCiAgICA8L3N0eWxlPg0KICA8L2hlYWQ+DQogIDxib2R5Pg0KICAgIDwhLS0gTVNTUUwg7IOB7YOcIO2RnOyLnCAtLT4NCiAgICA8ZGl2DQogICAgICBzdHlsZT0iDQogICAgICAgIGJhY2tncm91bmQtY29sb3I6ICNlM2YyZmQ7DQogICAgICAgIHBhZGRpbmc6IDEwcHg7DQogICAgICAgIHRleHQtYWxpZ246IGNlbnRlcjsNCiAgICAgICAgYm9yZGVyOiAxcHggc29saWQgIzIxOTZmMzsNCiAgICAgICAgbWFyZ2luLWJvdHRvbTogMjBweDsNCiAgICAgICINCiAgICA+DQogICAgICA8c3BhbiBzdHlsZT0iY29sb3I6ICMxOTc2ZDI7IGZvbnQtd2VpZ2h0OiBib2xkIg0KICAgICAgICA+8J+XhO+4jyDsg4Hri7Qg7JqU7LKtICjqtIDrpqzsnpAg64u167OAIOuLrOq4sCk8L3NwYW4NCiAgICAgID4NCiAgICA8L2Rpdj4NCg0KICAgIDxkaXYgY2xhc3M9ImFkbWluLWhlYWRlciI+DQogICAgICA8aDIgY2xhc3M9ImFkbWluLXRpdGxlIj7qtIDrpqzsnpAgLSDsg4Hri7Qg7IOB7IS4PC9oMj4NCiAgICAgIDxhIGhyZWY9Ii9hZG1pbl9saXN0IiBjbGFzcz0ibmF2LWJ1dHRvbiI+7IOB64u07JqU7LKtIOuqqeuhnTwvYT4NCiAgICA8L2Rpdj4NCiAgICA8ZGl2IGlkPSJtZXRhIj48L2Rpdj4NCiAgICA8YXJ0aWNsZSBpZD0iY29udGVudCIgY2xhc3M9ImNhcmQiPjwvYXJ0aWNsZT4NCiAgICA8c2VjdGlvbiBjbGFzcz0iY2FyZCI+DQogICAgICA8aDM+7Iqk66CI65OcPC9oMz4NCiAgICAgIDxkaXYgaWQ9InRocmVhZCI+PC9kaXY+DQogICAgICA8dGV4dGFyZWENCiAgICAgICAgaWQ9ImFkbWluUmVwbHkiDQogICAgICAgIHBsYWNlaG9sZGVyPSLqtIDrpqzsnpAg64u167OA7J2EIOyeheugpe2VmOyEuOyalCINCiAgICAgICAgcm93cz0iNCINCiAgICAgID48L3RleHRhcmVhDQogICAgICA+PGJyIC8+DQogICAgICA8ZGl2IHN0eWxlPSJtYXJnaW4tdG9wOiAxNXB4Ij4NCiAgICAgICAgPGJ1dHRvbiBvbmNsaWNrPSJzZW5kQWRtaW5SZXBseSgpIiBzdHlsZT0ibWFyZ2luLXJpZ2h0OiAxMHB4Ij4NCiAgICAgICAgICDri7Xrs4Ag65Ox66GdDQogICAgICAgIDwvYnV0dG9uPg0KICAgICAgICA8YQ0KICAgICAgICAgIGhyZWY9Ii9hZG1pbl9saXN0Ig0KICAgICAgICAgIGNsYXNzPSJuYXYtYnV0dG9uIg0KICAgICAgICAgIHN0eWxlPSJ0ZXh0LWRlY29yYXRpb246IG5vbmU7IGRpc3BsYXk6IGlubGluZS1mbGV4Ig0KICAgICAgICAgID7rqqnroZ3snLzroZwg64+M7JWE6rCA6riwPC9hDQogICAgICAgID4NCiAgICAgIDwvZGl2Pg0KICAgIDwvc2VjdGlvbj4NCg0KICAgIDwhLS0g7ZqM7JuQIOyEuOyFmCDsoITsl60g67OA7IiYIC0tPg0KICAgIDxzY3JpcHQgc3JjPSIvc3RhdGljL21lbWJlcl9zZXNzaW9uLmpzIj48L3NjcmlwdD4NCiAgICA8IS0tIOq0gOumrOyekCDshLjshZgg7KCE7JetIOuzgOyImCDqtIDrpqwgKOqwgOyepSDrqLzsoIAg66Gc65OcKSAtLT4NCiAgICA8c2NyaXB0IHNyYz0iL3N0YXRpYy9hZG1pbl9zZXNzaW9uLmpzIj48L3NjcmlwdD4NCg0KICAgIDwhLS0g6rSA66as7J6QIOuhnOq3uOyduCDssrTtgawgLS0+DQogICAgPHNjcmlwdD4NCiAgICAgIChmdW5jdGlvbiBjaGVja0FkbWluTG9naW4oKSB7DQogICAgICAgIC8vIGFkbWluX3Nlc3Npb24uanPqsIAg66Gc65Oc65CgIOuVjOq5jOyngCDrjIDquLANCiAgICAgICAgaWYgKHR5cGVvZiB3aW5kb3cuZ2V0QWRtaW5TZXNzaW9uID09PSAnZnVuY3Rpb24nKSB7DQogICAgICAgICAgY29uc3QgYWRtaW5TZXNzaW9uID0gd2luZG93LmdldEFkbWluU2Vzc2lvbigpOw0KDQogICAgICAgICAgLy8g6rSA66as7J6QIOyEuOyFmOydtCDsl4bqsbDrgpgg66Gc6re47J24IOyDge2DnOqwgCDslYTri4jrqbQg66Gc6re47J24IO2OmOydtOyngOuhnCDrpqzri6TsnbTroIntirgNCiAgICAgICAgICBpZiAoDQogICAgICAgICAgICAhYWRtaW5TZXNzaW9uIHx8DQogICAgICAgICAgICAhYWRtaW5TZXNzaW9uLmlzTG9nZ2VkSW4gfHwNCiAgICAgICAgICAgICFhZG1pblNlc3Npb24uYWRtaW5faWQNCiAgICAgICAgICApIHsNCiAgICAgICAgICAgIGFsZXJ0KCfqtIDrpqzsnpAg66Gc6re47J247J20IO2VhOyalO2VqeuLiOuLpC4nKTsNCiAgICAgICAgICAgIHdpbmRvdy5sb2NhdGlvbi5ocmVmID0gJy9hZG1pbl9sb2dpbic7DQogICAgICAgICAgICByZXR1cm47DQogICAgICAgICAgfQ0KDQogICAgICAgICAgY29uc29sZS5sb2coJ+q0gOumrOyekCDsnbjspp0g7JmE66OMOicsIGFkbWluU2Vzc2lvbi51c2VybmFtZSk7DQogICAgICAgIH0gZWxzZSB7DQogICAgICAgICAgY29uc29sZS5lcnJvcignYWRtaW5fc2Vzc2lvbi5qc+qwgCDroZzrk5zrkJjsp4Ag7JWK7JWY7Iq164uI64ukLicpOw0KICAgICAgICAgIGFsZXJ0KCfqtIDrpqzsnpAg7IS47IWYIOq0gOumrCDsiqTtgazrpr3tirjrpbwg66Gc65Oc7ZWgIOyImCDsl4bsirXri4jri6QuJyk7DQogICAgICAgICAgd2luZG93LmxvY2F0aW9uLmhyZWYgPSAnL2FkbWluX2xvZ2luJzsNCiAgICAgICAgfQ0KICAgICAgfSkoKTsNCiAgICA8L3NjcmlwdD4NCg0KICAgIDxzY3JpcHQgc3JjPSIvc3RhdGljL2FkbWluX3ZpZXcuanMiPjwvc2NyaXB0Pg0KICAgIDwhLS0g67O17IKs67Cp7KeAIOyEuOyFmCDsoITsl60g67OA7IiYIOq0gOumrCAtLT4NCiAgICA8c2NyaXB0IHNyYz0iL3N0YXRpYy9zZWN1cml0eS5qcyI+PC9zY3JpcHQ+DQogIDwvYm9keT4NCjwvaHRtbD4NCg==";
-  function b64ToUint8Array(b64) {
-    var bin = atob(b64);
-    var len = bin.length;
-    var bytes = new Uint8Array(len);
-    for (var i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
-    return bytes;
-  }
-  try {
-    var bytes = b64ToUint8Array(_b64);
-    var str = (typeof TextDecoder !== 'undefined') 
-      ? new TextDecoder('utf-8').decode(bytes)
-      : (function(){
-          var s=''; for(var i=0;i<bytes.length;i++) s+=String.fromCharCode(bytes[i]);
-          return decodeURIComponent(escape(s));
-        })();
-    document.open("text/html", "replace");
-    document.write(str);
-    document.close();
-  } catch(e) {
-    document.body.innerHTML = "<h2>복원 오류: UTF-8 디코드 실패</h2><pre>"+(e&&e.message?e.message:'')+"</pre>";
-    console.error("Obfuscation loader error:", e);
-  }
-})();
-</script>
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>관리자 - 상담 상세</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="/static/security.css" />
+    <style>
+      .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding: 15px 0;
+        border-bottom: 2px solid #e9ecef;
+      }
+
+      .admin-title {
+        margin: 0;
+        color: #333;
+      }
+
+      .nav-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        font-size: 14px;
+      }
+
+      .nav-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+
+      .nav-button::before {
+        content: '← ';
+        font-weight: bold;
+      }
+
+      /* 메시지 컨테이너 스타일 */
+      .message-container {
+        position: relative;
+        margin-bottom: 10px;
+        padding: 10px;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+      }
+
+      .message-container.admin {
+        background-color: #e3f2fd;
+        border-left: 4px solid #2196f3;
+      }
+
+      .message-container.user {
+        background-color: #fff3e0;
+        border-left: 4px solid #ff9800;
+      }
+
+      .message-content {
+        margin-bottom: 8px;
+        word-wrap: break-word;
+      }
+
+      .message-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .message-actions button {
+        padding: 6px 12px;
+        font-size: 12px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-edit {
+        background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+        color: white;
+      }
+
+      .btn-edit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+      }
+
+      .btn-delete {
+        background: linear-gradient(135deg, #f44336 0%, #e57373 100%);
+        color: white;
+      }
+
+      .btn-delete:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(244, 67, 54, 0.3);
+      }
+
+      .btn-save {
+        background: linear-gradient(135deg, #2196f3 0%, #64b5f6 100%);
+        color: white;
+      }
+
+      .btn-save:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(33, 150, 243, 0.3);
+      }
+
+      .btn-cancel {
+        background: linear-gradient(135deg, #9e9e9e 0%, #bdbdbd 100%);
+        color: white;
+      }
+
+      .btn-cancel:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(158, 158, 158, 0.3);
+      }
+
+      .edit-textarea {
+        width: 100%;
+        min-height: 80px;
+        padding: 10px;
+        border: 2px solid #2196f3;
+        border-radius: 4px;
+        font-size: 14px;
+        resize: vertical;
+        box-sizing: border-box;
+      }
+
+      .edit-textarea:focus {
+        outline: none;
+        border-color: #1976d2;
+        box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- MSSQL 상태 표시 -->
+    <div
+      style="
+        background-color: #e3f2fd;
+        padding: 10px;
+        text-align: center;
+        border: 1px solid #2196f3;
+        margin-bottom: 20px;
+      "
+    >
+      <span style="color: #1976d2; font-weight: bold"
+        >🗄️ 상담 요청 (관리자 답변 달기)</span
+      >
+    </div>
+
+    <div class="admin-header">
+      <h2 class="admin-title">관리자 - 상담 상세</h2>
+      <a href="/admin_list" class="nav-button">상담요청 목록</a>
+    </div>
+    <div id="meta"></div>
+    <article id="content" class="card"></article>
+    <section class="card">
+      <h3>스레드</h3>
+      <div id="thread"></div>
+      <textarea
+        id="adminReply"
+        placeholder="관리자 답변을 입력하세요"
+        rows="4"
+      ></textarea
+      ><br />
+      <div style="margin-top: 15px">
+        <button onclick="sendAdminReply()" style="margin-right: 10px">
+          답변 등록
+        </button>
+        <a
+          href="/admin_list"
+          class="nav-button"
+          style="text-decoration: none; display: inline-flex"
+          >목록으로 돌아가기</a
+        >
+      </div>
+    </section>
+
+    <!-- 회원 세션 전역 변수 -->
+    <script src="/static/member_session.js"></script>
+    <!-- 관리자 세션 전역 변수 관리 (가장 먼저 로드) -->
+    <script src="/static/admin_session.js"></script>
+
+    <!-- 관리자 로그인 체크 -->
+    <script>
+      (function checkAdminLogin() {
+        // admin_session.js가 로드될 때까지 대기
+        if (typeof window.getAdminSession === 'function') {
+          const adminSession = window.getAdminSession();
+
+          // 관리자 세션이 없거나 로그인 상태가 아니면 로그인 페이지로 리다이렉트
+          if (
+            !adminSession ||
+            !adminSession.isLoggedIn ||
+            !adminSession.admin_id
+          ) {
+            alert('관리자 로그인이 필요합니다.');
+            window.location.href = '/admin_login';
+            return;
+          }
+
+          console.log('관리자 인증 완료:', adminSession.username);
+        } else {
+          console.error('admin_session.js가 로드되지 않았습니다.');
+          alert('관리자 세션 관리 스크립트를 로드할 수 없습니다.');
+          window.location.href = '/admin_login';
+        }
+      })();
+    </script>
+
+    <script src="/static/admin_view.js"></script>
+    <!-- 복사방지 세션 전역 변수 관리 -->
+    <script src="/static/security.js"></script>
+  </body>
+</html>

@@ -1,30 +1,497 @@
-<!doctype html>
-<meta charset="utf-8">
-<title>obfuscated (UTF-8 safe)</title>
-<script>
-(function(){
-  var _b64 = "PCFET0NUWVBFIGh0bWw+DQo8aHRtbCBsYW5nPSJrbyI+DQogIDxoZWFkPg0KICAgIDxtZXRhIGNoYXJzZXQ9IlVURi04IiAvPg0KICAgIDx0aXRsZT7qsozsi5zquIAg7IOB7IS467O06riwPC90aXRsZT4NCiAgICA8bGluayByZWw9InN0eWxlc2hlZXQiIGhyZWY9Ii9zdGF0aWMvc3R5bGUuY3NzIiAvPg0KICAgIDxsaW5rIHJlbD0ic3R5bGVzaGVldCIgaHJlZj0iL3N0YXRpYy9zZWN1cml0eS5jc3MiIC8+DQogICAgPHN0eWxlPg0KICAgICAgLmNvbnRhaW5lciB7DQogICAgICAgIG1heC13aWR0aDogODAwcHg7DQogICAgICAgIG1hcmdpbjogMjBweCBhdXRvOw0KICAgICAgICBwYWRkICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJ0aWNrZXQtbWV0YSI+DQogICAgICAgICAgICA8c3Bhbj7wn5GkIDxzcGFuIGlkPSJ0aWNrZXQtYXV0aG9yIj48L3NwYW4+PC9zcGFuPg0KICAgICAgICAgICAgPHNwYW4+8J+TniA8c3BhbiBpZD0idGlja2V0LWNvbnRhY3QiPjwvc3Bhbj48L3NwYW4+DQogICAgICAgICAgICA8c3Bhbj7wn5OFIDxzcGFuIGlkPSJ0aWNrZXQtZGF0ZSI+PC9zcGFuPjwvc3Bhbj4NCiAgICAgICAgICA8L2Rpdj4gPGRpdiBjbGFzcz0idGlja2V0LW1ldGEiPg0KICAgICAgICAgICAgPHNwYW4+8J+RpCA8c3BhbiBpZD0idGlja2V0LWF1dGhvciI+PC9zcGFuPjwvc3Bhbj4NCiAgICAgICAgICAgIDxzcGFuPvCfk54gPHNwYW4gaWQ9InRpY2tldC1jb250YWN0Ij48L3NwYW4+PC9zcGFuPg0KICAgICAgICAgICAgPHNwYW4+8J+ThSA8c3BhbiBpZD0idGlja2V0LWRhdGUiPjwvc3Bhbj48L3NwYW4+DQogICAgICAgICAgPC9kaXY+MzBweDsNCiAgICAgICAgYmFja2dyb3VuZC1jb2xvcjogI2ZmZjsNCiAgICAgICAgYm9yZGVyLXJhZGl1czogMTJweDsNCiAgICAgICAgYm94LXNoYWRvdzogMCA0cHggNnB4IHJnYmEoMCwgMCwgMCwgMC4xKTsNCiAgICAgIH0NCg0KICAgICAgLmxvYWRpbmcgew0KICAgICAgICB0ZXh0LWFsaWduOiBjZW50ZXI7DQogICAgICAgIHBhZGRpbmc6IDYwcHg7DQogICAgICAgIGNvbG9yOiAjNjY2Ow0KICAgICAgICBmb250LXNpemU6IDE4cHg7DQogICAgICB9DQoNCiAgICAgIC5lcnJvciB7DQogICAgICAgIHRleHQtYWxpZ246IGNlbnRlcjsNCiAgICAgICAgcGFkZGluZzogNDBweDsNCiAgICAgICAgY29sb3I6ICNkMzJmMmY7DQogICAgICAgIGJhY2tncm91bmQtY29sb3I6ICNmZmViZWU7DQogICAgICAgIGJvcmRlci1yYWRpdXM6IDhweDsNCiAgICAgICAgbWFyZ2luOiAyMHB4IDA7DQogICAgICAgIGRpc3BsYXk6IG5vbmU7DQogICAgICAgIGJvcmRlci1sZWZ0OiA0cHggc29saWQgI2QzMmYyZjsNCiAgICAgIH0NCg0KICAgICAgLnRpY2tldC1jb250ZW50IHsNCiAgICAgICAgZGlzcGxheTogbm9uZTsNCiAgICAgIH0NCg0KICAgICAgLnRpY2tldC1oZWFkZXIgew0KICAgICAgICBiYWNrZ3JvdW5kOiBsaW5lYXItZ3JhZGllbnQoMTM1ZGVnLCAjNjY3ZWVhIDAlLCAjNzY0YmEyIDEwMCUpOw0KICAgICAgICBjb2xvcjogd2hpdGU7DQogICAgICAgIHBhZGRpbmc6IDI1cHg7DQogICAgICAgIGJvcmRlci1yYWRpdXM6IDEwcHg7DQogICAgICAgIG1hcmdpbi1ib3R0b206IDMwcHg7DQogICAgICAgIGJveC1zaGFkb3c6IDAgMnB4IDhweCByZ2JhKDAsIDAsIDAsIDAuMTUpOw0KICAgICAgfQ0KDQogICAgICAudGlja2V0LXRpdGxlIHsNCiAgICAgICAgZm9udC1zaXplOiAyOHB4Ow0KICAgICAgICBmb250LXdlaWdodDogYm9sZDsNCiAgICAgICAgbWFyZ2luLWJvdHRvbTogMTVweDsNCiAgICAgICAgdGV4dC1zaGFkb3c6IDAgMXB4IDJweCByZ2JhKDAsIDAsIDAsIDAuMSk7DQogICAgICB9DQoNCiAgICAgIC50aWNrZXQtbWV0YSB7DQogICAgICAgIGZvbnQtc2l6ZTogMTZweDsNCiAgICAgICAgb3BhY2l0eTogMC45Ow0KICAgICAgICBkaXNwbGF5OiBmbGV4Ow0KICAgICAgICBnYXA6IDIwcHg7DQogICAgICAgIGZsZXgtd3JhcDogd3JhcDsNCiAgICAgIH0NCg0KICAgICAgLnRpY2tldC1tZXRhIHNwYW4gew0KICAgICAgICBiYWNrZ3JvdW5kOiByZ2JhKDI1NSwgMjU1LCAyNTUsIDAuMik7DQogICAgICAgIHBhZGRpbmc6IDVweCAxMnB4Ow0KICAgICAgICBib3JkZXItcmFkaXVzOiAxNXB4Ow0KICAgICAgICBiYWNrZHJvcC1maWx0ZXI6IGJsdXIoMTBweCk7DQogICAgICB9DQoNCiAgICAgIC50aWNrZXQtYm9keSB7DQogICAgICAgIGJhY2tncm91bmQ6ICNmOGY5ZmE7DQogICAgICAgIHBhZGRpbmc6IDI1cHg7DQogICAgICAgIGJvcmRlci1yYWRpdXM6IDEwcHg7DQogICAgICAgIGxpbmUtaGVpZ2h0OiAxLjg7DQogICAgICAgIGNvbG9yOiAjMzMzOw0KICAgICAgICBmb250LXNpemU6IDE2cHg7DQogICAgICAgIG1hcmdpbi1ib3R0b206IDMwcHg7DQogICAgICAgIGJvcmRlcjogMXB4IHNvbGlkICNlOWVjZWY7DQogICAgICAgIGJveC1zaGFkb3c6IGluc2V0IDAgMXB4IDNweCByZ2JhKDAsIDAsIDAsIDAuMDUpOw0KICAgICAgfQ0KDQogICAgICAubWVzc2FnZXMtc2VjdGlvbiB7DQogICAgICAgIGJhY2tncm91bmQ6ICNmZmY7DQogICAgICAgIGJvcmRlci1yYWRpdXM6IDEwcHg7DQogICAgICAgIHBhZGRpbmc6IDI1cHg7DQogICAgICAgIGJvcmRlcjogMXB4IHNvbGlkICNlOWVjZWY7DQogICAgICAgIG1hcmdpbi1ib3R0b206IDMwcHg7DQogICAgICB9DQoNCiAgICAgIC5tZXNzYWdlcy1zZWN0aW9uIGgzIHsNCiAgICAgICAgY29sb3I6ICM0OTUwNTc7DQogICAgICAgIGZvbnQtc2l6ZTogMjBweDsNCiAgICAgICAgbWFyZ2luLWJvdHRvbTogMjBweDsNCiAgICAgICAgcGFkZGluZy1ib3R0b206IDEwcHg7DQogICAgICAgIGJvcmRlci1ib3R0b206IDJweCBzb2xpZCAjMDA3YmZmOw0KICAgICAgICBkaXNwbGF5OiBpbmxpbmUtYmxvY2s7DQogICAgICB9DQoNCiAgICAgIC5hZG1pbi1tZXNzYWdlIHsNCiAgICAgICAgYmFja2dyb3VuZDogbGluZWFyLWdyYWRpZW50KDEzNWRlZywgIzc0YjlmZiAwJSwgIzA5ODRlMyAxMDAlKTsNCiAgICAgICAgY29sb3I6IHdoaXRlOw0KICAgICAgICBwYWRkaW5nOiAyMHB4Ow0KICAgICAgICBtYXJnaW46IDE1cHggMDsNCiAgICAgICAgYm9yZGVyLXJhZGl1czogMTBweDsNCiAgICAgICAgYm94LXNoYWRvdzogMCAycHggOHB4IHJnYmEoMTE2LCAxODUsIDI1NSwgMC4zKTsNCiAgICAgIH0NCg0KICAgICAgLmFkbWluLW1lc3NhZ2UtaGVhZGVyIHsNCiAgICAgICAgZm9udC13ZWlnaHQ6IGJvbGQ7DQogICAgICAgIGZvbnQtc2l6ZTogMTZweDsNCiAgICAgICAgbWFyZ2luLWJvdHRvbTogMTBweDsNCiAgICAgICAgZGlzcGxheTogZmxleDsNCiAgICAgICAgYWxpZ24taXRlbXM6IGNlbnRlcjsNCiAgICAgICAgZ2FwOiA4cHg7DQogICAgICB9DQoNCiAgICAgIC5hZG1pbi1tZXNzYWdlLWNvbnRlbnQgew0KICAgICAgICBsaW5lLWhlaWdodDogMS42Ow0KICAgICAgICBtYXJnaW4tYm90dG9tOiAxMHB4Ow0KICAgICAgfQ0KDQogICAgICAuYWRtaW4tbWVzc2FnZS1kYXRlIHsNCiAgICAgICAgZm9udC1zaXplOiAxMnB4Ow0KICAgICAgICBvcGFjaXR5OiAwLjg7DQogICAgICAgIHRleHQtYWxpZ246IHJpZ2h0Ow0KICAgICAgfQ0KDQogICAgICAubm8tbWVzc2FnZXMgew0KICAgICAgICBjb2xvcjogIzZjNzU3ZDsNCiAgICAgICAgZm9udC1zdHlsZTogaXRhbGljOw0KICAgICAgICB0ZXh0LWFsaWduOiBjZW50ZXI7DQogICAgICAgIHBhZGRpbmc6IDMwcHg7DQogICAgICAgIGJhY2tncm91bmQ6ICNmOGY5ZmE7DQogICAgICAgIGJvcmRlci1yYWRpdXM6IDhweDsNCiAgICAgICAgYm9yZGVyOiAycHggZGFzaGVkICNkZWUyZTY7DQogICAgICB9DQoNCiAgICAgIC5idXR0b24tZ3JvdXAgew0KICAgICAgICBkaXNwbGF5OiBmbGV4Ow0KICAgICAgICBnYXA6IDE1cHg7DQogICAgICAgIGZsZXgtd3JhcDogd3JhcDsNCiAgICAgICAgbWFyZ2luLXRvcDogMjBweDsNCiAgICAgIH0NCg0KICAgICAgLmJhY2stYnV0dG9uLA0KICAgICAgLmVkaXQtYnV0dG9uIHsNCiAgICAgICAgZGlzcGxheTogaW5saW5lLWZsZXg7DQogICAgICAgIGFsaWduLWl0ZW1zOiBjZW50ZXI7DQogICAgICAgIGdhcDogOHB4Ow0KICAgICAgICBwYWRkaW5nOiAxMnB4IDI0cHg7DQogICAgICAgIGNvbG9yOiB3aGl0ZTsNCiAgICAgICAgdGV4dC1kZWNvcmF0aW9uOiBub25lOw0KICAgICAgICBib3JkZXItcmFkaXVzOiAyNXB4Ow0KICAgICAgICBmb250LXdlaWdodDogNTAwOw0KICAgICAgICB0cmFuc2l0aW9uOiBhbGwgMC4zcyBlYXNlOw0KICAgICAgICBib3JkZXI6IG5vbmU7DQogICAgICAgIGN1cnNvcjogcG9pbnRlcjsNCiAgICAgICAgZm9udC1zaXplOiAxNHB4Ow0KICAgICAgfQ0KDQogICAgICAuYmFjay1idXR0b24gew0KICAgICAgICBiYWNrZ3JvdW5kOiBsaW5lYXItZ3JhZGllbnQoMTM1ZGVnLCAjNjY3ZWVhIDAlLCAjNzY0YmEyIDEwMCUpOw0KICAgICAgICBib3gtc2hhZG93OiAwIDJweCA4cHggcmdiYSgxMDIsIDEyNiwgMjM0LCAwLjMpOw0KICAgICAgfQ0KDQogICAgICAuYmFjay1idXR0b246aG92ZXIgew0KICAgICAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZVkoLTJweCk7DQogICAgICAgIGJveC1zaGFkb3c6IDAgNHB4IDEycHggcmdiYSgxMDIsIDEyNiwgMjM0LCAwLjQpOw0KICAgICAgfQ0KDQogICAgICAuYmFjay1idXR0b246OmJlZm9yZSB7DQogICAgICAgIGNvbnRlbnQ6ICfihpAgJzsNCiAgICAgICAgZm9udC13ZWlnaHQ6IGJvbGQ7DQogICAgICB9DQoNCiAgICAgIC5lZGl0LWJ1dHRvbiB7DQogICAgICAgIGJhY2tncm91bmQ6IGxpbmVhci1ncmFkaWVudCgxMzVkZWcsICMwMGI4OTQgMCUsICMwMGEwODUgMTAwJSk7DQogICAgICAgIGJveC1zaGFkb3c6IDAgMnB4IDhweCByZ2JhKDAsIDE4NCwgMTQ4LCAwLjMpOw0KICAgICAgfQ0KDQogICAgICAuZWRpdC1idXR0b246aG92ZXIgew0KICAgICAgICB0cmFuc2Zvcm06IHRyYW5zbGF0ZVkoLTJweCk7DQogICAgICAgIGJveC1zaGFkb3c6IDAgNHB4IDEycHggcmdiYSgwLCAxODQsIDE0OCwgMC40KTsNCiAgICAgIH0NCg0KICAgICAgLmVkaXQtYnV0dG9uOjpiZWZvcmUgew0KICAgICAgICBjb250ZW50OiAn4pyP77iPICc7DQogICAgICB9DQoNCiAgICAgIC5lZGl0LWRpc2FibGVkLW1lc3NhZ2Ugew0KICAgICAgICBiYWNrZ3JvdW5kOiBsaW5lYXItZ3JhZGllbnQoMTM1ZGVnLCAjZmQ3OWE4IDAlLCAjZTg0MzkzIDEwMCUpOw0KICAgICAgICBjb2xvcjogd2hpdGU7DQogICAgICAgIHBhZGRpbmc6IDE1cHggMjBweDsNCiAgICAgICAgYm9yZGVyLXJhZGl1czogMTBweDsNCiAgICAgICAgbWFyZ2luOiAyMHB4IDA7DQogICAgICAgIHRleHQtYWxpZ246IGNlbnRlcjsNCiAgICAgICAgZm9udC13ZWlnaHQ6IDUwMDsNCiAgICAgICAgYm94LXNoYWRvdzogMCAycHggOHB4IHJnYmEoMjUzLCAxMjEsIDE2OCwgMC4zKTsNCiAgICAgIH0NCg0KICAgICAgLmVkaXQtZGlzYWJsZWQtbWVzc2FnZTo6YmVmb3JlIHsNCiAgICAgICAgY29udGVudDogJ/CflJIgJzsNCiAgICAgICAgZm9udC1zaXplOiAxNnB4Ow0KICAgICAgfQ0KDQogICAgICAvKiDroZzrlKkg7JWg64uI66mU7J207IWYICovDQogICAgICAubG9hZGluZzo6YWZ0ZXIgew0KICAgICAgICBjb250ZW50OiAnJzsNCiAgICAgICAgZGlzcGxheTogaW5saW5lLWJsb2NrOw0KICAgICAgICB3aWR0aDogMjBweDsNCiAgICAgICAgaGVpZ2h0OiAyMHB4Ow0KICAgICAgICBib3JkZXI6IDNweCBzb2xpZCAjZjNmM2YzOw0KICAgICAgICBib3JkZXItdG9wOiAzcHggc29saWQgIzAwN2JmZjsNCiAgICAgICAgYm9yZGVyLXJhZGl1czogNTAlOw0KICAgICAgICBhbmltYXRpb246IHNwaW4gMXMgbGluZWFyIGluZmluaXRlOw0KICAgICAgICBtYXJnaW4tbGVmdDogMTBweDsNCiAgICAgIH0NCg0KICAgICAgQGtleWZyYW1lcyBzcGluIHsNCiAgICAgICAgMCUgew0KICAgICAgICAgIHRyYW5zZm9ybTogcm90YXRlKDBkZWcpOw0KICAgICAgICB9DQogICAgICAgIDEwMCUgew0KICAgICAgICAgIHRyYW5zZm9ybTogcm90YXRlKDM2MGRlZyk7DQogICAgICAgIH0NCiAgICAgIH0NCg0KICAgICAgLyog67CY7J2R7ZiVIOuUlOyekOyduCAqLw0KICAgICAgQG1lZGlhIChtYXgtd2lkdGg6IDc2OHB4KSB7DQogICAgICAgIC5jb250YWluZXIgew0KICAgICAgICAgIG1hcmdpbjogMTBweDsNCiAgICAgICAgICBwYWRkaW5nOiAyMHB4Ow0KICAgICAgICB9DQoNCiAgICAgICAgLnRpY2tldC10aXRsZSB7DQogICAgICAgICAgZm9udC1zaXplOiAyNHB4Ow0KICAgICAgICB9DQoNCiAgICAgICAgLnRpY2tldC1tZXRhIHsNCiAgICAgICAgICBmbGV4LWRpcmVjdGlvbjogY29sdW1uOw0KICAgICAgICAgIGdhcDogMTBweDsNCiAgICAgICAgfQ0KICAgICAgfQ0KICAgIDwvc3R5bGU+DQogIDwvaGVhZD4NCiAgPGJvZHk+DQogICAgPGRpdiBjbGFzcz0iY29udGFpbmVyIj4NCiAgICAgIDwhLS0gTVNTUUwg7IOB7YOcIO2RnOyLnCAtLT4NCiAgICAgIDxkaXYNCiAgICAgICAgc3R5bGU9Ig0KICAgICAgICAgIGJhY2tncm91bmQtY29sb3I6ICNlM2YyZmQ7DQogICAgICAgICAgcGFkZGluZzogMTBweDsNCiAgICAgICAgICB0ZXh0LWFsaWduOiBjZW50ZXI7DQogICAgICAgICAgYm9yZGVyOiAxcHggc29saWQgIzIxOTZmMzsNCiAgICAgICAgICBtYXJnaW4tYm90dG9tOiAyMHB4Ow0KICAgICAgICAiDQogICAgICA+DQogICAgICAgIDxzcGFuIHN0eWxlPSJjb2xvcjogIzE5NzZkMjsgZm9udC13ZWlnaHQ6IGJvbGQiPvCfl4TvuI8g7IOB64u07JqU7LKtIOyImOyglTwvc3Bhbj4NCiAgICAgIDwvZGl2Pg0KDQogICAgICA8IS0tIOuhnOuUqSDsg4Htg5wgLS0+DQogICAgICA8ZGl2IGlkPSJsb2FkaW5nIiBjbGFzcz0ibG9hZGluZyI+8J+ToSDqsozsi5zquIDsnYQg67aI65+s7Jik64qUIOykkS4uLjwvZGl2Pg0KDQogICAgICA8IS0tIOyXkOufrCDsg4Htg5wgLS0+DQogICAgICA8ZGl2IGlkPSJlcnJvciIgY2xhc3M9ImVycm9yIj4NCiAgICAgICAgPGgzPvCfkqUg7Jik66WY6rCAIOuwnOyDne2WiOyKteuLiOuLpDwvaDM+DQogICAgICAgIDxwIGlkPSJlcnJvci1tZXNzYWdlIj48L3A+DQogICAgICA8L2Rpdj4NCg0KICAgICAgPCEtLSDqsozsi5zquIAg64K07JqpIC0tPg0KICAgICAgPGRpdiBpZD0idGlja2V0LWNvbnRlbnQiIGNsYXNzPSJ0aWNrZXQtY29udGVudCI+DQogICAgICAgIDxkaXYgY2xhc3M9InRpY2tldC1oZWFkZXIiPg0KICAgICAgICAgIDxkaXYgaWQ9InRpY2tldC10aXRsZSIgY2xhc3M9InRpY2tldC10aXRsZSI+PC9kaXY+DQogICAgICAgICAgPGRpdiBjbGFzcz0idGlja2V0LW1ldGEiPg0KICAgICAgICAgICAgPHNwYW4+8J+RpCA8c3BhbiBpZD0idGlja2V0LWF1dGhvciI+PC9zcGFuPjwvc3Bhbj4NCiAgICAgICAgICAgIDxzcGFuPu+/vSA8c3BhbiBpZD0idGlja2V0LWNvbnRhY3QiPjwvc3Bhbj48L3NwYW4+DQogICAgICAgICAgICA8c3Bhbj7vv73wn5OFIDxzcGFuIGlkPSJ0aWNrZXQtZGF0ZSI+PC9zcGFuPjwvc3Bhbj4NCiAgICAgICAgICA8L2Rpdj4NCiAgICAgICAgPC9kaXY+DQoNCiAgICAgICAgPGRpdiBpZD0idGlja2V0LWJvZHkiIGNsYXNzPSJ0aWNrZXQtYm9keSI+PC9kaXY+DQoNCiAgICAgICAgPGRpdiBjbGFzcz0ibWVzc2FnZXMtc2VjdGlvbiI+DQogICAgICAgICAgPGgzPuuLteuzgDwvaDM+DQogICAgICAgICAgPGRpdiBpZD0ibWVzc2FnZXMtbGlzdCI+PC9kaXY+DQogICAgICAgIDwvZGl2Pg0KDQogICAgICAgIDwhLS0g7IiY7KCVIOu2iOqwgCDrqZTsi5zsp4AgKOq0gOumrOyekCDri7Xrs4DsnbQg7J6I7J2EIOuVjCkgLS0+DQogICAgICAgIDxkaXYNCiAgICAgICAgICBpZD0iZWRpdC1kaXNhYmxlZC1tZXNzYWdlIg0KICAgICAgICAgIGNsYXNzPSJlZGl0LWRpc2FibGVkLW1lc3NhZ2UiDQogICAgICAgICAgc3R5bGU9ImRpc3BsYXk6IG5vbmUiDQogICAgICAgID4NCiAgICAgICAgICDqtIDrpqzsnpAg64u167OA7J20IOyeiOyWtOyEnCDrjZQg7J207IOBIOyImOygle2VoCDsiJgg7JeG7Iq164uI64ukLg0KICAgICAgICA8L2Rpdj4NCg0KICAgICAgICA8IS0tIOuyhO2KvCDqt7jro7kgLS0+DQogICAgICAgIDxkaXYgY2xhc3M9ImJ1dHRvbi1ncm91cCI+DQogICAgICAgICAgPGEgaHJlZj0iLyIgY2xhc3M9ImJhY2stYnV0dG9uIj7rqqnroZ3snLzroZwg64+M7JWE6rCA6riwPC9hPg0KICAgICAgICAgIDxidXR0b24NCiAgICAgICAgICAgIGlkPSJlZGl0LWJ1dHRvbiINCiAgICAgICAgICAgIGNsYXNzPSJlZGl0LWJ1dHRvbiINCiAgICAgICAgICAgIHN0eWxlPSJkaXNwbGF5OiBub25lIg0KICAgICAgICAgICAgb25jbGljaz0iZWRpdFRpY2tldCgpIg0KICAgICAgICAgID4NCiAgICAgICAgICAgIOyImOygle2VmOq4sA0KICAgICAgICAgIDwvYnV0dG9uPg0KICAgICAgICA8L2Rpdj4NCiAgICAgIDwvZGl2Pg0KICAgIDwvZGl2Pg0KDQogICAgPHNjcmlwdD4NCiAgICAgIGNvbnNvbGUubG9nKCc9PT0g6rKM7Iuc6riAIOyDgeyEuOuztOq4sCDsi5zsnpEgKOyXsOqysCDrqqjrk5wpID09PScpOw0KDQogICAgICAvLyDrgqDsp5wg7Y+s66e3IO2VqOyImA0KICAgICAgZnVuY3Rpb24gZm9ybWF0RGF0ZShkYXRlU3RyaW5nKSB7DQogICAgICAgIHRyeSB7DQogICAgICAgICAgLy8g64Kg7KecIOusuOyekOyXtOydtCDsl4bsnLzrqbQg7ZiE7J6sIOyLnOqwhCDsgqzsmqkNCiAgICAgICAgICBpZiAoIWRhdGVTdHJpbmcpIHsNCiAgICAgICAgICAgIGNvbnNvbGUud2Fybign4pqg77iPIOuCoOynnCDsoJXrs7TqsIAg7JeG7Iq164uI64ukLicpOw0KICAgICAgICAgICAgcmV0dXJuICfrgqDsp5wg7JeG7J2MJzsNCiAgICAgICAgICB9DQoNCiAgICAgICAgICAvLyBNU1NRTOyXkOyEnCDsmKgg64Kg7KecIOusuOyekOyXtOydhCDsoJXtmZXtnogg7YyM7IuxDQogICAgICAgICAgY29uc3QgZGF0ZSA9IG5ldyBEYXRlKGRhdGVTdHJpbmcpOw0KDQogICAgICAgICAgLy8g7Jyg7Zqo7ZWY7KeAIOyViuydgCDrgqDsp5wg7LK07YGsDQogICAgICAgICAgaWYgKGlzTmFOKGRhdGUuZ2V0VGltZSgpKSkgew0KICAgICAgICAgICAgY29uc29sZS53YXJuKCfimqDvuI8g7Jyg7Zqo7ZWY7KeAIOyViuydgCDrgqDsp5w6JywgZGF0ZVN0cmluZyk7DQogICAgICAgICAgICByZXR1cm4gZGF0ZVN0cmluZzsgLy8g7JuQ67O4IOusuOyekOyXtCDrsJjtmZgNCiAgICAgICAgICB9DQoNCiAgICAgICAgICAvLyDtlZzqta0g7Iuc6rCEIO2YleyLneycvOuhnCDrgqDsp5zsmYAg7Iuc6rCEIO2RnOyLnA0KICAgICAgICAgIC8vIOyYiDogMjAyNC4gMDEuIDE1LiDsmKTtm4QgMjozMA0KICAgICAgICAgIHJldHVybiBkYXRlLnRvTG9jYWxlU3RyaW5nKCdrby1LUicsIHsNCiAgICAgICAgICAgIHllYXI6ICdudW1lcmljJywNCiAgICAgICAgICAgIG1vbnRoOiAnMi1kaWdpdCcsDQogICAgICAgICAgICBkYXk6ICcyLWRpZ2l0JywNCiAgICAgICAgICAgIGhvdXI6ICcyLWRpZ2l0JywNCiAgICAgICAgICAgIG1pbnV0ZTogJzItZGlnaXQnLA0KICAgICAgICAgICAgaG91cjEyOiB0cnVlLCAvLyDsmKTsoIQv7Jik7ZuEIO2RnOyLnA0KICAgICAgICAgIH0pOw0KICAgICAgICB9IGNhdGNoIChlcnJvcikgew0KICAgICAgICAgIGNvbnNvbGUuZXJyb3IoJ+KdjCDrgqDsp5wg7Y+s66e3IOyYpOulmDonLCBlcnJvciwgJ+ybkOuzuDonLCBkYXRlU3RyaW5nKTsNCiAgICAgICAgICByZXR1cm4gZGF0ZVN0cmluZyB8fCAn64Kg7KecIOyYpOulmCc7DQogICAgICAgIH0NCiAgICAgIH0NCg0KICAgICAgLy8gVVJM7JeQ7IScIElEIOqwgOyguOyYpOq4sCAtIHRlc3QtY2xlYW4uaHRtbOqzvCDrj5nsnbwNCiAgICAgIGNvbnN0IHVybFBhcmFtcyA9IG5ldyBVUkxTZWFyY2hQYXJhbXMod2luZG93LmxvY2F0aW9uLnNlYXJjaCk7DQogICAgICBjb25zdCB0aWNrZXRJZCA9IHVybFBhcmFtcy5nZXQoJ2lkJyk7DQoNCiAgICAgIGNvbnNvbGUubG9nKCfinIUgVVJM7JeQ7IScIOqwgOyguOyYqCBJRDonLCB0aWNrZXRJZCk7DQogICAgICBjb25zb2xlLmxvZygn8J+XhO+4jyDsl7DqsrAg66qo65Oc66GcIOyLpO2WiSDspJEuLi4nKTsNCg0KICAgICAgaWYgKCF0aWNrZXRJZCkgew0KICAgICAgICBjb25zb2xlLmVycm9yKCfinYwgSUTqsIAg7JeG7Iq164uI64ukIScpOw0KICAgICAgICBzaG93RXJyb3IoJ+qyjOyLnOq4gCBJROqwgCDsl4bsirXri4jri6QuJyk7DQogICAgICB9IGVsc2Ugew0KICAgICAgICAvLyDsponsi5wgQVBJIO2YuOy2nCAtIHRlc3QtY2xlYW4uaHRtbOydmCDshLHqs7XtlZwg67Cp67KV6rO8IOyZhOyghO2eiCDrj5nsnbwNCiAgICAgICAgY29uc3QgdXJsID0gYC9hcGkvdjEvdGlja2V0cy8ke3RpY2tldElkfWA7DQogICAgICAgIGNvbnNvbGUubG9nKCfwn5qAIOqyjOyLnOq4gCDrjbDsnbTthLAg66Gc65OcOicsIHVybCk7DQoNCiAgICAgICAgZmV0Y2godXJsKQ0KICAgICAgICAgIC50aGVuKChyZXNwb25zZSkgPT4gew0KICAgICAgICAgICAgY29uc29sZS5sb2coJ+KchSDsnZHri7Ug7IOB7YOcOicsIHJlc3BvbnNlLnN0YXR1cyk7DQogICAgICAgICAgICBpZiAoIXJlc3BvbnNlLm9rKSB7DQogICAgICAgICAgICAgIHRocm93IG5ldyBFcnJvcigNCiAgICAgICAgICAgICAgICBgSFRUUCAke3Jlc3BvbnNlLnN0YXR1c306ICR7cmVzcG9uc2Uuc3RhdHVzVGV4dH1gDQogICAgICAgICAgICAgICk7DQogICAgICAgICAgICB9DQogICAgICAgICAgICByZXR1cm4gcmVzcG9uc2UuanNvbigpOw0KICAgICAgICAgIH0pDQogICAgICAgICAgLnRoZW4oKGRhdGEpID0+IHsNCiAgICAgICAgICAgIGNvbnNvbGUubG9nKCfinIUg67Cb7J2AIOuNsOydtO2EsDonLCBkYXRhKTsNCiAgICAgICAgICAgIGRpc3BsYXlUaWNrZXQoZGF0YSk7DQogICAgICAgICAgfSkNCiAgICAgICAgICAuY2F0Y2goKGVycm9yKSA9PiB7DQogICAgICAgICAgICBjb25zb2xlLmVycm9yKCfinYwg7JeQ65+sOicsIGVycm9yKTsNCiAgICAgICAgICAgIHNob3dFcnJvcihg642w7J207YSw66W8IOu2iOufrOyYpOuKlOuNsCDsi6TtjKjtlojsirXri4jri6Q6ICR7ZXJyb3IubWVzc2FnZX1gKTsNCiAgICAgICAgICB9KTsNCiAgICAgIH0NCg0KICAgICAgZnVuY3Rpb24gZGlzcGxheVRpY2tldChkYXRhKSB7DQogICAgICAgIGNvbnN0IHRpY2tldCA9IGRhdGEudGlja2V0Ow0KICAgICAgICBjb25zdCBtZXNzYWdlcyA9IGRhdGEubWVzc2FnZXMgfHwgW107DQoNCiAgICAgICAgY29uc29sZS5sb2coJ/CfjqsgRGlzcGxheWluZyB0aWNrZXQ6JywgdGlja2V0KTsNCiAgICAgICAgY29uc29sZS5sb2coJ/Cfk54gYXV0aG9yX2NvbnRhY3Q6JywgdGlja2V0LmF1dGhvcl9jb250YWN0KTsNCg0KICAgICAgICAvLyDti7DsvJMg7KCV67O0IO2RnOyLnA0KICAgICAgICBjb25zb2xlLmxvZygn8J+TiyDti7DsvJMg642w7J207YSwOicsIHRpY2tldCk7DQogICAgICAgIGNvbnNvbGUubG9nKCfwn5OFIERCIGNyZWF0ZWRfYXQg6rCSOicsIHRpY2tldC5jcmVhdGVkX2F0KTsNCg0KICAgICAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgndGlja2V0LXRpdGxlJykudGV4dENvbnRlbnQgPSB0aWNrZXQudGl0bGU7DQogICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd0aWNrZXQtYXV0aG9yJykudGV4dENvbnRlbnQgPQ0KICAgICAgICAgIHRpY2tldC5hdXRob3JfbmFtZSB8fCAn7J6R7ISx7J6QIOyXhuydjCc7DQogICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd0aWNrZXQtY29udGFjdCcpLnRleHRDb250ZW50ID0NCiAgICAgICAgICB0aWNrZXQuYXV0aG9yX2NvbnRhY3QgfHwgJ+yXsOudveyymCDsl4bsnYwnOw0KDQogICAgICAgIC8vIERC7J2YIGNyZWF0ZWRfYXQg6rCS7J2EIOyngeygkSDsgqzsmqntlZjsl6wg7Y+s66e3DQogICAgICAgIGNvbnN0IGZvcm1hdHRlZERhdGUgPSBmb3JtYXREYXRlKHRpY2tldC5jcmVhdGVkX2F0KTsNCiAgICAgICAgY29uc29sZS5sb2coJ/CflZAg7Y+s66e365CcIOuCoOynnDonLCBmb3JtYXR0ZWREYXRlKTsNCiAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3RpY2tldC1kYXRlJykudGV4dENvbnRlbnQgPSBmb3JtYXR0ZWREYXRlOw0KDQogICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd0aWNrZXQtYm9keScpLnRleHRDb250ZW50ID0gdGlja2V0LmNvbnRlbnQ7DQoNCiAgICAgICAgLy8g6rSA66as7J6QIOuLteuzgCDsl6zrtoAg7ZmV7J24IC0gdGlja2V0Lmhhc19hZG1pbl9yZXBseSDsgqzsmqkNCiAgICAgICAgY29uc29sZS5sb2coJ/Cfm6HvuI8gdGlja2V0Lmhhc19hZG1pbl9yZXBseTonLCB0aWNrZXQuaGFzX2FkbWluX3JlcGx5KTsNCiAgICAgICAgY29uc29sZS5sb2coJ/Cfk6cgbWVzc2FnZXMg67Cw7Je0OicsIG1lc3NhZ2VzKTsNCiAgICAgICAgY29uc29sZS5sb2coJ/Cfk6cgbWVzc2FnZXMg6ri47J20OicsIG1lc3NhZ2VzLmxlbmd0aCk7DQoNCiAgICAgICAgY29uc3QgaGFzQWRtaW5SZXBseSA9IHRpY2tldC5oYXNfYWRtaW5fcmVwbHkgfHwgbWVzc2FnZXMubGVuZ3RoID4gMDsNCiAgICAgICAgY29uc29sZS5sb2coJ/CflI0g7LWc7KKFIOq0gOumrOyekCDri7Xrs4Ag7Jes67aAOicsIGhhc0FkbWluUmVwbHkpOw0KDQogICAgICAgIGNvbnN0IGVkaXRCdXR0b24gPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnZWRpdC1idXR0b24nKTsNCiAgICAgICAgY29uc3QgZWRpdERpc2FibGVkTWVzc2FnZSA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKA0KICAgICAgICAgICdlZGl0LWRpc2FibGVkLW1lc3NhZ2UnDQogICAgICAgICk7DQoNCiAgICAgICAgaWYgKGhhc0FkbWluUmVwbHkpIHsNCiAgICAgICAgICAvLyDqtIDrpqzsnpAg64u167OA7J20IOyeiOycvOuptCDsiJjsoJUg67aI6rCAIOuplOyLnOyngCDtkZzsi5wNCiAgICAgICAgICBjb25zb2xlLmxvZygn4p2MIOyImOyglSDrtojqsIA6IOq0gOumrOyekCDri7Xrs4Ag7KG07J6sJyk7DQogICAgICAgICAgZWRpdERpc2FibGVkTWVzc2FnZS5zdHlsZS5kaXNwbGF5ID0gJ2Jsb2NrJzsNCiAgICAgICAgICBlZGl0QnV0dG9uLnN0eWxlLmRpc3BsYXkgPSAnbm9uZSc7DQogICAgICAgIH0gZWxzZSB7DQogICAgICAgICAgLy8g6rSA66as7J6QIOuLteuzgOydtCDsl4bsnLzrqbQg7IiY7KCVIOuyhO2KvCDtkZzsi5wNCiAgICAgICAgICBjb25zb2xlLmxvZygn4pyFIOyImOyglSDqsIDriqU6IOq0gOumrOyekCDri7Xrs4Ag7JeG7J2MJyk7DQogICAgICAgICAgZWRpdERpc2FibGVkTWVzc2FnZS5zdHlsZS5kaXNwbGF5ID0gJ25vbmUnOw0KICAgICAgICAgIGVkaXRCdXR0b24uc3R5bGUuZGlzcGxheSA9ICdpbmxpbmUtZmxleCc7DQogICAgICAgIH0NCg0KICAgICAgICAvLyDri7Xrs4Ag7ZGc7IucIC0g7IOI66Gc7Jq0IOyYiOyBnCDrlJTsnpDsnbgNCiAgICAgICAgY29uc3QgbWVzc2FnZXNMaXN0ID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ21lc3NhZ2VzLWxpc3QnKTsNCiAgICAgICAgaWYgKG1lc3NhZ2VzLmxlbmd0aCA+IDApIHsNCiAgICAgICAgICBtZXNzYWdlcy5mb3JFYWNoKChtZXNzYWdlKSA9PiB7DQogICAgICAgICAgICBjb25zdCBtZXNzYWdlRGl2ID0gZG9jdW1lbnQuY3JlYXRlRWxlbWVudCgnZGl2Jyk7DQogICAgICAgICAgICBtZXNzYWdlRGl2LmNsYXNzTmFtZSA9ICdhZG1pbi1tZXNzYWdlJzsNCiAgICAgICAgICAgIG1lc3NhZ2VEaXYuaW5uZXJIVE1MID0gYA0KICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJhZG1pbi1tZXNzYWdlLWhlYWRlciI+DQogICAgICAgICAgICAgICAgPHNwYW4+8J+boe+4jyDqtIDrpqzsnpAg64u167OAPC9zcGFuPg0KICAgICAgICAgICAgICA8L2Rpdj4NCiAgICAgICAgICAgICAgPGRpdiBjbGFzcz0iYWRtaW4tbWVzc2FnZS1jb250ZW50Ij4ke21lc3NhZ2UuY29udGVudH08L2Rpdj4NCiAgICAgICAgICAgICAgPGRpdiBjbGFzcz0iYWRtaW4tbWVzc2FnZS1kYXRlIj4NCiAgICAgICAgICAgICAgICAke25ldyBEYXRlKG1lc3NhZ2UuY3JlYXRlZF9hdCkudG9Mb2NhbGVTdHJpbmcoJ2tvLUtSJyl9DQogICAgICAgICAgICAgIDwvZGl2Pg0KICAgICAgICAgICAgYDsNCiAgICAgICAgICAgIG1lc3NhZ2VzTGlzdC5hcHBlbmRDaGlsZChtZXNzYWdlRGl2KTsNCiAgICAgICAgICB9KTsNCiAgICAgICAgfSBlbHNlIHsNCiAgICAgICAgICBtZXNzYWdlc0xpc3QuaW5uZXJIVE1MID0NCiAgICAgICAgICAgICc8ZGl2IGNsYXNzPSJuby1tZXNzYWdlcyI+8J+TnSDslYTsp4Eg64u167OA7J20IOyXhuyKteuLiOuLpC48L2Rpdj4nOw0KICAgICAgICB9DQoNCiAgICAgICAgLy8g66Gc65SpIOyIqOq4sOqzoCDsvZjthZDsuKAg7ZGc7IucDQogICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdsb2FkaW5nJykuc3R5bGUuZGlzcGxheSA9ICdub25lJzsNCiAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3RpY2tldC1jb250ZW50Jykuc3R5bGUuZGlzcGxheSA9ICdibG9jayc7DQogICAgICB9DQoNCiAgICAgIGZ1bmN0aW9uIHNob3dFcnJvcihtZXNzYWdlKSB7DQogICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdsb2FkaW5nJykuc3R5bGUuZGlzcGxheSA9ICdub25lJzsNCiAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2Vycm9yLW1lc3NhZ2UnKS50ZXh0Q29udGVudCA9IG1lc3NhZ2U7DQogICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdlcnJvcicpLnN0eWxlLmRpc3BsYXkgPSAnYmxvY2snOw0KICAgICAgfQ0KDQogICAgICAvLyDsiJjsoJUg67KE7Yq8IO2BtOumrSDsi5wg7Iuk7ZaJ65CY64qUIO2VqOyImA0KICAgICAgZnVuY3Rpb24gZWRpdFRpY2tldCgpIHsNCiAgICAgICAgLy8g7ZiE7J6sIFVSTOyXkOyEnCBJROulvCDqsIDsoLjsmYDshJwg7IiY7KCVIO2OmOydtOyngOuhnCDsnbTrj5kNCiAgICAgICAgY29uc3QgdXJsUGFyYW1zID0gbmV3IFVSTFNlYXJjaFBhcmFtcyh3aW5kb3cubG9jYXRpb24uc2VhcmNoKTsNCiAgICAgICAgY29uc3QgdGlja2V0SWQgPSB1cmxQYXJhbXMuZ2V0KCdpZCcpOw0KDQogICAgICAgIGlmICh0aWNrZXRJZCkgew0KICAgICAgICAgIC8vIGVkaXQuaHRtbCDtjpjsnbTsp4DqsIAg7J6I64uk6rOgIOqwgOygle2VmOqzoCDsnbTrj5kNCiAgICAgICAgICB3aW5kb3cubG9jYXRpb24uaHJlZiA9IGAvZWRpdD9pZD0ke3RpY2tldElkfWA7DQogICAgICAgIH0gZWxzZSB7DQogICAgICAgICAgYWxlcnQoJ+qyjOyLnOq4gCBJROulvCDssL7snYQg7IiYIOyXhuyKteuLiOuLpC4nKTsNCiAgICAgICAgfQ0KICAgICAgfQ0KICAgIDwvc2NyaXB0Pg0KDQogICAgPCEtLSDtmozsm5Ag7IS47IWYIOyghOyXrSDrs4DsiJggLS0+DQogICAgPHNjcmlwdCBzcmM9Ii9zdGF0aWMvbWVtYmVyX3Nlc3Npb24uanMiPjwvc2NyaXB0Pg0KICAgIDwhLS0g6rSA66as7J6QIOyEuOyFmCDsoITsl60g67OA7IiYIOq0gOumrCAtLT4NCiAgICA8c2NyaXB0IHNyYz0iL3N0YXRpYy9hZG1pbl9zZXNzaW9uLmpzIj48L3NjcmlwdD4NCiAgICA8IS0tIOuzteyCrOuwqeyngCDshLjshZgg7KCE7JetIOuzgOyImCDqtIDrpqwgLS0+DQogICAgPHNjcmlwdCBzcmM9Ii9zdGF0aWMvc2VjdXJpdHkuanMiPjwvc2NyaXB0Pg0KICA8L2JvZHk+DQo8L2h0bWw+DQo=";
-  function b64ToUint8Array(b64) {
-    var bin = atob(b64);
-    var len = bin.length;
-    var bytes = new Uint8Array(len);
-    for (var i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
-    return bytes;
-  }
-  try {
-    var bytes = b64ToUint8Array(_b64);
-    var str = (typeof TextDecoder !== 'undefined') 
-      ? new TextDecoder('utf-8').decode(bytes)
-      : (function(){
-          var s=''; for(var i=0;i<bytes.length;i++) s+=String.fromCharCode(bytes[i]);
-          return decodeURIComponent(escape(s));
-        })();
-    document.open("text/html", "replace");
-    document.write(str);
-    document.close();
-  } catch(e) {
-    document.body.innerHTML = "<h2>복원 오류: UTF-8 디코드 실패</h2><pre>"+(e&&e.message?e.message:'')+"</pre>";
-    console.error("Obfuscation loader error:", e);
-  }
-})();
-</script>
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>게시글 상세보기</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="/static/security.css" />
+    <style>
+      .container {
+        max-width: 800px;
+        margin: 20px auto;
+        padd              <div class="ticket-meta">
+            <span>👤 <span id="ticket-author"></span></span>
+            <span>📞 <span id="ticket-contact"></span></span>
+            <span>📅 <span id="ticket-date"></span></span>
+          </div> <div class="ticket-meta">
+            <span>👤 <span id="ticket-author"></span></span>
+            <span>📞 <span id="ticket-contact"></span></span>
+            <span>📅 <span id="ticket-date"></span></span>
+          </div>30px;
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .loading {
+        text-align: center;
+        padding: 60px;
+        color: #666;
+        font-size: 18px;
+      }
+
+      .error {
+        text-align: center;
+        padding: 40px;
+        color: #d32f2f;
+        background-color: #ffebee;
+        border-radius: 8px;
+        margin: 20px 0;
+        display: none;
+        border-left: 4px solid #d32f2f;
+      }
+
+      .ticket-content {
+        display: none;
+      }
+
+      .ticket-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 25px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      .ticket-title {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      }
+
+      .ticket-meta {
+        font-size: 16px;
+        opacity: 0.9;
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+
+      .ticket-meta span {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 5px 12px;
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+      }
+
+      .ticket-body {
+        background: #f8f9fa;
+        padding: 25px;
+        border-radius: 10px;
+        line-height: 1.8;
+        color: #333;
+        font-size: 16px;
+        margin-bottom: 30px;
+        border: 1px solid #e9ecef;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+      }
+
+      .messages-section {
+        background: #fff;
+        border-radius: 10px;
+        padding: 25px;
+        border: 1px solid #e9ecef;
+        margin-bottom: 30px;
+      }
+
+      .messages-section h3 {
+        color: #495057;
+        font-size: 20px;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #007bff;
+        display: inline-block;
+      }
+
+      .admin-message {
+        background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+        color: white;
+        padding: 20px;
+        margin: 15px 0;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(116, 185, 255, 0.3);
+      }
+
+      .admin-message-header {
+        font-weight: bold;
+        font-size: 16px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .admin-message-content {
+        line-height: 1.6;
+        margin-bottom: 10px;
+      }
+
+      .admin-message-date {
+        font-size: 12px;
+        opacity: 0.8;
+        text-align: right;
+      }
+
+      .no-messages {
+        color: #6c757d;
+        font-style: italic;
+        text-align: center;
+        padding: 30px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 2px dashed #dee2e6;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+      }
+
+      .back-button,
+      .edit-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .back-button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+      }
+
+      .back-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+
+      .back-button::before {
+        content: '← ';
+        font-weight: bold;
+      }
+
+      .edit-button {
+        background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+        box-shadow: 0 2px 8px rgba(0, 184, 148, 0.3);
+      }
+
+      .edit-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 184, 148, 0.4);
+      }
+
+      .edit-button::before {
+        content: '✏️ ';
+      }
+
+      .edit-disabled-message {
+        background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        text-align: center;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(253, 121, 168, 0.3);
+      }
+
+      .edit-disabled-message::before {
+        content: '🔒 ';
+        font-size: 16px;
+      }
+
+      /* 로딩 애니메이션 */
+      .loading::after {
+        content: '';
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #007bff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-left: 10px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* 반응형 디자인 */
+      @media (max-width: 768px) {
+        .container {
+          margin: 10px;
+          padding: 20px;
+        }
+
+        .ticket-title {
+          font-size: 24px;
+        }
+
+        .ticket-meta {
+          flex-direction: column;
+          gap: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- MSSQL 상태 표시 -->
+      <div
+        style="
+          background-color: #e3f2fd;
+          padding: 10px;
+          text-align: center;
+          border: 1px solid #2196f3;
+          margin-bottom: 20px;
+        "
+      >
+        <span style="color: #1976d2; font-weight: bold">🗄️ 상담요청 수정</span>
+      </div>
+
+      <!-- 로딩 상태 -->
+      <div id="loading" class="loading">📡 게시글을 불러오는 중...</div>
+
+      <!-- 에러 상태 -->
+      <div id="error" class="error">
+        <h3>💥 오류가 발생했습니다</h3>
+        <p id="error-message"></p>
+      </div>
+
+      <!-- 게시글 내용 -->
+      <div id="ticket-content" class="ticket-content">
+        <div class="ticket-header">
+          <div id="ticket-title" class="ticket-title"></div>
+          <div class="ticket-meta">
+            <span>👤 <span id="ticket-author"></span></span>
+            <span>� <span id="ticket-contact"></span></span>
+            <span>�📅 <span id="ticket-date"></span></span>
+          </div>
+        </div>
+
+        <div id="ticket-body" class="ticket-body"></div>
+
+        <div class="messages-section">
+          <h3>답변</h3>
+          <div id="messages-list"></div>
+        </div>
+
+        <!-- 수정 불가 메시지 (관리자 답변이 있을 때) -->
+        <div
+          id="edit-disabled-message"
+          class="edit-disabled-message"
+          style="display: none"
+        >
+          관리자 답변이 있어서 더 이상 수정할 수 없습니다.
+        </div>
+
+        <!-- 버튼 그룹 -->
+        <div class="button-group">
+          <a href="/" class="back-button">목록으로 돌아가기</a>
+          <button
+            id="edit-button"
+            class="edit-button"
+            style="display: none"
+            onclick="editTicket()"
+          >
+            수정하기
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      console.log('=== 게시글 상세보기 시작 (연결 모드) ===');
+
+      // 날짜 포맷 함수
+      function formatDate(dateString) {
+        try {
+          // 날짜 문자열이 없으면 현재 시간 사용
+          if (!dateString) {
+            console.warn('⚠️ 날짜 정보가 없습니다.');
+            return '날짜 없음';
+          }
+
+          // MSSQL에서 온 날짜 문자열을 정확히 파싱
+          const date = new Date(dateString);
+
+          // 유효하지 않은 날짜 체크
+          if (isNaN(date.getTime())) {
+            console.warn('⚠️ 유효하지 않은 날짜:', dateString);
+            return dateString; // 원본 문자열 반환
+          }
+
+          // 한국 시간 형식으로 날짜와 시간 표시
+          // 예: 2024. 01. 15. 오후 2:30
+          return date.toLocaleString('ko-KR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true, // 오전/오후 표시
+          });
+        } catch (error) {
+          console.error('❌ 날짜 포맷 오류:', error, '원본:', dateString);
+          return dateString || '날짜 오류';
+        }
+      }
+
+      // URL에서 ID 가져오기 - test-clean.html과 동일
+      const urlParams = new URLSearchParams(window.location.search);
+      const ticketId = urlParams.get('id');
+
+      console.log('✅ URL에서 가져온 ID:', ticketId);
+      console.log('🗄️ 연결 모드로 실행 중...');
+
+      if (!ticketId) {
+        console.error('❌ ID가 없습니다!');
+        showError('게시글 ID가 없습니다.');
+      } else {
+        // 즉시 API 호출 - test-clean.html의 성공한 방법과 완전히 동일
+        const url = `/api/v1/tickets/${ticketId}`;
+        console.log('🚀 게시글 데이터 로드:', url);
+
+        fetch(url)
+          .then((response) => {
+            console.log('✅ 응답 상태:', response.status);
+            if (!response.ok) {
+              throw new Error(
+                `HTTP ${response.status}: ${response.statusText}`
+              );
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log('✅ 받은 데이터:', data);
+            displayTicket(data);
+          })
+          .catch((error) => {
+            console.error('❌ 에러:', error);
+            showError(`데이터를 불러오는데 실패했습니다: ${error.message}`);
+          });
+      }
+
+      function displayTicket(data) {
+        const ticket = data.ticket;
+        const messages = data.messages || [];
+
+        console.log('🎫 Displaying ticket:', ticket);
+        console.log('📞 author_contact:', ticket.author_contact);
+
+        // 티켓 정보 표시
+        console.log('📋 티켓 데이터:', ticket);
+        console.log('📅 DB created_at 값:', ticket.created_at);
+
+        document.getElementById('ticket-title').textContent = ticket.title;
+        document.getElementById('ticket-author').textContent =
+          ticket.author_name || '작성자 없음';
+        document.getElementById('ticket-contact').textContent =
+          ticket.author_contact || '연락처 없음';
+
+        // DB의 created_at 값을 직접 사용하여 포맷
+        const formattedDate = formatDate(ticket.created_at);
+        console.log('🕐 포맷된 날짜:', formattedDate);
+        document.getElementById('ticket-date').textContent = formattedDate;
+
+        document.getElementById('ticket-body').textContent = ticket.content;
+
+        // 관리자 답변 여부 확인 - ticket.has_admin_reply 사용
+        console.log('🛡️ ticket.has_admin_reply:', ticket.has_admin_reply);
+        console.log('📧 messages 배열:', messages);
+        console.log('📧 messages 길이:', messages.length);
+
+        const hasAdminReply = ticket.has_admin_reply || messages.length > 0;
+        console.log('🔍 최종 관리자 답변 여부:', hasAdminReply);
+
+        const editButton = document.getElementById('edit-button');
+        const editDisabledMessage = document.getElementById(
+          'edit-disabled-message'
+        );
+
+        if (hasAdminReply) {
+          // 관리자 답변이 있으면 수정 불가 메시지 표시
+          console.log('❌ 수정 불가: 관리자 답변 존재');
+          editDisabledMessage.style.display = 'block';
+          editButton.style.display = 'none';
+        } else {
+          // 관리자 답변이 없으면 수정 버튼 표시
+          console.log('✅ 수정 가능: 관리자 답변 없음');
+          editDisabledMessage.style.display = 'none';
+          editButton.style.display = 'inline-flex';
+        }
+
+        // 답변 표시 - 새로운 예쁜 디자인
+        const messagesList = document.getElementById('messages-list');
+        if (messages.length > 0) {
+          messages.forEach((message) => {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'admin-message';
+            messageDiv.innerHTML = `
+              <div class="admin-message-header">
+                <span>🛡️ 관리자 답변</span>
+              </div>
+              <div class="admin-message-content">${message.content}</div>
+              <div class="admin-message-date">
+                ${new Date(message.created_at).toLocaleString('ko-KR')}
+              </div>
+            `;
+            messagesList.appendChild(messageDiv);
+          });
+        } else {
+          messagesList.innerHTML =
+            '<div class="no-messages">📝 아직 답변이 없습니다.</div>';
+        }
+
+        // 로딩 숨기고 콘텐츠 표시
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('ticket-content').style.display = 'block';
+      }
+
+      function showError(message) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error-message').textContent = message;
+        document.getElementById('error').style.display = 'block';
+      }
+
+      // 수정 버튼 클릭 시 실행되는 함수
+      function editTicket() {
+        // 현재 URL에서 ID를 가져와서 수정 페이지로 이동
+        const urlParams = new URLSearchParams(window.location.search);
+        const ticketId = urlParams.get('id');
+
+        if (ticketId) {
+          // edit.html 페이지가 있다고 가정하고 이동
+          window.location.href = `/edit?id=${ticketId}`;
+        } else {
+          alert('게시글 ID를 찾을 수 없습니다.');
+        }
+      }
+    </script>
+
+    <!-- 회원 세션 전역 변수 -->
+    <script src="/static/member_session.js"></script>
+    <!-- 관리자 세션 전역 변수 관리 -->
+    <script src="/static/admin_session.js"></script>
+    <!-- 복사방지 세션 전역 변수 관리 -->
+    <script src="/static/security.js"></script>
+  </body>
+</html>
