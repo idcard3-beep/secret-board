@@ -318,7 +318,174 @@
       </div>
     </div>
 
-    <script src="/static/view.js"></script>
+    <script>
+      console.log('=== 게시글 상세보기 시작 (연결 모드) ===');
+
+      // 날짜 포맷 함수
+      function formatDate(dateString) {
+        try {
+          // 날짜 문자열이 없으면 현재 시간 사용
+          if (!dateString) {
+            console.warn('⚠️ 날짜 정보가 없습니다.');
+            return '날짜 없음';
+          }
+
+          // MSSQL에서 온 날짜 문자열을 정확히 파싱
+          const date = new Date(dateString);
+
+          // 유효하지 않은 날짜 체크
+          if (isNaN(date.getTime())) {
+            console.warn('⚠️ 유효하지 않은 날짜:', dateString);
+            return dateString; // 원본 문자열 반환
+          }
+
+          // 한국 시간 형식으로 날짜와 시간 표시
+          // 예: 2024. 01. 15. 오후 2:30
+          return date.toLocaleString('ko-KR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true, // 오전/오후 표시
+          });
+        } catch (error) {
+          console.error('❌ 날짜 포맷 오류:', error, '원본:', dateString);
+          return dateString || '날짜 오류';
+        }
+      }
+
+      // URL에서 ID 가져오기 - test-clean.html과 동일
+      const urlParams = new URLSearchParams(window.location.search);
+      const ticketId = urlParams.get('id');
+
+      console.log('✅ URL에서 가져온 ID:', ticketId);
+      console.log('🗄️ 연결 모드로 실행 중...');
+
+      if (!ticketId) {
+        console.error('❌ ID가 없습니다!');
+        showError('게시글 ID가 없습니다.');
+      } else {
+        // 즉시 API 호출 - test-clean.html의 성공한 방법과 완전히 동일
+        const url = `/api/v1/tickets/${ticketId}`;
+        console.log('🚀 게시글 데이터 로드:', url);
+
+        fetch(url)
+          .then((response) => {
+            console.log('✅ 응답 상태:', response.status);
+            if (!response.ok) {
+              throw new Error(
+                `HTTP ${response.status}: ${response.statusText}`
+              );
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log('✅ 받은 데이터:', data);
+            displayTicket(data);
+          })
+          .catch((error) => {
+            console.error('❌ 에러:', error);
+            showError(`데이터를 불러오는데 실패했습니다: ${error.message}`);
+          });
+      }
+
+      function displayTicket(data) {
+        const ticket = data.ticket;
+        const messages = data.messages || [];
+
+        console.log('🎫 Displaying ticket:', ticket);
+        console.log('📞 author_contact:', ticket.author_contact);
+
+        // 티켓 정보 표시
+        console.log('📋 티켓 데이터:', ticket);
+        console.log('📅 DB created_at 값:', ticket.created_at);
+
+        document.getElementById('ticket-title').textContent = ticket.title;
+        document.getElementById('ticket-author').textContent =
+          ticket.author_name || '작성자 없음';
+        document.getElementById('ticket-contact').textContent =
+          ticket.author_contact || '연락처 없음';
+
+        // DB의 created_at 값을 직접 사용하여 포맷
+        const formattedDate = formatDate(ticket.created_at);
+        console.log('🕐 포맷된 날짜:', formattedDate);
+        document.getElementById('ticket-date').textContent = formattedDate;
+
+        document.getElementById('ticket-body').textContent = ticket.content;
+
+        // 관리자 답변 여부 확인 - ticket.has_admin_reply 사용
+        console.log('🛡️ ticket.has_admin_reply:', ticket.has_admin_reply);
+        console.log('📧 messages 배열:', messages);
+        console.log('📧 messages 길이:', messages.length);
+
+        const hasAdminReply = ticket.has_admin_reply || messages.length > 0;
+        console.log('🔍 최종 관리자 답변 여부:', hasAdminReply);
+
+        const editButton = document.getElementById('edit-button');
+        const editDisabledMessage = document.getElementById(
+          'edit-disabled-message'
+        );
+
+        if (hasAdminReply) {
+          // 관리자 답변이 있으면 수정 불가 메시지 표시
+          console.log('❌ 수정 불가: 관리자 답변 존재');
+          editDisabledMessage.style.display = 'block';
+          editButton.style.display = 'none';
+        } else {
+          // 관리자 답변이 없으면 수정 버튼 표시
+          console.log('✅ 수정 가능: 관리자 답변 없음');
+          editDisabledMessage.style.display = 'none';
+          editButton.style.display = 'inline-flex';
+        }
+
+        // 답변 표시 - 새로운 예쁜 디자인
+        const messagesList = document.getElementById('messages-list');
+        if (messages.length > 0) {
+          messages.forEach((message) => {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'admin-message';
+            messageDiv.innerHTML = `
+              <div class="admin-message-header">
+                <span>🛡️ 관리자 답변</span>
+              </div>
+              <div class="admin-message-content">${message.content}</div>
+              <div class="admin-message-date">
+                ${new Date(message.created_at).toLocaleString('ko-KR')}
+              </div>
+            `;
+            messagesList.appendChild(messageDiv);
+          });
+        } else {
+          messagesList.innerHTML =
+            '<div class="no-messages">📝 아직 답변이 없습니다.</div>';
+        }
+
+        // 로딩 숨기고 콘텐츠 표시
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('ticket-content').style.display = 'block';
+      }
+
+      function showError(message) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error-message').textContent = message;
+        document.getElementById('error').style.display = 'block';
+      }
+
+      // 수정 버튼 클릭 시 실행되는 함수
+      function editTicket() {
+        // 현재 URL에서 ID를 가져와서 수정 페이지로 이동
+        const urlParams = new URLSearchParams(window.location.search);
+        const ticketId = urlParams.get('id');
+
+        if (ticketId) {
+          // edit.html 페이지가 있다고 가정하고 이동
+          window.location.href = `/edit?id=${ticketId}`;
+        } else {
+          alert('게시글 ID를 찾을 수 없습니다.');
+        }
+      }
+    </script>
 
     <!-- 회원 세션 전역 변수 -->
     <script src="/static/member_session.js"></script>

@@ -698,7 +698,337 @@
       </p>
     </footer>
 
-    <script src="/static/main_index.js"></script>
+    <script>
+      // ===== 회원 세션 관리 =====
+      function updateMemberUI() {
+        console.log('🔄 updateMemberUI 호출됨');
+
+        // member_session.js가 로드되었는지 확인
+        if (!window.getMemberSession || !window.isMemberLoggedIn) {
+          console.error('❌ member_session.js가 로드되지 않았습니다!');
+          return;
+        }
+
+        const session = window.getMemberSession();
+        const isLoggedIn = window.isMemberLoggedIn();
+
+        console.log('📊 세션 정보:', session);
+        console.log('🔐 로그인 상태:', isLoggedIn);
+
+        // 헤더 영역 - 로그인 버튼 자리를 활용
+        const loginLinks = document.getElementById('loginLinks');
+        const memberInfo = document.getElementById('memberInfo');
+        const displayMemberId = document.getElementById('displayMemberId');
+        const displayMemberName = document.getElementById('displayMemberName');
+        const displayMemberNickname = document.getElementById(
+          'displayMemberNickname'
+        );
+
+        // 요소 확인
+        console.log('🔍 loginLinks:', loginLinks);
+        console.log('🔍 memberInfo:', memberInfo);
+
+        if (!loginLinks || !memberInfo) {
+          console.error('❌ 필수 요소를 찾을 수 없습니다!');
+          return;
+        }
+
+        // 사이드바 영역
+        const sideMemberInfo = document.getElementById('sideMemberInfo');
+        const sideAuthDefault = document.getElementById('sideAuthDefault');
+        const sideMemberId = document.getElementById('sideMemberId');
+        const sideMemberName = document.getElementById('sideMemberName');
+
+        if (isLoggedIn && session.sMem_id) {
+          console.log('✅ 로그인 상태 - UI 표시');
+          console.log('   ID:', session.sMem_id);
+          console.log('   이름:', session.sMem_name);
+          console.log('   닉네임:', session.sMem_nickname);
+
+          // 로그인 버튼 숨기고, 같은 자리에 회원 정보 표시
+          loginLinks.style.display = 'none';
+          memberInfo.style.display = 'flex';
+          displayMemberId.textContent = session.sMem_id;
+          displayMemberName.textContent = session.sMem_name || '이름없음';
+          displayMemberNickname.textContent =
+            session.sMem_nickname || '닉네임없음';
+
+          console.log('   ✓ loginLinks 숨김:', loginLinks.style.display);
+          console.log('   ✓ memberInfo 표시:', memberInfo.style.display);
+
+          // 사이드바
+          sideMemberInfo.style.display = 'block';
+          sideAuthDefault.style.display = 'none';
+          sideMemberId.textContent = session.sMem_id;
+          sideMemberName.textContent = session.sMem_name || '이름없음';
+        } else {
+          console.log('❌ 로그아웃 상태 - UI 숨김');
+          // 로그아웃 상태 - 로그인 버튼 표시, 회원 정보 숨김
+          loginLinks.style.display = 'flex';
+          memberInfo.style.display = 'none';
+
+          console.log('   ✓ loginLinks 표시:', loginLinks.style.display);
+          console.log('   ✓ memberInfo 숨김:', memberInfo.style.display);
+
+          // 사이드바
+          sideMemberInfo.style.display = 'none';
+          sideAuthDefault.style.display = 'block';
+        }
+      }
+
+      function handleMemberLogout() {
+        if (confirm('로그아웃하시겠습니까?')) {
+          console.log('🚪 로그아웃 시작...');
+
+          // 1. 전역 변수 완전 초기화
+          window.clearMemberSession();
+
+          // 2. UI 업데이트
+          updateMemberUI();
+
+          // 3. iframe 초기화 (로그인 페이지가 열려있을 수 있음)
+          if (contentFrame) {
+            contentFrame.style.display = 'none';
+            contentFrame.src = '';
+          }
+
+          // 4. 홈 화면으로 복귀
+          if (homeContent) {
+            homeContent.style.display = 'block';
+          }
+
+          // 5. 전역 변수 최종 상태 확인
+          console.log('🔍 로그아웃 후 전역 변수 상태:', window.MEMBER_SESSION);
+          console.log('   isLoggedIn:', window.isMemberLoggedIn());
+
+          alert('✅ 로그아웃되었습니다.');
+        }
+      }
+
+      // 로그아웃 버튼 이벤트 (DOMContentLoaded 후에 연결)
+      function attachLogoutEvents() {
+        const memberLogoutBtn = document.getElementById('memberLogoutBtn');
+        const sideMemberLogout = document.getElementById('sideMemberLogout');
+
+        if (memberLogoutBtn) {
+          memberLogoutBtn.addEventListener('click', handleMemberLogout);
+        }
+        if (sideMemberLogout) {
+          sideMemberLogout.addEventListener('click', handleMemberLogout);
+        }
+      }
+
+      // 페이지 로드 시 회원 세션 확인
+      window.addEventListener('DOMContentLoaded', () => {
+        console.log('📄 페이지 로드 완료');
+        console.log('🔍 초기 상태 확인...');
+
+        // 요소 존재 확인
+        const loginLinks = document.getElementById('loginLinks');
+        const memberInfo = document.getElementById('memberInfo');
+        console.log('   loginLinks 요소:', loginLinks ? '✓ 존재' : '✗ 없음');
+        console.log('   memberInfo 요소:', memberInfo ? '✓ 존재' : '✗ 없음');
+
+        if (memberInfo) {
+          const computedStyle = window.getComputedStyle(memberInfo);
+          console.log('   memberInfo display:', computedStyle.display);
+          console.log('   memberInfo visibility:', computedStyle.visibility);
+        }
+
+        attachLogoutEvents();
+        // 약간의 지연 후 UI 업데이트 (member_session.js 로드 대기)
+        setTimeout(() => {
+          updateMemberUI();
+        }, 100);
+      });
+
+      // iframe에서 로그인 성공 시 이벤트 감지
+      window.addEventListener('message', (event) => {
+        console.log('📨 메시지 수신:', event.data);
+        if (event.data === 'memberLoginSuccess') {
+          console.log('✅ 로그인 성공 메시지 수신 - UI 업데이트');
+          // 세션 복원 후 UI 업데이트
+          setTimeout(() => {
+            window.restoreMemberSession();
+            updateMemberUI();
+          }, 200);
+
+          // 홈으로 이동
+          contentFrame.style.display = 'none';
+          contentFrame.src = '';
+          homeContent.style.display = 'block';
+        } else if (event.data === 'closeIframe') {
+          // iframe 닫기 메시지 수신
+          console.log('🚪 iframe 닫기 요청 수신');
+          contentFrame.style.display = 'none';
+          contentFrame.src = '';
+          homeContent.style.display = 'block';
+        }
+      });
+
+      // ===== 테스트용 헬퍼 함수 (콘솔에서 사용 가능) =====
+      window.testMemberLogin = function () {
+        console.log('🧪 테스트 로그인 시작...');
+        const testData = {
+          sMem_id: 'test123',
+          sMem_name: '홍길동',
+          sMem_nickname: '테스터',
+        };
+        window.setMemberSession(testData);
+        console.log('✓ 세션 설정 완료');
+        updateMemberUI();
+        console.log('✓ UI 업데이트 완료');
+        console.log('✅ 테스트 로그인 완료:', testData);
+        console.log('💡 상단 바를 확인하세요!');
+      };
+
+      window.testMemberLogout = function () {
+        console.log('🧪 테스트 로그아웃 시작...');
+        window.clearMemberSession();
+        console.log('✓ 세션 초기화 완료');
+        updateMemberUI();
+        console.log('✓ UI 업데이트 완료');
+        console.log('✅ 테스트 로그아웃 완료');
+      };
+
+      // ===== 강제 UI 업데이트 (디버깅용) =====
+      window.forceUpdateUI = function () {
+        console.log('🔧 강제 UI 업데이트...');
+        updateMemberUI();
+      };
+
+      // ===== 기존 코드 =====
+      const sideMenu = document.getElementById('sideMenu');
+      const mainContent = document.getElementById('mainContent');
+      const homeContent = document.getElementById('homeContent');
+      const contentFrame = document.getElementById('contentFrame');
+
+      // ✅ 사이드 메뉴 토글 공통 함수
+      function toggleSideMenu() {
+        if (sideMenu.classList.contains('show')) {
+          sideMenu.classList.remove('show');
+          mainContent.style.marginLeft = '0';
+        } else {
+          sideMenu.classList.add('show');
+          mainContent.style.marginLeft = sideMenu.offsetWidth + 'px';
+        }
+      }
+
+      // 버튼 이벤트
+      document
+        .getElementById('toggleMenuTop')
+        .addEventListener('click', toggleSideMenu);
+      document
+        .getElementById('closeSideMenu')
+        .addEventListener('click', toggleSideMenu);
+
+      // ✅ 모든 화면에서 마우스 왼쪽 끝에서 자동 열림
+      document.addEventListener('mousemove', (e) => {
+        if (e.clientX <= 5) {
+          sideMenu.classList.add('show');
+          mainContent.style.marginLeft = sideMenu.offsetWidth + 'px';
+        }
+      });
+
+      // ✅ 외부 클릭 시 닫기
+      document.addEventListener('click', (e) => {
+        if (
+          !e.target.closest('.side-menu') &&
+          !e.target.closest('#toggleMenuTop')
+        ) {
+          sideMenu.classList.remove('show');
+          mainContent.style.marginLeft = '0';
+        }
+      });
+
+      // ✅ 주메뉴 토글
+      document.querySelectorAll('.menu-trigger').forEach((trigger) => {
+        trigger.addEventListener('click', () => {
+          const submenu = trigger.nextElementSibling;
+          const isOpen = submenu.classList.contains('show');
+
+          document
+            .querySelectorAll('.submenu')
+            .forEach((s) => s.classList.remove('show'));
+          document
+            .querySelectorAll('.menu-trigger')
+            .forEach((btn) => btn.classList.remove('active'));
+
+          if (!isOpen) {
+            submenu.classList.add('show');
+            trigger.classList.add('active');
+          }
+        });
+      });
+
+      // ✅ 부메뉴 선택 시 강조 + 사이드바 닫기
+      document.querySelectorAll('.submenu a').forEach((link) => {
+        link.addEventListener('click', (e) => {
+          document
+            .querySelectorAll('.submenu a')
+            .forEach((a) => a.classList.remove('active'));
+          e.target.classList.add('active');
+          sideMenu.classList.remove('show');
+          mainContent.style.marginLeft = '0';
+        });
+      });
+
+      // ✅ 상담예약 클릭 시 iframe 로드
+      document.querySelectorAll('.load-form').forEach((link) => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          homeContent.style.display = 'none';
+          contentFrame.src = link.dataset.target;
+          contentFrame.style.display = 'block';
+        });
+      });
+
+      // ✅ iframe 높이 자동 조정
+      contentFrame.addEventListener('load', () => {
+        try {
+          const iframeDoc =
+            contentFrame.contentDocument || contentFrame.contentWindow.document;
+          contentFrame.style.height = iframeDoc.body.scrollHeight + 'px';
+        } catch (err) {
+          contentFrame.style.height = '1000px';
+        }
+      });
+
+      // ✅ 홈 버튼 클릭
+      document.getElementById('homeBtn').addEventListener('click', (e) => {
+        e.preventDefault();
+        contentFrame.style.display = 'none';
+        contentFrame.src = '';
+        homeContent.style.display = 'block';
+      });
+
+      // ✅ 슬라이드
+      const slides = document.querySelectorAll('#mainSlider .slides img');
+      const dotsContainer = document.getElementById('sliderDots');
+      let currentIndex = 0;
+
+      slides.forEach((_, i) => {
+        const dot = document.createElement('span');
+        if (i === 0) dot.classList.add('active');
+        dot.addEventListener('click', () => showSlide(i));
+        dotsContainer.appendChild(dot);
+      });
+
+      function showSlide(index) {
+        slides[currentIndex].style.display = 'none';
+        dotsContainer.children[currentIndex].classList.remove('active');
+        currentIndex = index;
+        slides[currentIndex].style.display = 'block';
+        dotsContainer.children[currentIndex].classList.add('active');
+      }
+
+      slides.forEach((s, i) => (s.style.display = i === 0 ? 'block' : 'none'));
+
+      setInterval(() => {
+        let next = (currentIndex + 1) % slides.length;
+        showSlide(next);
+      }, 5000);
+    </script>
 
     <!-- 회원 세션 전역 변수 -->
     <script src="/static/member_session.js"></script>
