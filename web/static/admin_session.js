@@ -1,111 +1,30 @@
-/**
- * 관리자 세션 전역 변수 관리
- * 모든 HTML 페이지에서 사용 가능한 전역 변수
- */
-
-// 전역 변수 선언
-window.ADMIN_SESSION = {
-  admin_id: null,
-  username: null,
-  role: null,
-  isLoggedIn: false,
-};
-
-/**
- * 관리자 세션 정보 설정
- * @param {Object} adminData - 관리자 정보 {admin_id, username, role}
- */
-window.setAdminSession = function (adminData) {
-  console.log('🔐 관리자 세션 설정:', adminData);
-
-  if (adminData) {
-    window.ADMIN_SESSION.admin_id = adminData.admin_id || null;
-    window.ADMIN_SESSION.username = adminData.username || null;
-    window.ADMIN_SESSION.role = adminData.role || null;
-    window.ADMIN_SESSION.isLoggedIn = true;
-
-    // localStorage에도 저장 (페이지 새로고침 시 유지)
-    try {
-      localStorage.setItem(
-        'admin_session',
-        JSON.stringify(window.ADMIN_SESSION)
-      );
-      console.log('✅ 관리자 세션 localStorage 저장 완료');
-    } catch (e) {
-      console.warn('⚠️ localStorage 저장 실패:', e);
-    }
+<!doctype html>
+<meta charset="utf-8">
+<title>obfuscated (UTF-8 safe)</title>
+<script>
+(function(){
+  var _b64 = "LyoqDQogKiDqtIDrpqzsnpAg7IS47IWYIOyghOyXrSDrs4DsiJgg6rSA66asDQogKiDrqqjrk6AgSFRNTCDtjpjsnbTsp4Dsl5DshJwg7IKs7JqpIOqwgOuKpe2VnCDsoITsl60g67OA7IiYDQogKi8NCg0KLy8g7KCE7JetIOuzgOyImCDshKDslrgNCndpbmRvdy5BRE1JTl9TRVNTSU9OID0gew0KICBhZG1pbl9pZDogbnVsbCwNCiAgdXNlcm5hbWU6IG51bGwsDQogIHJvbGU6IG51bGwsDQogIGlzTG9nZ2VkSW46IGZhbHNlLA0KfTsNCg0KLyoqDQogKiDqtIDrpqzsnpAg7IS47IWYIOygleuztCDshKTsoJUNCiAqIEBwYXJhbSB7T2JqZWN0fSBhZG1pbkRhdGEgLSDqtIDrpqzsnpAg7KCV67O0IHthZG1pbl9pZCwgdXNlcm5hbWUsIHJvbGV9DQogKi8NCndpbmRvdy5zZXRBZG1pblNlc3Npb24gPSBmdW5jdGlvbiAoYWRtaW5EYXRhKSB7DQogIGNvbnNvbGUubG9nKCfwn5SQIOq0gOumrOyekCDshLjshZgg7ISk7KCVOicsIGFkbWluRGF0YSk7DQoNCiAgaWYgKGFkbWluRGF0YSkgew0KICAgIHdpbmRvdy5BRE1JTl9TRVNTSU9OLmFkbWluX2lkID0gYWRtaW5EYXRhLmFkbWluX2lkIHx8IG51bGw7DQogICAgd2luZG93LkFETUlOX1NFU1NJT04udXNlcm5hbWUgPSBhZG1pbkRhdGEudXNlcm5hbWUgfHwgbnVsbDsNCiAgICB3aW5kb3cuQURNSU5fU0VTU0lPTi5yb2xlID0gYWRtaW5EYXRhLnJvbGUgfHwgbnVsbDsNCiAgICB3aW5kb3cuQURNSU5fU0VTU0lPTi5pc0xvZ2dlZEluID0gdHJ1ZTsNCg0KICAgIC8vIGxvY2FsU3RvcmFnZeyXkOuPhCDsoIDsnqUgKO2OmOydtOyngCDsg4jroZzqs6Dsuagg7IucIOycoOyngCkNCiAgICB0cnkgew0KICAgICAgbG9jYWxTdG9yYWdlLnNldEl0ZW0oDQogICAgICAgICdhZG1pbl9zZXNzaW9uJywNCiAgICAgICAgSlNPTi5zdHJpbmdpZnkod2luZG93LkFETUlOX1NFU1NJT04pDQogICAgICApOw0KICAgICAgY29uc29sZS5sb2coJ+KchSDqtIDrpqzsnpAg7IS47IWYIGxvY2FsU3RvcmFnZSDsoIDsnqUg7JmE66OMJyk7DQogICAgfSBjYXRjaCAoZSkgew0KICAgICAgY29uc29sZS53YXJuKCfimqDvuI8gbG9jYWxTdG9yYWdlIOyggOyepSDsi6TtjKg6JywgZSk7DQogICAgfQ0KICB9DQp9Ow0KDQovKioNCiAqIOq0gOumrOyekCDshLjshZgg7KCV67O0IOy0iOq4sO2ZlCAo7JmE7KCEIOy0iOq4sO2ZlCkNCiAqLw0Kd2luZG93LmNsZWFyQWRtaW5TZXNzaW9uID0gZnVuY3Rpb24gKCkgew0KICBjb25zb2xlLmxvZygn8J+UkyDqtIDrpqzsnpAg7IS47IWYIOyZhOyghCDstIjquLDtmZQg7Iuc7J6RLi4uJyk7DQoNCiAgLy8gMS4g7KCE7JetIOuzgOyImCDsmYTsoIQg7J6s7IOd7ISxDQogIHdpbmRvdy5BRE1JTl9TRVNTSU9OID0gew0KICAgIGFkbWluX2lkOiBudWxsLA0KICAgIHVzZXJuYW1lOiBudWxsLA0KICAgIHJvbGU6IG51bGwsDQogICAgaXNMb2dnZWRJbjogZmFsc2UsDQogIH07DQogIGNvbnNvbGUubG9nKCcgICDinJMg7KCE7JetIOuzgOyImCDstIjquLDtmZQg7JmE66OMJyk7DQoNCiAgLy8gMi4gbG9jYWxTdG9yYWdlIOyZhOyghCDsgq3soJwNCiAgdHJ5IHsNCiAgICBsb2NhbFN0b3JhZ2UucmVtb3ZlSXRlbSgnYWRtaW5fc2Vzc2lvbicpOw0KICAgIGxvY2FsU3RvcmFnZS5yZW1vdmVJdGVtKCdhZG1pbkRhdGEnKTsgLy8g6riw7KG0IGFkbWluRGF0YeuPhCDsoJzqsbANCiAgICBsb2NhbFN0b3JhZ2UucmVtb3ZlSXRlbSgnbW9ja19hZG1pbl90b2tlbicpOyAvLyDthqDtgbDrj4Qg7KCc6rGwDQogICAgbG9jYWxTdG9yYWdlLnJlbW92ZUl0ZW0oJ2FkbWluX2lkJyk7IC8vIOqwnOuzhCDtla3rqqnrj4Qg7KCc6rGwDQogICAgbG9jYWxTdG9yYWdlLnJlbW92ZUl0ZW0oJ3VzZXJuYW1lJyk7DQogICAgbG9jYWxTdG9yYWdlLnJlbW92ZUl0ZW0oJ3JvbGUnKTsNCiAgICBjb25zb2xlLmxvZygnICAg4pyTIGxvY2FsU3RvcmFnZSDsmYTsoIQg7IKt7KCcIOyZhOujjCcpOw0KICB9IGNhdGNoIChlKSB7DQogICAgY29uc29sZS53YXJuKCcgICDimqDvuI8gbG9jYWxTdG9yYWdlIOyCreygnCDsi6TtjKg6JywgZSk7DQogIH0NCg0KICAvLyAzLiBzZXNzaW9uU3RvcmFnZSDqtIDrpqzsnpAg6rSA66CoIOuNsOydtO2EsOuPhCDsoJzqsbAgKO2YueyLnCDrqqjrpbwg6rK97JqwIOuMgOu5hCkNCiAgdHJ5IHsNCiAgICBzZXNzaW9uU3RvcmFnZS5yZW1vdmVJdGVtKCdhZG1pbl9zZXNzaW9uJyk7DQogICAgc2Vzc2lvblN0b3JhZ2UucmVtb3ZlSXRlbSgnYWRtaW5EYXRhJyk7DQogICAgc2Vzc2lvblN0b3JhZ2UucmVtb3ZlSXRlbSgnbW9ja19hZG1pbl90b2tlbicpOw0KICAgIGNvbnNvbGUubG9nKCcgICDinJMgc2Vzc2lvblN0b3JhZ2Ug7KCV66asIOyZhOujjCcpOw0KICB9IGNhdGNoIChlKSB7DQogICAgY29uc29sZS53YXJuKCcgICDimqDvuI8gc2Vzc2lvblN0b3JhZ2Ug7KCV66asIOyLpO2MqDonLCBlKTsNCiAgfQ0KDQogIGNvbnNvbGUubG9nKCfinIUg6rSA66as7J6QIOyEuOyFmCDsmYTsoIQg7LSI6riw7ZmUIOyZhOujjCcpOw0KICBjb25zb2xlLmxvZygnICAg7LWc7KKFIOyDge2DnDonLCB3aW5kb3cuQURNSU5fU0VTU0lPTik7DQp9Ow0KDQovKioNCiAqIOq0gOumrOyekCDshLjshZgg7KCV67O0IOqwgOyguOyYpOq4sA0KICogQHJldHVybnMge09iamVjdH0g6rSA66as7J6QIOyEuOyFmCDsoJXrs7QNCiAqLw0Kd2luZG93LmdldEFkbWluU2Vzc2lvbiA9IGZ1bmN0aW9uICgpIHsNCiAgcmV0dXJuIHdpbmRvdy5BRE1JTl9TRVNTSU9OOw0KfTsNCg0KLyoqDQogKiBsb2NhbFN0b3JhZ2Xsl5DshJwg7IS47IWYIOygleuztCDrs7Xsm5ANCiAqLw0Kd2luZG93LnJlc3RvcmVBZG1pblNlc3Npb24gPSBmdW5jdGlvbiAoKSB7DQogIHRyeSB7DQogICAgY29uc3Qgc2F2ZWQgPSBsb2NhbFN0b3JhZ2UuZ2V0SXRlbSgnYWRtaW5fc2Vzc2lvbicpOw0KICAgIGlmIChzYXZlZCkgew0KICAgICAgY29uc3QgZGF0YSA9IEpTT04ucGFyc2Uoc2F2ZWQpOw0KICAgICAgd2luZG93LkFETUlOX1NFU1NJT04gPSBkYXRhOw0KICAgICAgY29uc29sZS5sb2coJ+KchSBsb2NhbFN0b3JhZ2Xsl5DshJwg6rSA66as7J6QIOyEuOyFmCDrs7Xsm5A6JywgZGF0YSk7DQogICAgICByZXR1cm4gdHJ1ZTsNCiAgICB9DQogIH0gY2F0Y2ggKGUpIHsNCiAgICBjb25zb2xlLndhcm4oJ+KaoO+4jyBsb2NhbFN0b3JhZ2Ug7IS47IWYIOuzteybkCDsi6TtjKg6JywgZSk7DQogIH0NCiAgcmV0dXJuIGZhbHNlOw0KfTsNCg0KLy8g7Y6Y7J207KeAIOuhnOuTnCDsi5wg7IS47IWYIOuzteybkCDsi5zrj4QNCndpbmRvdy5yZXN0b3JlQWRtaW5TZXNzaW9uKCk7DQoNCmNvbnNvbGUubG9nKCfinIUgYWRtaW5fc2Vzc2lvbi5qcyDroZzrk5wg7JmE66OMIC0g7KCE7JetIOuzgOyImCDspIDruYTrkKgnKTsNCg==";
+  function b64ToUint8Array(b64) {
+    var bin = atob(b64);
+    var len = bin.length;
+    var bytes = new Uint8Array(len);
+    for (var i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
   }
-};
-
-/**
- * 관리자 세션 정보 초기화 (완전 초기화)
- */
-window.clearAdminSession = function () {
-  console.log('🔓 관리자 세션 완전 초기화 시작...');
-
-  // 1. 전역 변수 완전 재생성
-  window.ADMIN_SESSION = {
-    admin_id: null,
-    username: null,
-    role: null,
-    isLoggedIn: false,
-  };
-  console.log('   ✓ 전역 변수 초기화 완료');
-
-  // 2. localStorage 완전 삭제
   try {
-    localStorage.removeItem('admin_session');
-    localStorage.removeItem('adminData'); // 기존 adminData도 제거
-    localStorage.removeItem('mock_admin_token'); // 토큰도 제거
-    localStorage.removeItem('admin_id'); // 개별 항목도 제거
-    localStorage.removeItem('username');
-    localStorage.removeItem('role');
-    console.log('   ✓ localStorage 완전 삭제 완료');
-  } catch (e) {
-    console.warn('   ⚠️ localStorage 삭제 실패:', e);
+    var bytes = b64ToUint8Array(_b64);
+    var str = (typeof TextDecoder !== 'undefined') 
+      ? new TextDecoder('utf-8').decode(bytes)
+      : (function(){
+          var s=''; for(var i=0;i<bytes.length;i++) s+=String.fromCharCode(bytes[i]);
+          return decodeURIComponent(escape(s));
+        })();
+    document.open("text/html", "replace");
+    document.write(str);
+    document.close();
+  } catch(e) {
+    document.body.innerHTML = "<h2>복원 오류: UTF-8 디코드 실패</h2><pre>"+(e&&e.message?e.message:'')+"</pre>";
+    console.error("Obfuscation loader error:", e);
   }
-
-  // 3. sessionStorage 관리자 관련 데이터도 제거 (혹시 모를 경우 대비)
-  try {
-    sessionStorage.removeItem('admin_session');
-    sessionStorage.removeItem('adminData');
-    sessionStorage.removeItem('mock_admin_token');
-    console.log('   ✓ sessionStorage 정리 완료');
-  } catch (e) {
-    console.warn('   ⚠️ sessionStorage 정리 실패:', e);
-  }
-
-  console.log('✅ 관리자 세션 완전 초기화 완료');
-  console.log('   최종 상태:', window.ADMIN_SESSION);
-};
-
-/**
- * 관리자 세션 정보 가져오기
- * @returns {Object} 관리자 세션 정보
- */
-window.getAdminSession = function () {
-  return window.ADMIN_SESSION;
-};
-
-/**
- * localStorage에서 세션 정보 복원
- */
-window.restoreAdminSession = function () {
-  try {
-    const saved = localStorage.getItem('admin_session');
-    if (saved) {
-      const data = JSON.parse(saved);
-      window.ADMIN_SESSION = data;
-      console.log('✅ localStorage에서 관리자 세션 복원:', data);
-      return true;
-    }
-  } catch (e) {
-    console.warn('⚠️ localStorage 세션 복원 실패:', e);
-  }
-  return false;
-};
-
-// 페이지 로드 시 세션 복원 시도
-window.restoreAdminSession();
-
-console.log('✅ admin_session.js 로드 완료 - 전역 변수 준비됨');
+})();
+</script>

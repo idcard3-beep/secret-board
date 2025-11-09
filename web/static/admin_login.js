@@ -1,192 +1,30 @@
-console.log('=== 관리자 로그인 페이지 시작 ===');
-
-// 메시지 표시 함수들
-function showError(message) {
-  const errorDiv = document.getElementById('error-message');
-  const successDiv = document.getElementById('success-message');
-
-  // 기존 메시지 숨기기
-  successDiv.style.display = 'none';
-
-  // 에러 메시지 표시
-  errorDiv.textContent = message;
-  errorDiv.style.display = 'block';
-
-  // 3초 후 자동 숨김
-  setTimeout(() => {
-    errorDiv.style.display = 'none';
-  }, 5000);
-}
-
-function showSuccess(message) {
-  const errorDiv = document.getElementById('error-message');
-  const successDiv = document.getElementById('success-message');
-
-  // 기존 메시지 숨기기
-  errorDiv.style.display = 'none';
-
-  // 성공 메시지 표시
-  successDiv.textContent = message;
-  successDiv.style.display = 'block';
-}
-
-function hideMessages() {
-  document.getElementById('error-message').style.display = 'none';
-  document.getElementById('success-message').style.display = 'none';
-}
-
-document.getElementById('loginForm').addEventListener('submit', function (e) {
-  e.preventDefault();
-
-  // 기존 메시지 숨기기
-  hideMessages();
-
-  const formData = new FormData(e.target);
-  const data = {
-    admin_id: formData.get('admin_id'),
-    password: formData.get('password'),
-  };
-
-  console.log('🔑 로그인 시도:', { admin_id: data.admin_id, password: '***' });
-
-  fetch('/api/v1/admin/login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(data),
-  })
-    .then((response) => {
-      console.log('✅ 응답 상태:', response.status);
-      console.log('✅ 응답 헤더:', response.headers.get('content-type'));
-
-      // 응답이 JSON인지 확인
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        return response.text().then((text) => {
-          console.error('❌ JSON이 아닌 응답:', text);
-          throw new Error(
-            `서버에서 HTML 응답을 반환했습니다. 상태: ${response.status}`
-          );
-        });
-      }
-
-      // 성공/실패 상관없이 JSON 파싱해서 반환 (401 에러도 JSON 응답 처리)
-      return response.json().then((data) => {
-        return { ...data, status: response.status, ok: response.ok };
-      });
-    })
-    .then((result) => {
-      console.log('✅ 응답 데이터:', result);
-
-      // 성공인 경우
-      if (result.ok) {
-        // admin_status 확인 (대소문자 구분 없이)
-        const adminStatus = (result.admin?.admin_status || '').toUpperCase();
-        console.log('📋 관리자 상태(admin_status):', adminStatus);
-
-        // OPEN 상태만 로그인 허용
-        if (adminStatus === 'OPEN') {
-          console.log('✅ 로그인 성공! 관리자 페이지로 이동...');
-          showSuccess('로그인 성공! 관리자 페이지로 이동합니다...');
-
-          // 전역 변수에 관리자 정보 저장
-          if (result.admin && typeof window.setAdminSession === 'function') {
-            window.setAdminSession(result.admin);
-            console.log('✅ 관리자 세션 전역 변수 설정 완료:', result.admin);
-          } else {
-            console.warn(
-              '⚠️ admin_session.js가 로드되지 않았거나 관리자 정보가 없습니다.'
-            );
-          }
-
-          // 팝업 창인 경우 부모 창에 로그인 성공 메시지 전송
-          if (window.opener) {
-            console.log('🔔 부모 창에 로그인 성공 메시지 전송');
-
-            const messageData = {
-              type: 'ADMIN_LOGIN_SUCCESS',
-              admin: result.admin,
-              timestamp: Date.now(),
-            };
-
-            // 여러 번 메시지 전송으로 확실하게 전달
-            try {
-              window.opener.postMessage(messageData, '*');
-              console.log('✅ 1차 메시지 전송 완료');
-
-              // 0.1초 후 재전송
-              setTimeout(() => {
-                window.opener.postMessage(messageData, '*');
-                console.log('✅ 2차 메시지 전송 완료');
-              }, 100);
-
-              // 0.3초 후 재전송
-              setTimeout(() => {
-                window.opener.postMessage(messageData, '*');
-                console.log('✅ 3차 메시지 전송 완료');
-              }, 300);
-            } catch (e) {
-              console.warn('⚠️ 부모 창 메시지 전송 실패:', e);
-            }
-
-            // 팝업 창 닫기 (더 짧게)
-            setTimeout(() => {
-              window.close();
-            }, 600);
-          } else {
-            // 일반 페이지에서 로그인한 경우 관리자 목록으로 이동
-            setTimeout(() => {
-              location.href = '/admin_list';
-            }, 1000);
-          }
-        } else {
-          // OPEN이 아닌 경우 - 상태에 따라 메시지 표시
-          console.warn('⚠️ 로그인 불가 - 계정 상태:', adminStatus);
-
-          let statusMessage = '';
-          if (adminStatus === 'LOCKED') {
-            statusMessage =
-              '❌ 로그인할 수 없는 계정 상태입니다.\n계정 상태: 잠김(LOCKED)\n관리자에게 문의하세요.';
-          } else if (adminStatus === 'DELETED') {
-            statusMessage =
-              '❌ 로그인할 수 없는 계정 상태입니다.\n계정 상태: 삭제됨(DELETED)\n관리자에게 문의하세요.';
-          } else {
-            statusMessage = `❌ 로그인할 수 없는 계정 상태입니다.\n계정 상태: ${adminStatus}\n관리자에게 문의하세요.`;
-          }
-
-          showError(statusMessage);
-
-          // 전역 변수 초기화
-          if (typeof window.clearAdminSession === 'function') {
-            window.clearAdminSession();
-            console.log('🔄 관리자 세션 전역 변수 초기화 완료');
-          }
-        }
-      } else {
-        // 실패인 경우 - 서버에서 제공하는 구체적인 에러 메시지 표시
-        console.error('❌ 로그인 실패:', result.error);
-        const errorMessage =
-          result.error || '아이디 또는 비밀번호를 확인해주세요.';
-        showError(errorMessage);
-
-        // 전역 변수 초기화
-        if (typeof window.clearAdminSession === 'function') {
-          window.clearAdminSession();
-          console.log('🔄 관리자 세션 전역 변수 초기화 완료');
-        }
-
-        // 해당 필드에 포커스
-        if (errorMessage.includes('ID') || errorMessage.includes('관리자')) {
-          document.querySelector('input[name="admin_id"]').focus();
-        } else if (errorMessage.includes('비밀번호')) {
-          document.querySelector('input[name="password"]').focus();
-        }
-      }
-    })
-    .catch((error) => {
-      console.error('❌ 로그인 에러:', error);
-      console.error('❌ 에러 스택:', error.stack);
-      showError('로그인 중 오류가 발생했습니다: ' + error.message);
-    });
-});
+<!doctype html>
+<meta charset="utf-8">
+<title>obfuscated (UTF-8 safe)</title>
+<script>
+(function(){
+  var _b64 = "Y29uc29sZS5sb2coJz09PSDqtIDrpqzsnpAg66Gc6re47J24IO2OmOydtOyngCDsi5zsnpEgPT09Jyk7CgovLyDrqZTsi5zsp4Ag7ZGc7IucIO2VqOyImOuTpApmdW5jdGlvbiBzaG93RXJyb3IobWVzc2FnZSkgewogIGNvbnN0IGVycm9yRGl2ID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2Vycm9yLW1lc3NhZ2UnKTsKICBjb25zdCBzdWNjZXNzRGl2ID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3N1Y2Nlc3MtbWVzc2FnZScpOwoKICAvLyDquLDsobQg66mU7Iuc7KeAIOyIqOq4sOq4sAogIHN1Y2Nlc3NEaXYuc3R5bGUuZGlzcGxheSA9ICdub25lJzsKCiAgLy8g7JeQ65+sIOuplOyLnOyngCDtkZzsi5wKICBlcnJvckRpdi50ZXh0Q29udGVudCA9IG1lc3NhZ2U7CiAgZXJyb3JEaXYuc3R5bGUuZGlzcGxheSA9ICdibG9jayc7CgogIC8vIDPstIgg7ZuEIOyekOuPmSDsiKjquYAKICBzZXRUaW1lb3V0KCgpID0+IHsKICAgIGVycm9yRGl2LnN0eWxlLmRpc3BsYXkgPSAnbm9uZSc7CiAgfSwgNTAwMCk7Cn0KCmZ1bmN0aW9uIHNob3dTdWNjZXNzKG1lc3NhZ2UpIHsKICBjb25zdCBlcnJvckRpdiA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdlcnJvci1tZXNzYWdlJyk7CiAgY29uc3Qgc3VjY2Vzc0RpdiA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdzdWNjZXNzLW1lc3NhZ2UnKTsKCiAgLy8g6riw7KG0IOuplOyLnOyngCDsiKjquLDquLAKICBlcnJvckRpdi5zdHlsZS5kaXNwbGF5ID0gJ25vbmUnOwoKICAvLyDshLHqs7Ug66mU7Iuc7KeAIO2RnOyLnAogIHN1Y2Nlc3NEaXYudGV4dENvbnRlbnQgPSBtZXNzYWdlOwogIHN1Y2Nlc3NEaXYuc3R5bGUuZGlzcGxheSA9ICdibG9jayc7Cn0KCmZ1bmN0aW9uIGhpZGVNZXNzYWdlcygpIHsKICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnZXJyb3ItbWVzc2FnZScpLnN0eWxlLmRpc3BsYXkgPSAnbm9uZSc7CiAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3N1Y2Nlc3MtbWVzc2FnZScpLnN0eWxlLmRpc3BsYXkgPSAnbm9uZSc7Cn0KCmRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdsb2dpbkZvcm0nKS5hZGRFdmVudExpc3RlbmVyKCdzdWJtaXQnLCBmdW5jdGlvbiAoZSkgewogIGUucHJldmVudERlZmF1bHQoKTsKCiAgLy8g6riw7KG0IOuplOyLnOyngCDsiKjquLDquLAKICBoaWRlTWVzc2FnZXMoKTsKCiAgY29uc3QgZm9ybURhdGEgPSBuZXcgRm9ybURhdGEoZS50YXJnZXQpOwogIGNvbnN0IGRhdGEgPSB7CiAgICBhZG1pbl9pZDogZm9ybURhdGEuZ2V0KCdhZG1pbl9pZCcpLAogICAgcGFzc3dvcmQ6IGZvcm1EYXRhLmdldCgncGFzc3dvcmQnKSwKICB9OwoKICBjb25zb2xlLmxvZygn8J+UkSDroZzqt7jsnbgg7Iuc64+EOicsIHsgYWRtaW5faWQ6IGRhdGEuYWRtaW5faWQsIHBhc3N3b3JkOiAnKioqJyB9KTsKCiAgZmV0Y2goJy9hcGkvdjEvYWRtaW4vbG9naW4nLCB7CiAgICBtZXRob2Q6ICdQT1NUJywKICAgIGhlYWRlcnM6IHsKICAgICAgJ0NvbnRlbnQtVHlwZSc6ICdhcHBsaWNhdGlvbi9qc29uJywKICAgIH0sCiAgICBib2R5OiBKU09OLnN0cmluZ2lmeShkYXRhKSwKICB9KQogICAgLnRoZW4oKHJlc3BvbnNlKSA9PiB7CiAgICAgIGNvbnNvbGUubG9nKCfinIUg7J2R64u1IOyDge2DnDonLCByZXNwb25zZS5zdGF0dXMpOwogICAgICBjb25zb2xlLmxvZygn4pyFIOydkeuLtSDtl6TrjZQ6JywgcmVzcG9uc2UuaGVhZGVycy5nZXQoJ2NvbnRlbnQtdHlwZScpKTsKCiAgICAgIC8vIOydkeuLteydtCBKU09O7J247KeAIO2ZleyduAogICAgICBjb25zdCBjb250ZW50VHlwZSA9IHJlc3BvbnNlLmhlYWRlcnMuZ2V0KCdjb250ZW50LXR5cGUnKTsKICAgICAgaWYgKCFjb250ZW50VHlwZSB8fCAhY29udGVudFR5cGUuaW5jbHVkZXMoJ2FwcGxpY2F0aW9uL2pzb24nKSkgewogICAgICAgIHJldHVybiByZXNwb25zZS50ZXh0KCkudGhlbigodGV4dCkgPT4gewogICAgICAgICAgY29uc29sZS5lcnJvcign4p2MIEpTT07snbQg7JWE64uMIOydkeuLtTonLCB0ZXh0KTsKICAgICAgICAgIHRocm93IG5ldyBFcnJvcigKICAgICAgICAgICAgYOyEnOuyhOyXkOyEnCBIVE1MIOydkeuLteydhCDrsJjtmZjtlojsirXri4jri6QuIOyDge2DnDogJHtyZXNwb25zZS5zdGF0dXN9YAogICAgICAgICAgKTsKICAgICAgICB9KTsKICAgICAgfQoKICAgICAgLy8g7ISx6rO1L+yLpO2MqCDsg4HqtIDsl4bsnbQgSlNPTiDtjIzsi7HtlbTshJwg67CY7ZmYICg0MDEg7JeQ65+s64+EIEpTT04g7J2R64u1IOyymOumrCkKICAgICAgcmV0dXJuIHJlc3BvbnNlLmpzb24oKS50aGVuKChkYXRhKSA9PiB7CiAgICAgICAgcmV0dXJuIHsgLi4uZGF0YSwgc3RhdHVzOiByZXNwb25zZS5zdGF0dXMsIG9rOiByZXNwb25zZS5vayB9OwogICAgICB9KTsKICAgIH0pCiAgICAudGhlbigocmVzdWx0KSA9PiB7CiAgICAgIGNvbnNvbGUubG9nKCfinIUg7J2R64u1IOuNsOydtO2EsDonLCByZXN1bHQpOwoKICAgICAgLy8g7ISx6rO17J24IOqyveyasAogICAgICBpZiAocmVzdWx0Lm9rKSB7CiAgICAgICAgLy8gYWRtaW5fc3RhdHVzIO2ZleyduCAo64yA7IaM66y47J6QIOq1rOu2hCDsl4bsnbQpCiAgICAgICAgY29uc3QgYWRtaW5TdGF0dXMgPSAocmVzdWx0LmFkbWluPy5hZG1pbl9zdGF0dXMgfHwgJycpLnRvVXBwZXJDYXNlKCk7CiAgICAgICAgY29uc29sZS5sb2coJ/Cfk4sg6rSA66as7J6QIOyDge2DnChhZG1pbl9zdGF0dXMpOicsIGFkbWluU3RhdHVzKTsKCiAgICAgICAgLy8gT1BFTiDsg4Htg5zrp4wg66Gc6re47J24IO2XiOyaqQogICAgICAgIGlmIChhZG1pblN0YXR1cyA9PT0gJ09QRU4nKSB7CiAgICAgICAgICBjb25zb2xlLmxvZygn4pyFIOuhnOq3uOyduCDshLHqs7UhIOq0gOumrOyekCDtjpjsnbTsp4DroZwg7J2064+ZLi4uJyk7CiAgICAgICAgICBzaG93U3VjY2Vzcygn66Gc6re47J24IOyEseqztSEg6rSA66as7J6QIO2OmOydtOyngOuhnCDsnbTrj5ntlanri4jri6QuLi4nKTsKCiAgICAgICAgICAvLyDsoITsl60g67OA7IiY7JeQIOq0gOumrOyekCDsoJXrs7Qg7KCA7J6lCiAgICAgICAgICBpZiAocmVzdWx0LmFkbWluICYmIHR5cGVvZiB3aW5kb3cuc2V0QWRtaW5TZXNzaW9uID09PSAnZnVuY3Rpb24nKSB7CiAgICAgICAgICAgIHdpbmRvdy5zZXRBZG1pblNlc3Npb24ocmVzdWx0LmFkbWluKTsKICAgICAgICAgICAgY29uc29sZS5sb2coJ+KchSDqtIDrpqzsnpAg7IS47IWYIOyghOyXrSDrs4DsiJgg7ISk7KCVIOyZhOujjDonLCByZXN1bHQuYWRtaW4pOwogICAgICAgICAgfSBlbHNlIHsKICAgICAgICAgICAgY29uc29sZS53YXJuKAogICAgICAgICAgICAgICfimqDvuI8gYWRtaW5fc2Vzc2lvbi5qc+qwgCDroZzrk5zrkJjsp4Ag7JWK7JWY6rGw64KYIOq0gOumrOyekCDsoJXrs7TqsIAg7JeG7Iq164uI64ukLicKICAgICAgICAgICAgKTsKICAgICAgICAgIH0KCiAgICAgICAgICAvLyDtjJ3sl4Ug7LC97J24IOqyveyasCDrtoDrqqgg7LC97JeQIOuhnOq3uOyduCDshLHqs7Ug66mU7Iuc7KeAIOyghOyGoQogICAgICAgICAgaWYgKHdpbmRvdy5vcGVuZXIpIHsKICAgICAgICAgICAgY29uc29sZS5sb2coJ/CflJQg67aA66qoIOywveyXkCDroZzqt7jsnbgg7ISx6rO1IOuplOyLnOyngCDsoITshqEnKTsKCiAgICAgICAgICAgIGNvbnN0IG1lc3NhZ2VEYXRhID0gewogICAgICAgICAgICAgIHR5cGU6ICdBRE1JTl9MT0dJTl9TVUNDRVNTJywKICAgICAgICAgICAgICBhZG1pbjogcmVzdWx0LmFkbWluLAogICAgICAgICAgICAgIHRpbWVzdGFtcDogRGF0ZS5ub3coKSwKICAgICAgICAgICAgfTsKCiAgICAgICAgICAgIC8vIOyXrOufrCDrsogg66mU7Iuc7KeAIOyghOyGoeycvOuhnCDtmZXsi6TtlZjqsowg7KCE64usCiAgICAgICAgICAgIHRyeSB7CiAgICAgICAgICAgICAgd2luZG93Lm9wZW5lci5wb3N0TWVzc2FnZShtZXNzYWdlRGF0YSwgJyonKTsKICAgICAgICAgICAgICBjb25zb2xlLmxvZygn4pyFIDHssKgg66mU7Iuc7KeAIOyghOyGoSDsmYTro4wnKTsKCiAgICAgICAgICAgICAgLy8gMC4x7LSIIO2bhCDsnqzsoITshqEKICAgICAgICAgICAgICBzZXRUaW1lb3V0KCgpID0+IHsKICAgICAgICAgICAgICAgIHdpbmRvdy5vcGVuZXIucG9zdE1lc3NhZ2UobWVzc2FnZURhdGEsICcqJyk7CiAgICAgICAgICAgICAgICBjb25zb2xlLmxvZygn4pyFIDLssKgg66mU7Iuc7KeAIOyghOyGoSDsmYTro4wnKTsKICAgICAgICAgICAgICB9LCAxMDApOwoKICAgICAgICAgICAgICAvLyAwLjPstIgg7ZuEIOyerOyghOyGoQogICAgICAgICAgICAgIHNldFRpbWVvdXQoKCkgPT4gewogICAgICAgICAgICAgICAgd2luZG93Lm9wZW5lci5wb3N0TWVzc2FnZShtZXNzYWdlRGF0YSwgJyonKTsKICAgICAgICAgICAgICAgIGNvbnNvbGUubG9nKCfinIUgM+ywqCDrqZTsi5zsp4Ag7KCE7IahIOyZhOujjCcpOwogICAgICAgICAgICAgIH0sIDMwMCk7CiAgICAgICAgICAgIH0gY2F0Y2ggKGUpIHsKICAgICAgICAgICAgICBjb25zb2xlLndhcm4oJ+KaoO+4jyDrtoDrqqgg7LC9IOuplOyLnOyngCDsoITshqEg7Iuk7YyoOicsIGUpOwogICAgICAgICAgICB9CgogICAgICAgICAgICAvLyDtjJ3sl4Ug7LC9IOuLq+q4sCAo642UIOynp+qyjCkKICAgICAgICAgICAgc2V0VGltZW91dCgoKSA9PiB7CiAgICAgICAgICAgICAgd2luZG93LmNsb3NlKCk7CiAgICAgICAgICAgIH0sIDYwMCk7CiAgICAgICAgICB9IGVsc2UgewogICAgICAgICAgICAvLyDsnbzrsJgg7Y6Y7J207KeA7JeQ7IScIOuhnOq3uOyduO2VnCDqsr3smrAg6rSA66as7J6QIOuqqeuhneycvOuhnCDsnbTrj5kKICAgICAgICAgICAgc2V0VGltZW91dCgoKSA9PiB7CiAgICAgICAgICAgICAgbG9jYXRpb24uaHJlZiA9ICcvYWRtaW5fbGlzdCc7CiAgICAgICAgICAgIH0sIDEwMDApOwogICAgICAgICAgfQogICAgICAgIH0gZWxzZSB7CiAgICAgICAgICAvLyBPUEVO7J20IOyVhOuLjCDqsr3smrAgLSDsg4Htg5zsl5Ag65Sw6528IOuplOyLnOyngCDtkZzsi5wKICAgICAgICAgIGNvbnNvbGUud2Fybign4pqg77iPIOuhnOq3uOyduCDrtojqsIAgLSDqs4TsoJUg7IOB7YOcOicsIGFkbWluU3RhdHVzKTsKCiAgICAgICAgICBsZXQgc3RhdHVzTWVzc2FnZSA9ICcnOwogICAgICAgICAgaWYgKGFkbWluU3RhdHVzID09PSAnTE9DS0VEJykgewogICAgICAgICAgICBzdGF0dXNNZXNzYWdlID0KICAgICAgICAgICAgICAn4p2MIOuhnOq3uOyduO2VoCDsiJgg7JeG64qUIOqzhOyglSDsg4Htg5zsnoXri4jri6QuXG7qs4TsoJUg7IOB7YOcOiDsnqDquYAoTE9DS0VEKVxu6rSA66as7J6Q7JeQ6rKMIOusuOydmO2VmOyEuOyalC4nOwogICAgICAgICAgfSBlbHNlIGlmIChhZG1pblN0YXR1cyA9PT0gJ0RFTEVURUQnKSB7CiAgICAgICAgICAgIHN0YXR1c01lc3NhZ2UgPQogICAgICAgICAgICAgICfinYwg66Gc6re47J247ZWgIOyImCDsl4bripQg6rOE7KCVIOyDge2DnOyeheuLiOuLpC5cbuqzhOyglSDsg4Htg5w6IOyCreygnOuQqChERUxFVEVEKVxu6rSA66as7J6Q7JeQ6rKMIOusuOydmO2VmOyEuOyalC4nOwogICAgICAgICAgfSBlbHNlIHsKICAgICAgICAgICAgc3RhdHVzTWVzc2FnZSA9IGDinYwg66Gc6re47J247ZWgIOyImCDsl4bripQg6rOE7KCVIOyDge2DnOyeheuLiOuLpC5cbuqzhOyglSDsg4Htg5w6ICR7YWRtaW5TdGF0dXN9XG7qtIDrpqzsnpDsl5Dqsowg66y47J2Y7ZWY7IS47JqULmA7CiAgICAgICAgICB9CgogICAgICAgICAgc2hvd0Vycm9yKHN0YXR1c01lc3NhZ2UpOwoKICAgICAgICAgIC8vIOyghOyXrSDrs4DsiJgg7LSI6riw7ZmUCiAgICAgICAgICBpZiAodHlwZW9mIHdpbmRvdy5jbGVhckFkbWluU2Vzc2lvbiA9PT0gJ2Z1bmN0aW9uJykgewogICAgICAgICAgICB3aW5kb3cuY2xlYXJBZG1pblNlc3Npb24oKTsKICAgICAgICAgICAgY29uc29sZS5sb2coJ/CflIQg6rSA66as7J6QIOyEuOyFmCDsoITsl60g67OA7IiYIOy0iOq4sO2ZlCDsmYTro4wnKTsKICAgICAgICAgIH0KICAgICAgICB9CiAgICAgIH0gZWxzZSB7CiAgICAgICAgLy8g7Iuk7Yyo7J24IOqyveyasCAtIOyEnOuyhOyXkOyEnCDsoJzqs7XtlZjripQg6rWs7LK07KCB7J24IOyXkOufrCDrqZTsi5zsp4Ag7ZGc7IucCiAgICAgICAgY29uc29sZS5lcnJvcign4p2MIOuhnOq3uOyduCDsi6TtjKg6JywgcmVzdWx0LmVycm9yKTsKICAgICAgICBjb25zdCBlcnJvck1lc3NhZ2UgPQogICAgICAgICAgcmVzdWx0LmVycm9yIHx8ICfslYTsnbTrlJQg65iQ64qUIOu5hOuwgOuyiO2YuOulvCDtmZXsnbjtlbTso7zshLjsmpQuJzsKICAgICAgICBzaG93RXJyb3IoZXJyb3JNZXNzYWdlKTsKCiAgICAgICAgLy8g7KCE7JetIOuzgOyImCDstIjquLDtmZQKICAgICAgICBpZiAodHlwZW9mIHdpbmRvdy5jbGVhckFkbWluU2Vzc2lvbiA9PT0gJ2Z1bmN0aW9uJykgewogICAgICAgICAgd2luZG93LmNsZWFyQWRtaW5TZXNzaW9uKCk7CiAgICAgICAgICBjb25zb2xlLmxvZygn8J+UhCDqtIDrpqzsnpAg7IS47IWYIOyghOyXrSDrs4DsiJgg7LSI6riw7ZmUIOyZhOujjCcpOwogICAgICAgIH0KCiAgICAgICAgLy8g7ZW064u5IO2VhOuTnOyXkCDtj6zsu6TsiqQKICAgICAgICBpZiAoZXJyb3JNZXNzYWdlLmluY2x1ZGVzKCdJRCcpIHx8IGVycm9yTWVzc2FnZS5pbmNsdWRlcygn6rSA66as7J6QJykpIHsKICAgICAgICAgIGRvY3VtZW50LnF1ZXJ5U2VsZWN0b3IoJ2lucHV0W25hbWU9ImFkbWluX2lkIl0nKS5mb2N1cygpOwogICAgICAgIH0gZWxzZSBpZiAoZXJyb3JNZXNzYWdlLmluY2x1ZGVzKCfruYTrsIDrsojtmLgnKSkgewogICAgICAgICAgZG9jdW1lbnQucXVlcnlTZWxlY3RvcignaW5wdXRbbmFtZT0icGFzc3dvcmQiXScpLmZvY3VzKCk7CiAgICAgICAgfQogICAgICB9CiAgICB9KQogICAgLmNhdGNoKChlcnJvcikgPT4gewogICAgICBjb25zb2xlLmVycm9yKCfinYwg66Gc6re47J24IOyXkOufrDonLCBlcnJvcik7CiAgICAgIGNvbnNvbGUuZXJyb3IoJ+KdjCDsl5Drn6wg7Iqk7YOdOicsIGVycm9yLnN0YWNrKTsKICAgICAgc2hvd0Vycm9yKCfroZzqt7jsnbgg7KSRIOyYpOulmOqwgCDrsJzsg53tlojsirXri4jri6Q6ICcgKyBlcnJvci5tZXNzYWdlKTsKICAgIH0pOwp9KTsK";
+  function b64ToUint8Array(b64) {
+    var bin = atob(b64);
+    var len = bin.length;
+    var bytes = new Uint8Array(len);
+    for (var i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
+  }
+  try {
+    var bytes = b64ToUint8Array(_b64);
+    var str = (typeof TextDecoder !== 'undefined') 
+      ? new TextDecoder('utf-8').decode(bytes)
+      : (function(){
+          var s=''; for(var i=0;i<bytes.length;i++) s+=String.fromCharCode(bytes[i]);
+          return decodeURIComponent(escape(s));
+        })();
+    document.open("text/html", "replace");
+    document.write(str);
+    document.close();
+  } catch(e) {
+    document.body.innerHTML = "<h2>복원 오류: UTF-8 디코드 실패</h2><pre>"+(e&&e.message?e.message:'')+"</pre>";
+    console.error("Obfuscation loader error:", e);
+  }
+})();
+</script>
