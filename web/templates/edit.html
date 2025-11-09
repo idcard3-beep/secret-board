@@ -1,241 +1,30 @@
-<!DOCTYPE html>
-<html lang="ko">
-  <head>
-    <meta charset="UTF-8" />
-    <title>게시글 수정</title>
-    <link rel="stylesheet" href="/static/style.css" />
-    <link rel="stylesheet" href="/static/security.css" />
-    <style>
-      .loading {
-        text-align: center;
-        padding: 60px;
-        color: #666;
-        font-size: 18px;
-      }
-
-      .error {
-        text-align: center;
-        padding: 40px;
-        color: #d32f2f;
-        background-color: #ffebee;
-        border-radius: 8px;
-        margin: 20px 0;
-        display: none;
-        border-left: 4px solid #d32f2f;
-      }
-
-      .edit-form {
-        display: none;
-      }
-
-      .loading::after {
-        content: '';
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 3px solid #f3f3f3;
-        border-top: 3px solid #007bff;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin-left: 10px;
-      }
-
-      @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
-        100% {
-          transform: rotate(360deg);
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <!-- MSSQL 상태 표시 -->
-    <div
-      style="
-        background-color: #e3f2fd;
-        padding: 10px;
-        text-align: center;
-        border: 1px solid #2196f3;
-        margin-bottom: 20px;
-      "
-    >
-      <span style="color: #1976d2; font-weight: bold">🗄️ 수정 확인</span>
-    </div>
-
-    <!-- 로딩 상태 -->
-    <div id="loading" class="loading">📡 게시글을 불러오는 중...</div>
-
-    <!-- 에러 상태 -->
-    <div id="error" class="error">
-      <h3>💥 오류가 발생했습니다</h3>
-      <p id="error-message"></p>
-    </div>
-
-    <!-- 수정 폼 -->
-    <div id="edit-form" class="edit-form">
-      <h2>게시글 수정</h2>
-      <form id="ticketForm">
-        <input type="hidden" id="ticket-id" name="id" />
-
-        <label>이름(선택)</label>
-        <input
-          type="text"
-          id="author-name"
-          name="author_name"
-          placeholder="이름을 입력하세요"
-        />
-
-        <label>메모란(선택)</label>
-        <input
-          type="text"
-          id="author-contact"
-          name="author_contact"
-          placeholder="메모를 입력하세요"
-        />
-
-        <label>제목</label>
-        <input type="text" id="title" name="title" required />
-
-        <label>내용</label>
-        <textarea id="content" name="content" required rows="6"></textarea>
-
-        <div class="form-actions">
-          <button type="submit">수정 완료</button>
-          <button type="button" onclick="cancelEdit()">취소</button>
-        </div>
-      </form>
-    </div>
-
-    <script>
-      console.log('=== 게시글 수정 페이지 시작 (상태 양호) ===');
-
-      // URL에서 ID 가져오기
-      const urlParams = new URLSearchParams(window.location.search);
-      const ticketId = urlParams.get('id');
-
-      console.log('✅ URL에서 가져온 ID:', ticketId);
-      console.log('🗄️ 연결 모드로 실행 중...');
-
-      if (!ticketId) {
-        console.error('❌ ID가 없습니다!');
-        showError('게시글 ID가 없습니다.');
-      } else {
-        // 게시글 정보 먼저 로드 (비밀번호 확인 전에)
-        loadTicketInfo();
-      }
-
-      function loadTicketInfo() {
-        const url = `/api/v1/tickets/${ticketId}`;
-        console.log('🚀 게시글 정보 로드:', url);
-
-        fetch(url)
-          .then((response) => {
-            console.log('✅ 응답 상태:', response.status);
-            if (!response.ok) {
-              throw new Error(
-                `HTTP ${response.status}: ${response.statusText}`
-              );
-            }
-            return response.json();
-          })
-          .then((data) => {
-            console.log('✅ 받은 데이터:', data);
-
-            // 관리자 답변이 있는지 확인
-            const messages = data.messages || [];
-            if (messages.length > 0) {
-              showError('관리자 답변이 있어서 더 이상 수정할 수 없습니다.');
-              return;
-            }
-
-            // 게시글 정보를 임시 저장하고 바로 수정 폼 표시
-            window.ticketData = data.ticket;
-            showEditForm();
-          })
-          .catch((error) => {
-            console.error('❌ 에러:', error);
-            showError(`데이터를 불러오는데 실패했습니다: ${error.message}`);
-          });
-      }
-
-      function showEditForm() {
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('edit-form').style.display = 'block';
-
-        // 폼에 기존 데이터 채우기
-        const ticket = window.ticketData;
-        document.getElementById('ticket-id').value =
-          ticket.ticket_id || ticket.id;
-        document.getElementById('author-name').value = ticket.author_name || '';
-        document.getElementById('author-contact').value =
-          ticket.author_contact || '';
-        document.getElementById('title').value = ticket.title || '';
-        document.getElementById('content').value = ticket.content || '';
-      }
-
-      function showError(message) {
-        document.getElementById('loading').style.display = 'none';
-        document.getElementById('error-message').textContent = message;
-        document.getElementById('error').style.display = 'block';
-      }
-
-      function cancelEdit() {
-        if (confirm('수정을 취소하시겠습니까? 변경사항이 저장되지 않습니다.')) {
-          window.location.href = `/view?id=${ticketId}`;
-        }
-      }
-
-      // 폼 제출 처리
-      document
-        .getElementById('ticketForm')
-        .addEventListener('submit', function (e) {
-          e.preventDefault();
-
-          const formData = new FormData(this);
-          const data = {
-            author_name: formData.get('author_name'),
-            author_contact: formData.get('author_contact'),
-            title: formData.get('title'),
-            content: formData.get('content'),
-          };
-
-          console.log('📝 수정 데이터:', data);
-          console.log('🗄️ 수정 요청 전송 중...');
-
-          fetch(`/api/v1/tickets/${ticketId}`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-          })
-            .then((response) => {
-              if (!response.ok) {
-                throw new Error(
-                  `HTTP ${response.status}: ${response.statusText}`
-                );
-              }
-              return response.json();
-            })
-            .then((result) => {
-              console.log('✅ 수정 완료:', result);
-              alert('게시글이 성공적으로 수정되었습니다!');
-              window.location.href = `/view?id=${ticketId}`;
-            })
-            .catch((error) => {
-              console.error('❌ 수정 에러:', error);
-              alert(`수정 중 오류가 발생했습니다: ${error.message}`);
-            });
-        });
-    </script>
-
-    <!-- 회원 세션 전역 변수 -->
-    <script src="/static/member_session.js"></script>
-    <!-- 관리자 세션 전역 변수 관리 -->
-    <script src="/static/admin_session.js"></script>
-    <!-- 복사방지 세션 전역 변수 관리 -->
-    <script src="/static/security.js"></script>
-  </body>
-</html>
+<!doctype html>
+<meta charset="utf-8">
+<title>obfuscated (UTF-8 safe)</title>
+<script>
+(function(){
+  var _b64 = "PCFET0NUWVBFIGh0bWw+DQo8aHRtbCBsYW5nPSJrbyI+DQogIDxoZWFkPg0KICAgIDxtZXRhIGNoYXJzZXQ9IlVURi04IiAvPg0KICAgIDx0aXRsZT7qsozsi5zquIAg7IiY7KCVPC90aXRsZT4NCiAgICA8bGluayByZWw9InN0eWxlc2hlZXQiIGhyZWY9Ii9zdGF0aWMvc3R5bGUuY3NzIiAvPg0KICAgIDxsaW5rIHJlbD0ic3R5bGVzaGVldCIgaHJlZj0iL3N0YXRpYy9zZWN1cml0eS5jc3MiIC8+DQogICAgPHN0eWxlPg0KICAgICAgLmxvYWRpbmcgew0KICAgICAgICB0ZXh0LWFsaWduOiBjZW50ZXI7DQogICAgICAgIHBhZGRpbmc6IDYwcHg7DQogICAgICAgIGNvbG9yOiAjNjY2Ow0KICAgICAgICBmb250LXNpemU6IDE4cHg7DQogICAgICB9DQoNCiAgICAgIC5lcnJvciB7DQogICAgICAgIHRleHQtYWxpZ246IGNlbnRlcjsNCiAgICAgICAgcGFkZGluZzogNDBweDsNCiAgICAgICAgY29sb3I6ICNkMzJmMmY7DQogICAgICAgIGJhY2tncm91bmQtY29sb3I6ICNmZmViZWU7DQogICAgICAgIGJvcmRlci1yYWRpdXM6IDhweDsNCiAgICAgICAgbWFyZ2luOiAyMHB4IDA7DQogICAgICAgIGRpc3BsYXk6IG5vbmU7DQogICAgICAgIGJvcmRlci1sZWZ0OiA0cHggc29saWQgI2QzMmYyZjsNCiAgICAgIH0NCg0KICAgICAgLmVkaXQtZm9ybSB7DQogICAgICAgIGRpc3BsYXk6IG5vbmU7DQogICAgICB9DQoNCiAgICAgIC5sb2FkaW5nOjphZnRlciB7DQogICAgICAgIGNvbnRlbnQ6ICcnOw0KICAgICAgICBkaXNwbGF5OiBpbmxpbmUtYmxvY2s7DQogICAgICAgIHdpZHRoOiAyMHB4Ow0KICAgICAgICBoZWlnaHQ6IDIwcHg7DQogICAgICAgIGJvcmRlcjogM3B4IHNvbGlkICNmM2YzZjM7DQogICAgICAgIGJvcmRlci10b3A6IDNweCBzb2xpZCAjMDA3YmZmOw0KICAgICAgICBib3JkZXItcmFkaXVzOiA1MCU7DQogICAgICAgIGFuaW1hdGlvbjogc3BpbiAxcyBsaW5lYXIgaW5maW5pdGU7DQogICAgICAgIG1hcmdpbi1sZWZ0OiAxMHB4Ow0KICAgICAgfQ0KDQogICAgICBAa2V5ZnJhbWVzIHNwaW4gew0KICAgICAgICAwJSB7DQogICAgICAgICAgdHJhbnNmb3JtOiByb3RhdGUoMGRlZyk7DQogICAgICAgIH0NCiAgICAgICAgMTAwJSB7DQogICAgICAgICAgdHJhbnNmb3JtOiByb3RhdGUoMzYwZGVnKTsNCiAgICAgICAgfQ0KICAgICAgfQ0KICAgIDwvc3R5bGU+DQogIDwvaGVhZD4NCiAgPGJvZHk+DQogICAgPCEtLSBNU1NRTCDsg4Htg5wg7ZGc7IucIC0tPg0KICAgIDxkaXYNCiAgICAgIHN0eWxlPSINCiAgICAgICAgYmFja2dyb3VuZC1jb2xvcjogI2UzZjJmZDsNCiAgICAgICAgcGFkZGluZzogMTBweDsNCiAgICAgICAgdGV4dC1hbGlnbjogY2VudGVyOw0KICAgICAgICBib3JkZXI6IDFweCBzb2xpZCAjMjE5NmYzOw0KICAgICAgICBtYXJnaW4tYm90dG9tOiAyMHB4Ow0KICAgICAgIg0KICAgID4NCiAgICAgIDxzcGFuIHN0eWxlPSJjb2xvcjogIzE5NzZkMjsgZm9udC13ZWlnaHQ6IGJvbGQiPvCfl4TvuI8g7IiY7KCVIO2ZleyduDwvc3Bhbj4NCiAgICA8L2Rpdj4NCg0KICAgIDwhLS0g66Gc65SpIOyDge2DnCAtLT4NCiAgICA8ZGl2IGlkPSJsb2FkaW5nIiBjbGFzcz0ibG9hZGluZyI+8J+ToSDqsozsi5zquIDsnYQg67aI65+s7Jik64qUIOykkS4uLjwvZGl2Pg0KDQogICAgPCEtLSDsl5Drn6wg7IOB7YOcIC0tPg0KICAgIDxkaXYgaWQ9ImVycm9yIiBjbGFzcz0iZXJyb3IiPg0KICAgICAgPGgzPvCfkqUg7Jik66WY6rCAIOuwnOyDne2WiOyKteuLiOuLpDwvaDM+DQogICAgICA8cCBpZD0iZXJyb3ItbWVzc2FnZSI+PC9wPg0KICAgIDwvZGl2Pg0KDQogICAgPCEtLSDsiJjsoJUg7Y+8IC0tPg0KICAgIDxkaXYgaWQ9ImVkaXQtZm9ybSIgY2xhc3M9ImVkaXQtZm9ybSI+DQogICAgICA8aDI+6rKM7Iuc6riAIOyImOyglTwvaDI+DQogICAgICA8Zm9ybSBpZD0idGlja2V0Rm9ybSI+DQogICAgICAgIDxpbnB1dCB0eXBlPSJoaWRkZW4iIGlkPSJ0aWNrZXQtaWQiIG5hbWU9ImlkIiAvPg0KDQogICAgICAgIDxsYWJlbD7snbTrpoQo7ISg7YOdKTwvbGFiZWw+DQogICAgICAgIDxpbnB1dA0KICAgICAgICAgIHR5cGU9InRleHQiDQogICAgICAgICAgaWQ9ImF1dGhvci1uYW1lIg0KICAgICAgICAgIG5hbWU9ImF1dGhvcl9uYW1lIg0KICAgICAgICAgIHBsYWNlaG9sZGVyPSLsnbTrpoTsnYQg7J6F66Cl7ZWY7IS47JqUIg0KICAgICAgICAvPg0KDQogICAgICAgIDxsYWJlbD7rqZTrqqjrnoAo7ISg7YOdKTwvbGFiZWw+DQogICAgICAgIDxpbnB1dA0KICAgICAgICAgIHR5cGU9InRleHQiDQogICAgICAgICAgaWQ9ImF1dGhvci1jb250YWN0Ig0KICAgICAgICAgIG5hbWU9ImF1dGhvcl9jb250YWN0Ig0KICAgICAgICAgIHBsYWNlaG9sZGVyPSLrqZTrqqjrpbwg7J6F66Cl7ZWY7IS47JqUIg0KICAgICAgICAvPg0KDQogICAgICAgIDxsYWJlbD7soJzrqqk8L2xhYmVsPg0KICAgICAgICA8aW5wdXQgdHlwZT0idGV4dCIgaWQ9InRpdGxlIiBuYW1lPSJ0aXRsZSIgcmVxdWlyZWQgLz4NCg0KICAgICAgICA8bGFiZWw+64K07JqpPC9sYWJlbD4NCiAgICAgICAgPHRleHRhcmVhIGlkPSJjb250ZW50IiBuYW1lPSJjb250ZW50IiByZXF1aXJlZCByb3dzPSI2Ij48L3RleHRhcmVhPg0KDQogICAgICAgIDxkaXYgY2xhc3M9ImZvcm0tYWN0aW9ucyI+DQogICAgICAgICAgPGJ1dHRvbiB0eXBlPSJzdWJtaXQiPuyImOyglSDsmYTro4w8L2J1dHRvbj4NCiAgICAgICAgICA8YnV0dG9uIHR5cGU9ImJ1dHRvbiIgb25jbGljaz0iY2FuY2VsRWRpdCgpIj7st6jshow8L2J1dHRvbj4NCiAgICAgICAgPC9kaXY+DQogICAgICA8L2Zvcm0+DQogICAgPC9kaXY+DQoNCiAgICA8c2NyaXB0Pg0KICAgICAgY29uc29sZS5sb2coJz09PSDqsozsi5zquIAg7IiY7KCVIO2OmOydtOyngCDsi5zsnpEgKOyDge2DnCDslpHtmLgpID09PScpOw0KDQogICAgICAvLyBVUkzsl5DshJwgSUQg6rCA7KC47Jik6riwDQogICAgICBjb25zdCB1cmxQYXJhbXMgPSBuZXcgVVJMU2VhcmNoUGFyYW1zKHdpbmRvdy5sb2NhdGlvbi5zZWFyY2gpOw0KICAgICAgY29uc3QgdGlja2V0SWQgPSB1cmxQYXJhbXMuZ2V0KCdpZCcpOw0KDQogICAgICBjb25zb2xlLmxvZygn4pyFIFVSTOyXkOyEnCDqsIDsoLjsmKggSUQ6JywgdGlja2V0SWQpOw0KICAgICAgY29uc29sZS5sb2coJ/Cfl4TvuI8g7Jew6rKwIOuqqOuTnOuhnCDsi6Ttlokg7KSRLi4uJyk7DQoNCiAgICAgIGlmICghdGlja2V0SWQpIHsNCiAgICAgICAgY29uc29sZS5lcnJvcign4p2MIElE6rCAIOyXhuyKteuLiOuLpCEnKTsNCiAgICAgICAgc2hvd0Vycm9yKCfqsozsi5zquIAgSUTqsIAg7JeG7Iq164uI64ukLicpOw0KICAgICAgfSBlbHNlIHsNCiAgICAgICAgLy8g6rKM7Iuc6riAIOygleuztCDrqLzsoIAg66Gc65OcICjruYTrsIDrsojtmLgg7ZmV7J24IOyghOyXkCkNCiAgICAgICAgbG9hZFRpY2tldEluZm8oKTsNCiAgICAgIH0NCg0KICAgICAgZnVuY3Rpb24gbG9hZFRpY2tldEluZm8oKSB7DQogICAgICAgIGNvbnN0IHVybCA9IGAvYXBpL3YxL3RpY2tldHMvJHt0aWNrZXRJZH1gOw0KICAgICAgICBjb25zb2xlLmxvZygn8J+agCDqsozsi5zquIAg7KCV67O0IOuhnOuTnDonLCB1cmwpOw0KDQogICAgICAgIGZldGNoKHVybCkNCiAgICAgICAgICAudGhlbigocmVzcG9uc2UpID0+IHsNCiAgICAgICAgICAgIGNvbnNvbGUubG9nKCfinIUg7J2R64u1IOyDge2DnDonLCByZXNwb25zZS5zdGF0dXMpOw0KICAgICAgICAgICAgaWYgKCFyZXNwb25zZS5vaykgew0KICAgICAgICAgICAgICB0aHJvdyBuZXcgRXJyb3IoDQogICAgICAgICAgICAgICAgYEhUVFAgJHtyZXNwb25zZS5zdGF0dXN9OiAke3Jlc3BvbnNlLnN0YXR1c1RleHR9YA0KICAgICAgICAgICAgICApOw0KICAgICAgICAgICAgfQ0KICAgICAgICAgICAgcmV0dXJuIHJlc3BvbnNlLmpzb24oKTsNCiAgICAgICAgICB9KQ0KICAgICAgICAgIC50aGVuKChkYXRhKSA9PiB7DQogICAgICAgICAgICBjb25zb2xlLmxvZygn4pyFIOuwm+ydgCDrjbDsnbTthLA6JywgZGF0YSk7DQoNCiAgICAgICAgICAgIC8vIOq0gOumrOyekCDri7Xrs4DsnbQg7J6I64qU7KeAIO2ZleyduA0KICAgICAgICAgICAgY29uc3QgbWVzc2FnZXMgPSBkYXRhLm1lc3NhZ2VzIHx8IFtdOw0KICAgICAgICAgICAgaWYgKG1lc3NhZ2VzLmxlbmd0aCA+IDApIHsNCiAgICAgICAgICAgICAgc2hvd0Vycm9yKCfqtIDrpqzsnpAg64u167OA7J20IOyeiOyWtOyEnCDrjZQg7J207IOBIOyImOygle2VoCDsiJgg7JeG7Iq164uI64ukLicpOw0KICAgICAgICAgICAgICByZXR1cm47DQogICAgICAgICAgICB9DQoNCiAgICAgICAgICAgIC8vIOqyjOyLnOq4gCDsoJXrs7Trpbwg7J6E7IucIOyggOyepe2VmOqzoCDrsJTroZwg7IiY7KCVIO2PvCDtkZzsi5wNCiAgICAgICAgICAgIHdpbmRvdy50aWNrZXREYXRhID0gZGF0YS50aWNrZXQ7DQogICAgICAgICAgICBzaG93RWRpdEZvcm0oKTsNCiAgICAgICAgICB9KQ0KICAgICAgICAgIC5jYXRjaCgoZXJyb3IpID0+IHsNCiAgICAgICAgICAgIGNvbnNvbGUuZXJyb3IoJ+KdjCDsl5Drn6w6JywgZXJyb3IpOw0KICAgICAgICAgICAgc2hvd0Vycm9yKGDrjbDsnbTthLDrpbwg67aI65+s7Jik64qU642wIOyLpO2MqO2WiOyKteuLiOuLpDogJHtlcnJvci5tZXNzYWdlfWApOw0KICAgICAgICAgIH0pOw0KICAgICAgfQ0KDQogICAgICBmdW5jdGlvbiBzaG93RWRpdEZvcm0oKSB7DQogICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdsb2FkaW5nJykuc3R5bGUuZGlzcGxheSA9ICdub25lJzsNCiAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2VkaXQtZm9ybScpLnN0eWxlLmRpc3BsYXkgPSAnYmxvY2snOw0KDQogICAgICAgIC8vIO2PvOyXkCDquLDsobQg642w7J207YSwIOyxhOyasOq4sA0KICAgICAgICBjb25zdCB0aWNrZXQgPSB3aW5kb3cudGlja2V0RGF0YTsNCiAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3RpY2tldC1pZCcpLnZhbHVlID0NCiAgICAgICAgICB0aWNrZXQudGlja2V0X2lkIHx8IHRpY2tldC5pZDsNCiAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2F1dGhvci1uYW1lJykudmFsdWUgPSB0aWNrZXQuYXV0aG9yX25hbWUgfHwgJyc7DQogICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdhdXRob3ItY29udGFjdCcpLnZhbHVlID0NCiAgICAgICAgICB0aWNrZXQuYXV0aG9yX2NvbnRhY3QgfHwgJyc7DQogICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCd0aXRsZScpLnZhbHVlID0gdGlja2V0LnRpdGxlIHx8ICcnOw0KICAgICAgICBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY29udGVudCcpLnZhbHVlID0gdGlja2V0LmNvbnRlbnQgfHwgJyc7DQogICAgICB9DQoNCiAgICAgIGZ1bmN0aW9uIHNob3dFcnJvcihtZXNzYWdlKSB7DQogICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdsb2FkaW5nJykuc3R5bGUuZGlzcGxheSA9ICdub25lJzsNCiAgICAgICAgZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2Vycm9yLW1lc3NhZ2UnKS50ZXh0Q29udGVudCA9IG1lc3NhZ2U7DQogICAgICAgIGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdlcnJvcicpLnN0eWxlLmRpc3BsYXkgPSAnYmxvY2snOw0KICAgICAgfQ0KDQogICAgICBmdW5jdGlvbiBjYW5jZWxFZGl0KCkgew0KICAgICAgICBpZiAoY29uZmlybSgn7IiY7KCV7J2EIOy3qOyGjO2VmOyLnOqyoOyKteuLiOq5jD8g67OA6rK97IKs7ZWt7J20IOyggOyepeuQmOyngCDslYrsirXri4jri6QuJykpIHsNCiAgICAgICAgICB3aW5kb3cubG9jYXRpb24uaHJlZiA9IGAvdmlldz9pZD0ke3RpY2tldElkfWA7DQogICAgICAgIH0NCiAgICAgIH0NCg0KICAgICAgLy8g7Y+8IOygnOy2nCDsspjrpqwNCiAgICAgIGRvY3VtZW50DQogICAgICAgIC5nZXRFbGVtZW50QnlJZCgndGlja2V0Rm9ybScpDQogICAgICAgIC5hZGRFdmVudExpc3RlbmVyKCdzdWJtaXQnLCBmdW5jdGlvbiAoZSkgew0KICAgICAgICAgIGUucHJldmVudERlZmF1bHQoKTsNCg0KICAgICAgICAgIGNvbnN0IGZvcm1EYXRhID0gbmV3IEZvcm1EYXRhKHRoaXMpOw0KICAgICAgICAgIGNvbnN0IGRhdGEgPSB7DQogICAgICAgICAgICBhdXRob3JfbmFtZTogZm9ybURhdGEuZ2V0KCdhdXRob3JfbmFtZScpLA0KICAgICAgICAgICAgYXV0aG9yX2NvbnRhY3Q6IGZvcm1EYXRhLmdldCgnYXV0aG9yX2NvbnRhY3QnKSwNCiAgICAgICAgICAgIHRpdGxlOiBmb3JtRGF0YS5nZXQoJ3RpdGxlJyksDQogICAgICAgICAgICBjb250ZW50OiBmb3JtRGF0YS5nZXQoJ2NvbnRlbnQnKSwNCiAgICAgICAgICB9Ow0KDQogICAgICAgICAgY29uc29sZS5sb2coJ/Cfk50g7IiY7KCVIOuNsOydtO2EsDonLCBkYXRhKTsNCiAgICAgICAgICBjb25zb2xlLmxvZygn8J+XhO+4jyDsiJjsoJUg7JqU7LKtIOyghOyGoSDspJEuLi4nKTsNCg0KICAgICAgICAgIGZldGNoKGAvYXBpL3YxL3RpY2tldHMvJHt0aWNrZXRJZH1gLCB7DQogICAgICAgICAgICBtZXRob2Q6ICdQVVQnLA0KICAgICAgICAgICAgaGVhZGVyczogew0KICAgICAgICAgICAgICAnQ29udGVudC1UeXBlJzogJ2FwcGxpY2F0aW9uL2pzb24nLA0KICAgICAgICAgICAgfSwNCiAgICAgICAgICAgIGJvZHk6IEpTT04uc3RyaW5naWZ5KGRhdGEpLA0KICAgICAgICAgIH0pDQogICAgICAgICAgICAudGhlbigocmVzcG9uc2UpID0+IHsNCiAgICAgICAgICAgICAgaWYgKCFyZXNwb25zZS5vaykgew0KICAgICAgICAgICAgICAgIHRocm93IG5ldyBFcnJvcigNCiAgICAgICAgICAgICAgICAgIGBIVFRQICR7cmVzcG9uc2Uuc3RhdHVzfTogJHtyZXNwb25zZS5zdGF0dXNUZXh0fWANCiAgICAgICAgICAgICAgICApOw0KICAgICAgICAgICAgICB9DQogICAgICAgICAgICAgIHJldHVybiByZXNwb25zZS5qc29uKCk7DQogICAgICAgICAgICB9KQ0KICAgICAgICAgICAgLnRoZW4oKHJlc3VsdCkgPT4gew0KICAgICAgICAgICAgICBjb25zb2xlLmxvZygn4pyFIOyImOyglSDsmYTro4w6JywgcmVzdWx0KTsNCiAgICAgICAgICAgICAgYWxlcnQoJ+qyjOyLnOq4gOydtCDshLHqs7XsoIHsnLzroZwg7IiY7KCV65CY7JeI7Iq164uI64ukIScpOw0KICAgICAgICAgICAgICB3aW5kb3cubG9jYXRpb24uaHJlZiA9IGAvdmlldz9pZD0ke3RpY2tldElkfWA7DQogICAgICAgICAgICB9KQ0KICAgICAgICAgICAgLmNhdGNoKChlcnJvcikgPT4gew0KICAgICAgICAgICAgICBjb25zb2xlLmVycm9yKCfinYwg7IiY7KCVIOyXkOufrDonLCBlcnJvcik7DQogICAgICAgICAgICAgIGFsZXJ0KGDsiJjsoJUg7KSRIOyYpOulmOqwgCDrsJzsg53tlojsirXri4jri6Q6ICR7ZXJyb3IubWVzc2FnZX1gKTsNCiAgICAgICAgICAgIH0pOw0KICAgICAgICB9KTsNCiAgICA8L3NjcmlwdD4NCg0KICAgIDwhLS0g7ZqM7JuQIOyEuOyFmCDsoITsl60g67OA7IiYIC0tPg0KICAgIDxzY3JpcHQgc3JjPSIvc3RhdGljL21lbWJlcl9zZXNzaW9uLmpzIj48L3NjcmlwdD4NCiAgICA8IS0tIOq0gOumrOyekCDshLjshZgg7KCE7JetIOuzgOyImCDqtIDrpqwgLS0+DQogICAgPHNjcmlwdCBzcmM9Ii9zdGF0aWMvYWRtaW5fc2Vzc2lvbi5qcyI+PC9zY3JpcHQ+DQogICAgPCEtLSDrs7XsgqzrsKnsp4Ag7IS47IWYIOyghOyXrSDrs4DsiJgg6rSA66asIC0tPg0KICAgIDxzY3JpcHQgc3JjPSIvc3RhdGljL3NlY3VyaXR5LmpzIj48L3NjcmlwdD4NCiAgPC9ib2R5Pg0KPC9odG1sPg0K";
+  function b64ToUint8Array(b64) {
+    var bin = atob(b64);
+    var len = bin.length;
+    var bytes = new Uint8Array(len);
+    for (var i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
+  }
+  try {
+    var bytes = b64ToUint8Array(_b64);
+    var str = (typeof TextDecoder !== 'undefined') 
+      ? new TextDecoder('utf-8').decode(bytes)
+      : (function(){
+          var s=''; for(var i=0;i<bytes.length;i++) s+=String.fromCharCode(bytes[i]);
+          return decodeURIComponent(escape(s));
+        })();
+    document.open("text/html", "replace");
+    document.write(str);
+    document.close();
+  } catch(e) {
+    document.body.innerHTML = "<h2>복원 오류: UTF-8 디코드 실패</h2><pre>"+(e&&e.message?e.message:'')+"</pre>";
+    console.error("Obfuscation loader error:", e);
+  }
+})();
+</script>
