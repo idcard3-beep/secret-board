@@ -1,30 +1,260 @@
-<!doctype html>
-<meta charset="utf-8">
-<title>obfuscated (UTF-8 safe)</title>
-<script>
-(function(){
-  var _b64 = "Ly8gdmlldy5qcyAtIOqyjOyLnOq4gCDsg4HshLjrs7TquLAg7Y6Y7J207KeAIOyKpO2BrOumve2KuAoKZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uICgpIHsKICBjb25zb2xlLmxvZygn8J+agCBWaWV3IHBhZ2UgbG9hZGVkIC0gRE9NQ29udGVudExvYWRlZCcpOwoKICAvLyBVUkzsl5DshJwgdGlja2V0IElEIOqwgOyguOyYpOq4sAogIGNvbnN0IHVybFBhcmFtcyA9IG5ldyBVUkxTZWFyY2hQYXJhbXMod2luZG93LmxvY2F0aW9uLnNlYXJjaCk7CiAgY29uc3QgdGlja2V0SWQgPSB1cmxQYXJhbXMuZ2V0KCdpZCcpOwoKICBjb25zb2xlLmxvZygn8J+UjSDtmITsnqwgVVJMOicsIHdpbmRvdy5sb2NhdGlvbi5ocmVmKTsKICBjb25zb2xlLmxvZygn8J+UjSBVUkwgcGFyYW1zOicsIHdpbmRvdy5sb2NhdGlvbi5zZWFyY2gpOwogIGNvbnNvbGUubG9nKCfwn46rIFRpY2tldCBJRCBmcm9tIFVSTDonLCB0aWNrZXRJZCk7CiAgY29uc29sZS5sb2coJ/CfjqsgVGlja2V0IElEIHR5cGU6JywgdHlwZW9mIHRpY2tldElkKTsKCiAgaWYgKCF0aWNrZXRJZCB8fCB0aWNrZXRJZCA9PT0gJ251bGwnIHx8IHRpY2tldElkID09PSAndW5kZWZpbmVkJykgewogICAgY29uc29sZS5lcnJvcign4p2MIO2LsOy8kyBJROqwgCDsl4bqsbDrgpgg7Jyg7Zqo7ZWY7KeAIOyViuydjDonLCB0aWNrZXRJZCk7CiAgICBhbGVydCgn7Jis67CU66W07KeAIOyViuydgCDsoJHqt7zsnoXri4jri6QuIO2LsOy8kyBJROqwgCDtlYTsmpTtlanri4jri6QuJyk7CiAgICB3aW5kb3cubG9jYXRpb24uaHJlZiA9ICcvJzsKICAgIHJldHVybjsKICB9CgogIGNvbnNvbGUubG9nKCfinIUg7Yuw7LyTIElEIO2ZleyduOuQqDonLCB0aWNrZXRJZCk7CgogIC8vIO2OmOydtOyngCDroZzrk5wg7IucIOy7qO2FkOy4oCDrtojrn6zsmKTquLAKICBjb25zb2xlLmxvZygn8J+TniBsb2FkQ29udGVudCDtmLjstpwg7Iuc7J6RJyk7CiAgbG9hZENvbnRlbnQodGlja2V0SWQpOwp9KTsKCmFzeW5jIGZ1bmN0aW9uIGxvYWRDb250ZW50KHRpY2tldElkKSB7CiAgY29uc29sZS5sb2coJ/CfmoAgbG9hZENvbnRlbnQg7ZWo7IiYIOyLnOyekS4gVGlja2V0IElEOicsIHRpY2tldElkKTsKCiAgY29uc3QgbG9hZGluZ0VsZW1lbnQgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnbG9hZGluZycpOwogIGNvbnN0IGNvbnRlbnRFbGVtZW50ID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NvbnRlbnQnKTsKICBjb25zdCBlcnJvckVsZW1lbnQgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnZXJyb3InKTsKCiAgY29uc29sZS5sb2coJ/Cfk40gRE9NIOyalOyGjCDtmZXsnbg6JywgewogICAgbG9hZGluZzogbG9hZGluZ0VsZW1lbnQgPyAn7LC+7J2MJyA6ICfsl4bsnYwnLAogICAgY29udGVudDogY29udGVudEVsZW1lbnQgPyAn7LC+7J2MJyA6ICfsl4bsnYwnLAogICAgZXJyb3I6IGVycm9yRWxlbWVudCA/ICfssL7snYwnIDogJ+yXhuydjCcsCiAgfSk7CgogIHRyeSB7CiAgICBjb25zb2xlLmxvZygn8J+UhCB0cnkg67iU66GdIOyLnOyekScpOwoKICAgIC8vIOuhnOuUqSDsg4Htg5wg7ZGc7IucCiAgICBpZiAobG9hZGluZ0VsZW1lbnQpIHsKICAgICAgbG9hZGluZ0VsZW1lbnQuc3R5bGUuZGlzcGxheSA9ICdibG9jayc7CiAgICAgIGNvbnNvbGUubG9nKCfinIUg66Gc65SpIO2ZlOuptCDtkZzsi5zrkKgnKTsKICAgIH0KICAgIGlmIChjb250ZW50RWxlbWVudCkgewogICAgICBjb250ZW50RWxlbWVudC5zdHlsZS5kaXNwbGF5ID0gJ25vbmUnOwogICAgICBjb25zb2xlLmxvZygn4pyFIOy7qO2FkOy4oCDsiKjquYAnKTsKICAgIH0KICAgIGlmIChlcnJvckVsZW1lbnQpIHsKICAgICAgZXJyb3JFbGVtZW50LnN0eWxlLmRpc3BsYXkgPSAnbm9uZSc7CiAgICAgIGNvbnNvbGUubG9nKCfinIUg7JeQ65+sIOyIqOq5gCcpOwogICAgfQoKICAgIGNvbnN0IGFwaVVybCA9IGAvYXBpL3YxL3RpY2tldHMvJHt0aWNrZXRJZH1gOwogICAgY29uc29sZS5sb2coJ/Cfk6EgQVBJIFVSTCDsg53shLE6JywgYXBpVXJsKTsKCiAgICBjb25zb2xlLmxvZygn8J+MkCBmZXRjaCDsi5zsnpEuLi4nKTsKCiAgICAvLyBBUEkg7Zi47LacCiAgICBjb25zdCByZXNwb25zZSA9IGF3YWl0IGZldGNoKGFwaVVybCwgewogICAgICBtZXRob2Q6ICdHRVQnLAogICAgICBoZWFkZXJzOiB7CiAgICAgICAgJ0NvbnRlbnQtVHlwZSc6ICdhcHBsaWNhdGlvbi9qc29uJywKICAgICAgfSwKICAgICAgY3JlZGVudGlhbHM6ICdzYW1lLW9yaWdpbicsIC8vIOy/oO2CpCDtj6ztlagKICAgIH0pOwoKICAgIGNvbnNvbGUubG9nKCfwn5OoIGZldGNoIOyZhOujjCEg7J2R64u1IOyDge2DnDonLCByZXNwb25zZS5zdGF0dXMpOwogICAgY29uc29sZS5sb2coJ/Cfk6gg7J2R64u1IO2XpOuNlOuTpDonLCBbLi4ucmVzcG9uc2UuaGVhZGVycy5lbnRyaWVzKCldKTsKCiAgICBpZiAoIXJlc3BvbnNlLm9rKSB7CiAgICAgIGNvbnN0IGVycm9yVGV4dCA9IGF3YWl0IHJlc3BvbnNlLnRleHQoKTsKICAgICAgY29uc29sZS5lcnJvcign4p2MIEFQSSDsl5Drn6wg7J2R64u1OicsIHJlc3BvbnNlLnN0YXR1cywgZXJyb3JUZXh0KTsKICAgICAgdGhyb3cgbmV3IEVycm9yKGBIVFRQICR7cmVzcG9uc2Uuc3RhdHVzfTogJHtlcnJvclRleHR9YCk7CiAgICB9CgogICAgY29uc29sZS5sb2coJ/Cfk6YgSlNPTiDtjIzsi7Eg7Iuc7J6RLi4uJyk7CiAgICBjb25zdCBkYXRhID0gYXdhaXQgcmVzcG9uc2UuanNvbigpOwogICAgY29uc29sZS5sb2coJ/Cfk6YgSlNPTiDtjIzsi7Eg7JmE66OMOicsIEpTT04uc3RyaW5naWZ5KGRhdGEsIG51bGwsIDIpKTsKCiAgICAvLyDsu6jthZDsuKAg7ZGc7IucIC0gQVBJIOydkeuLteyXkOyEnCB0aWNrZXQg7IaN7ISxIOy2lOy2nAogICAgaWYgKGRhdGEudGlja2V0KSB7CiAgICAgIGNvbnNvbGUubG9nKCfinIUg7Yuw7LyTIOuNsOydtO2EsCDrsJzqsqwsIGRpc3BsYXlDb250ZW50IO2YuOy2nCcpOwogICAgICBkaXNwbGF5Q29udGVudChkYXRhLnRpY2tldCk7CiAgICB9IGVsc2UgewogICAgICBjb25zb2xlLmVycm9yKCfinYwgZGF0YS50aWNrZXTsnbQg7JeG7J2MLiDsnZHri7Ug6rWs7KGwOicsIE9iamVjdC5rZXlzKGRhdGEpKTsKICAgICAgdGhyb3cgbmV3IEVycm9yKCfti7DsvJMg642w7J207YSw66W8IOywvuydhCDsiJgg7JeG7Iq164uI64ukLicpOwogICAgfQogIH0gY2F0Y2ggKGVycm9yKSB7CiAgICBjb25zb2xlLmVycm9yKCfwn5KlIEVycm9yIGluIGxvYWRDb250ZW50OicsIGVycm9yKTsKICAgIGNvbnNvbGUuZXJyb3IoJ/CfkqUgRXJyb3Igc3RhY2s6JywgZXJyb3Iuc3RhY2spOwogICAgc2hvd0Vycm9yKCfqsozsi5zquIDsnYQg67aI65+s7Jik64qUIOuNsCDsi6TtjKjtlojsirXri4jri6Q6ICcgKyBlcnJvci5tZXNzYWdlKTsKICB9IGZpbmFsbHkgewogICAgY29uc29sZS5sb2coJ/Cfj4EgZmluYWxseSDruJTroZ0g7Iuk7ZaJJyk7CiAgICAvLyDroZzrlKkg7IOB7YOcIOyIqOq4sOq4sAogICAgaWYgKGxvYWRpbmdFbGVtZW50KSB7CiAgICAgIGxvYWRpbmdFbGVtZW50LnN0eWxlLmRpc3BsYXkgPSAnbm9uZSc7CiAgICAgIGNvbnNvbGUubG9nKCfinIUg66Gc65SpIO2ZlOuptCDsiKjquYAg7JmE66OMJyk7CiAgICB9CiAgfQp9CgpmdW5jdGlvbiBkaXNwbGF5Q29udGVudCh0aWNrZXQpIHsKICBjb25zb2xlLmxvZygn8J+OqCBkaXNwbGF5Q29udGVudCDtlajsiJgg7Iuc7J6RJywgSlNPTi5zdHJpbmdpZnkodGlja2V0LCBudWxsLCAyKSk7CgogIGNvbnN0IGNvbnRlbnRFbGVtZW50ID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2NvbnRlbnQnKTsKICBpZiAoIWNvbnRlbnRFbGVtZW50KSB7CiAgICBjb25zb2xlLmVycm9yKCfinYwgQ29udGVudCBlbGVtZW50IG5vdCBmb3VuZCcpOwogICAgcmV0dXJuOwogIH0KCiAgdHJ5IHsKICAgIC8vIOq4sOuzuCDsoJXrs7Qg7ZGc7IucCiAgICBjb25zb2xlLmxvZygn8J+OqyBSZWNlaXZlZCB0aWNrZXQgZGF0YTonLCB0aWNrZXQpOwogICAgY29uc29sZS5sb2coJ/Cfk54gYXV0aG9yX2NvbnRhY3QgdmFsdWU6JywgdGlja2V0LmF1dGhvcl9jb250YWN0KTsKCiAgICBjb25zdCB0aXRsZUVsZW1lbnQgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgndGlja2V0LXRpdGxlJyk7CiAgICBjb25zdCBhdXRob3JFbGVtZW50ID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3RpY2tldC1hdXRob3InKTsKICAgIGNvbnN0IGNvbnRhY3RFbGVtZW50ID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ3RpY2tldC1jb250YWN0Jyk7CiAgICBjb25zdCBjb250ZW50VGV4dEVsZW1lbnQgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgndGlja2V0LWNvbnRlbnQnKTsKICAgIGNvbnN0IGNyZWF0ZWRBdEVsZW1lbnQgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgndGlja2V0LWRhdGUnKTsKCiAgICBjb25zb2xlLmxvZygn8J+TjSDqsJzrs4Qg7JqU7IaMIO2ZleyduDonLCB7CiAgICAgIHRpdGxlOiB0aXRsZUVsZW1lbnQgPyAn7LC+7J2MJyA6ICfsl4bsnYwnLAogICAgICBhdXRob3I6IGF1dGhvckVsZW1lbnQgPyAn7LC+7J2MJyA6ICfsl4bsnYwnLAogICAgICBjb250YWN0OiBjb250YWN0RWxlbWVudCA/ICfssL7snYwnIDogJ+yXhuydjCcsCiAgICAgIGNvbnRlbnQ6IGNvbnRlbnRUZXh0RWxlbWVudCA/ICfssL7snYwnIDogJ+yXhuydjCcsCiAgICAgIGNyZWF0ZWRBdDogY3JlYXRlZEF0RWxlbWVudCA/ICfssL7snYwnIDogJ+yXhuydjCcsCiAgICB9KTsKCiAgICBpZiAodGl0bGVFbGVtZW50KSB7CiAgICAgIHRpdGxlRWxlbWVudC50ZXh0Q29udGVudCA9IHRpY2tldC50aXRsZSB8fCAn7KCc66qpIOyXhuydjCc7CiAgICAgIGNvbnNvbGUubG9nKCfinIUg7KCc66qpIOyEpOyglTonLCB0aWNrZXQudGl0bGUpOwogICAgfQogICAgaWYgKGF1dGhvckVsZW1lbnQpIHsKICAgICAgYXV0aG9yRWxlbWVudC50ZXh0Q29udGVudCA9IHRpY2tldC5hdXRob3JfbmFtZSB8fCAn7J6R7ISx7J6QIOyXhuydjCc7CiAgICAgIGNvbnNvbGUubG9nKCfinIUg7J6R7ISx7J6QIOyEpOyglTonLCB0aWNrZXQuYXV0aG9yX25hbWUpOwogICAgfQogICAgaWYgKGNvbnRhY3RFbGVtZW50KSB7CiAgICAgIGNvbnRhY3RFbGVtZW50LnRleHRDb250ZW50ID0gdGlja2V0LmF1dGhvcl9jb250YWN0IHx8ICfsl7Drnb3sspgg7JeG7J2MJzsKICAgICAgY29uc29sZS5sb2coJ+KchSDsl7Drnb3sspgg7ISk7KCVOicsIHRpY2tldC5hdXRob3JfY29udGFjdCk7CiAgICAgIGNvbnNvbGUubG9nKCfwn5OeIENvbnRhY3QgZWxlbWVudDonLCBjb250YWN0RWxlbWVudCk7CiAgICAgIGNvbnNvbGUubG9nKCfwn5OeIENvbnRhY3QgZWxlbWVudCBjb250ZW50OicsIGNvbnRhY3RFbGVtZW50LnRleHRDb250ZW50KTsKICAgIH0gZWxzZSB7CiAgICAgIGNvbnNvbGUubG9nKCfinYwgQ29udGFjdCBlbGVtZW50IG5vdCBmb3VuZCEnKTsKICAgIH0KICAgIGlmIChjb250ZW50VGV4dEVsZW1lbnQpIHsKICAgICAgY29udGVudFRleHRFbGVtZW50LnRleHRDb250ZW50ID0gdGlja2V0LmNvbnRlbnQgfHwgJ+uCtOyaqSDsl4bsnYwnOwogICAgICBjb25zb2xlLmxvZygn4pyFIOuCtOyaqSDshKTsoJU6JywgdGlja2V0LmNvbnRlbnQpOwogICAgfQogICAgaWYgKGNyZWF0ZWRBdEVsZW1lbnQpIHsKICAgICAgY29uc3QgZm9ybWF0dGVkRGF0ZSA9IGZvcm1hdERhdGUodGlja2V0LmNyZWF0ZWRfYXQpOwogICAgICBjcmVhdGVkQXRFbGVtZW50LnRleHRDb250ZW50ID0gZm9ybWF0dGVkRGF0ZTsKICAgICAgY29uc29sZS5sb2coJ+KchSDsnpHshLHsnbwg7ISk7KCVOicsIGZvcm1hdHRlZERhdGUpOwogICAgfQoKICAgIC8vIOq0gOumrOyekCDsnZHri7Ug7ZGc7IucCiAgICBkaXNwbGF5QWRtaW5SZXNwb25zZSh0aWNrZXQpOwoKICAgIC8vIOy7qO2FkOy4oCDsmIHsl60g7ZGc7IucCiAgICBjb250ZW50RWxlbWVudC5zdHlsZS5kaXNwbGF5ID0gJ2Jsb2NrJzsKICAgIGNvbnNvbGUubG9nKCfinIUg7Luo7YWQ7LigIOyYgeyXrSDtkZzsi5wnKTsKCiAgICBjb25zb2xlLmxvZygn8J+OiSDsu6jthZDsuKAg7ZGc7IucIOyZhOujjCcpOwogIH0gY2F0Y2ggKGVycm9yKSB7CiAgICBjb25zb2xlLmVycm9yKCfwn5KlIEVycm9yIGRpc3BsYXlpbmcgY29udGVudDonLCBlcnJvcik7CiAgICBzaG93RXJyb3IoJ+y7qO2FkOy4oOulvCDtkZzsi5ztlZjripQg642wIOyLpO2MqO2WiOyKteuLiOuLpDogJyArIGVycm9yLm1lc3NhZ2UpOwogIH0KfQoKZnVuY3Rpb24gZGlzcGxheUFkbWluUmVzcG9uc2UodGlja2V0KSB7CiAgY29uc29sZS5sb2coJ2Rpc3BsYXlBZG1pblJlc3BvbnNlIO2VqOyImCDsi5zsnpEnKTsKCiAgY29uc3QgYWRtaW5SZXNwb25zZVNlY3Rpb24gPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgKICAgICdhZG1pbi1yZXNwb25zZS1zZWN0aW9uJwogICk7CiAgY29uc3QgYWRtaW5SZXNwb25zZUNvbnRlbnQgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgKICAgICdhZG1pbi1yZXNwb25zZS1jb250ZW50JwogICk7CiAgY29uc3QgYWRtaW5SZXNwb25zZURhdGUgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnYWRtaW4tcmVzcG9uc2UtZGF0ZScpOwoKICBpZiAoIWFkbWluUmVzcG9uc2VTZWN0aW9uKSB7CiAgICBjb25zb2xlLmxvZygnQWRtaW4gcmVzcG9uc2Ugc2VjdGlvbiBub3QgZm91bmQnKTsKICAgIHJldHVybjsKICB9CgogIGlmICh0aWNrZXQuYWRtaW5fcmVzcG9uc2UgJiYgdGlja2V0LmFkbWluX3Jlc3BvbnNlLnRyaW0oKSkgewogICAgLy8g6rSA66as7J6QIOydkeuLteydtCDsnojripQg6rK97JqwCiAgICBpZiAoYWRtaW5SZXNwb25zZUNvbnRlbnQpIHsKICAgICAgYWRtaW5SZXNwb25zZUNvbnRlbnQudGV4dENvbnRlbnQgPSB0aWNrZXQuYWRtaW5fcmVzcG9uc2U7CiAgICB9CiAgICBpZiAoYWRtaW5SZXNwb25zZURhdGUgJiYgdGlja2V0LmFkbWluX3Jlc3BvbnNlX2RhdGUpIHsKICAgICAgYWRtaW5SZXNwb25zZURhdGUudGV4dENvbnRlbnQgPSBmb3JtYXREYXRlKHRpY2tldC5hZG1pbl9yZXNwb25zZV9kYXRlKTsKICAgIH0KICAgIGFkbWluUmVzcG9uc2VTZWN0aW9uLnN0eWxlLmRpc3BsYXkgPSAnYmxvY2snOwogICAgY29uc29sZS5sb2coJ+q0gOumrOyekCDsnZHri7Ug7ZGc7Iuc65CoJyk7CiAgfSBlbHNlIHsKICAgIC8vIOq0gOumrOyekCDsnZHri7XsnbQg7JeG64qUIOqyveyasAogICAgYWRtaW5SZXNwb25zZVNlY3Rpb24uc3R5bGUuZGlzcGxheSA9ICdub25lJzsKICAgIGNvbnNvbGUubG9nKCfqtIDrpqzsnpAg7J2R64u1IOyXhuydjCcpOwogIH0KfQoKZnVuY3Rpb24gc2hvd0Vycm9yKG1lc3NhZ2UpIHsKICBjb25zb2xlLmVycm9yKCdFcnJvcjonLCBtZXNzYWdlKTsKCiAgY29uc3QgZXJyb3JFbGVtZW50ID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2Vycm9yJyk7CiAgY29uc3QgZXJyb3JNZXNzYWdlRWxlbWVudCA9IGRvY3VtZW50LmdldEVsZW1lbnRCeUlkKCdlcnJvci1tZXNzYWdlJyk7CiAgY29uc3QgY29udGVudEVsZW1lbnQgPSBkb2N1bWVudC5nZXRFbGVtZW50QnlJZCgnY29udGVudCcpOwogIGNvbnN0IGxvYWRpbmdFbGVtZW50ID0gZG9jdW1lbnQuZ2V0RWxlbWVudEJ5SWQoJ2xvYWRpbmcnKTsKCiAgaWYgKGVycm9yRWxlbWVudCkgewogICAgZXJyb3JFbGVtZW50LnN0eWxlLmRpc3BsYXkgPSAnYmxvY2snOwogIH0KCiAgaWYgKGVycm9yTWVzc2FnZUVsZW1lbnQpIHsKICAgIGVycm9yTWVzc2FnZUVsZW1lbnQudGV4dENvbnRlbnQgPSBtZXNzYWdlOwogIH0KCiAgaWYgKGNvbnRlbnRFbGVtZW50KSB7CiAgICBjb250ZW50RWxlbWVudC5zdHlsZS5kaXNwbGF5ID0gJ25vbmUnOwogIH0KCiAgaWYgKGxvYWRpbmdFbGVtZW50KSB7CiAgICBsb2FkaW5nRWxlbWVudC5zdHlsZS5kaXNwbGF5ID0gJ25vbmUnOwogIH0KfQoKZnVuY3Rpb24gZm9ybWF0RGF0ZShkYXRlU3RyaW5nKSB7CiAgaWYgKCFkYXRlU3RyaW5nKSByZXR1cm4gJyc7CgogIHRyeSB7CiAgICBjb25zdCBkYXRlID0gbmV3IERhdGUoZGF0ZVN0cmluZyk7CiAgICByZXR1cm4gZGF0ZS50b0xvY2FsZVN0cmluZygna28tS1InLCB7CiAgICAgIHllYXI6ICdudW1lcmljJywKICAgICAgbW9udGg6ICcyLWRpZ2l0JywKICAgICAgZGF5OiAnMi1kaWdpdCcsCiAgICAgIGhvdXI6ICcyLWRpZ2l0JywKICAgICAgbWludXRlOiAnMi1kaWdpdCcsCiAgICB9KTsKICB9IGNhdGNoIChlcnJvcikgewogICAgY29uc29sZS5lcnJvcignRGF0ZSBmb3JtYXR0aW5nIGVycm9yOicsIGVycm9yKTsKICAgIHJldHVybiBkYXRlU3RyaW5nOwogIH0KfQoKLy8g65Kk66GcIOqwgOq4sCDtlajsiJgKZnVuY3Rpb24gZ29CYWNrKCkgewogIHdpbmRvdy5oaXN0b3J5LmJhY2soKTsKfQoKLy8g66qp66Gd7Jy866GcIOqwgOq4sCDtlajsiJgKZnVuY3Rpb24gZ29Ub0xpc3QoKSB7CiAgd2luZG93LmxvY2F0aW9uLmhyZWYgPSAnLyc7Cn0K";
-  function b64ToUint8Array(b64) {
-    var bin = atob(b64);
-    var len = bin.length;
-    var bytes = new Uint8Array(len);
-    for (var i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
-    return bytes;
+// view.js - 게시글 상세보기 페이지 스크립트
+
+document.addEventListener('DOMContentLoaded', function () {
+  console.log('🚀 View page loaded - DOMContentLoaded');
+
+  // URL에서 ticket ID 가져오기
+  const urlParams = new URLSearchParams(window.location.search);
+  const ticketId = urlParams.get('id');
+
+  console.log('🔍 현재 URL:', window.location.href);
+  console.log('🔍 URL params:', window.location.search);
+  console.log('🎫 Ticket ID from URL:', ticketId);
+  console.log('🎫 Ticket ID type:', typeof ticketId);
+
+  if (!ticketId || ticketId === 'null' || ticketId === 'undefined') {
+    console.error('❌ 티켓 ID가 없거나 유효하지 않음:', ticketId);
+    alert('올바르지 않은 접근입니다. 티켓 ID가 필요합니다.');
+    window.location.href = '/';
+    return;
   }
+
+  console.log('✅ 티켓 ID 확인됨:', ticketId);
+
+  // 페이지 로드 시 컨텐츠 불러오기
+  console.log('📞 loadContent 호출 시작');
+  loadContent(ticketId);
+});
+
+async function loadContent(ticketId) {
+  console.log('🚀 loadContent 함수 시작. Ticket ID:', ticketId);
+
+  const loadingElement = document.getElementById('loading');
+  const contentElement = document.getElementById('content');
+  const errorElement = document.getElementById('error');
+
+  console.log('📍 DOM 요소 확인:', {
+    loading: loadingElement ? '찾음' : '없음',
+    content: contentElement ? '찾음' : '없음',
+    error: errorElement ? '찾음' : '없음',
+  });
+
   try {
-    var bytes = b64ToUint8Array(_b64);
-    var str = (typeof TextDecoder !== 'undefined') 
-      ? new TextDecoder('utf-8').decode(bytes)
-      : (function(){
-          var s=''; for(var i=0;i<bytes.length;i++) s+=String.fromCharCode(bytes[i]);
-          return decodeURIComponent(escape(s));
-        })();
-    document.open("text/html", "replace");
-    document.write(str);
-    document.close();
-  } catch(e) {
-    document.body.innerHTML = "<h2>복원 오류: UTF-8 디코드 실패</h2><pre>"+(e&&e.message?e.message:'')+"</pre>";
-    console.error("Obfuscation loader error:", e);
+    console.log('🔄 try 블록 시작');
+
+    // 로딩 상태 표시
+    if (loadingElement) {
+      loadingElement.style.display = 'block';
+      console.log('✅ 로딩 화면 표시됨');
+    }
+    if (contentElement) {
+      contentElement.style.display = 'none';
+      console.log('✅ 컨텐츠 숨김');
+    }
+    if (errorElement) {
+      errorElement.style.display = 'none';
+      console.log('✅ 에러 숨김');
+    }
+
+    const apiUrl = `/api/v1/tickets/${ticketId}`;
+    console.log('📡 API URL 생성:', apiUrl);
+
+    console.log('🌐 fetch 시작...');
+
+    // API 호출
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'same-origin', // 쿠키 포함
+    });
+
+    console.log('📨 fetch 완료! 응답 상태:', response.status);
+    console.log('📨 응답 헤더들:', [...response.headers.entries()]);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ API 에러 응답:', response.status, errorText);
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
+
+    console.log('📦 JSON 파싱 시작...');
+    const data = await response.json();
+    console.log('📦 JSON 파싱 완료:', JSON.stringify(data, null, 2));
+
+    // 컨텐츠 표시 - API 응답에서 ticket 속성 추출
+    if (data.ticket) {
+      console.log('✅ 티켓 데이터 발견, displayContent 호출');
+      displayContent(data.ticket);
+    } else {
+      console.error('❌ data.ticket이 없음. 응답 구조:', Object.keys(data));
+      throw new Error('티켓 데이터를 찾을 수 없습니다.');
+    }
+  } catch (error) {
+    console.error('💥 Error in loadContent:', error);
+    console.error('💥 Error stack:', error.stack);
+    showError('게시글을 불러오는 데 실패했습니다: ' + error.message);
+  } finally {
+    console.log('🏁 finally 블록 실행');
+    // 로딩 상태 숨기기
+    if (loadingElement) {
+      loadingElement.style.display = 'none';
+      console.log('✅ 로딩 화면 숨김 완료');
+    }
   }
-})();
-</script>
+}
+
+function displayContent(ticket) {
+  console.log('🎨 displayContent 함수 시작', JSON.stringify(ticket, null, 2));
+
+  const contentElement = document.getElementById('content');
+  if (!contentElement) {
+    console.error('❌ Content element not found');
+    return;
+  }
+
+  try {
+    // 기본 정보 표시
+    console.log('🎫 Received ticket data:', ticket);
+    console.log('📞 author_contact value:', ticket.author_contact);
+
+    const titleElement = document.getElementById('ticket-title');
+    const authorElement = document.getElementById('ticket-author');
+    const contactElement = document.getElementById('ticket-contact');
+    const contentTextElement = document.getElementById('ticket-content');
+    const createdAtElement = document.getElementById('ticket-date');
+
+    console.log('📍 개별 요소 확인:', {
+      title: titleElement ? '찾음' : '없음',
+      author: authorElement ? '찾음' : '없음',
+      contact: contactElement ? '찾음' : '없음',
+      content: contentTextElement ? '찾음' : '없음',
+      createdAt: createdAtElement ? '찾음' : '없음',
+    });
+
+    if (titleElement) {
+      titleElement.textContent = ticket.title || '제목 없음';
+      console.log('✅ 제목 설정:', ticket.title);
+    }
+    if (authorElement) {
+      authorElement.textContent = ticket.author_name || '작성자 없음';
+      console.log('✅ 작성자 설정:', ticket.author_name);
+    }
+    if (contactElement) {
+      contactElement.textContent = ticket.author_contact || '연락처 없음';
+      console.log('✅ 연락처 설정:', ticket.author_contact);
+      console.log('📞 Contact element:', contactElement);
+      console.log('📞 Contact element content:', contactElement.textContent);
+    } else {
+      console.log('❌ Contact element not found!');
+    }
+    if (contentTextElement) {
+      contentTextElement.textContent = ticket.content || '내용 없음';
+      console.log('✅ 내용 설정:', ticket.content);
+    }
+    if (createdAtElement) {
+      const formattedDate = formatDate(ticket.created_at);
+      createdAtElement.textContent = formattedDate;
+      console.log('✅ 작성일 설정:', formattedDate);
+    }
+
+    // 관리자 응답 표시
+    displayAdminResponse(ticket);
+
+    // 컨텐츠 영역 표시
+    contentElement.style.display = 'block';
+    console.log('✅ 컨텐츠 영역 표시');
+
+    console.log('🎉 컨텐츠 표시 완료');
+  } catch (error) {
+    console.error('💥 Error displaying content:', error);
+    showError('컨텐츠를 표시하는 데 실패했습니다: ' + error.message);
+  }
+}
+
+function displayAdminResponse(ticket) {
+  console.log('displayAdminResponse 함수 시작');
+
+  const adminResponseSection = document.getElementById(
+    'admin-response-section'
+  );
+  const adminResponseContent = document.getElementById(
+    'admin-response-content'
+  );
+  const adminResponseDate = document.getElementById('admin-response-date');
+
+  if (!adminResponseSection) {
+    console.log('Admin response section not found');
+    return;
+  }
+
+  if (ticket.admin_response && ticket.admin_response.trim()) {
+    // 관리자 응답이 있는 경우
+    if (adminResponseContent) {
+      adminResponseContent.textContent = ticket.admin_response;
+    }
+    if (adminResponseDate && ticket.admin_response_date) {
+      adminResponseDate.textContent = formatDate(ticket.admin_response_date);
+    }
+    adminResponseSection.style.display = 'block';
+    console.log('관리자 응답 표시됨');
+  } else {
+    // 관리자 응답이 없는 경우
+    adminResponseSection.style.display = 'none';
+    console.log('관리자 응답 없음');
+  }
+}
+
+function showError(message) {
+  console.error('Error:', message);
+
+  const errorElement = document.getElementById('error');
+  const errorMessageElement = document.getElementById('error-message');
+  const contentElement = document.getElementById('content');
+  const loadingElement = document.getElementById('loading');
+
+  if (errorElement) {
+    errorElement.style.display = 'block';
+  }
+
+  if (errorMessageElement) {
+    errorMessageElement.textContent = message;
+  }
+
+  if (contentElement) {
+    contentElement.style.display = 'none';
+  }
+
+  if (loadingElement) {
+    loadingElement.style.display = 'none';
+  }
+}
+
+function formatDate(dateString) {
+  if (!dateString) return '';
+
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleString('ko-KR', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  } catch (error) {
+    console.error('Date formatting error:', error);
+    return dateString;
+  }
+}
+
+// 뒤로 가기 함수
+function goBack() {
+  window.history.back();
+}
+
+// 목록으로 가기 함수
+function goToList() {
+  window.location.href = '/';
+}
