@@ -1,30 +1,150 @@
-<!doctype html>
-<meta charset="utf-8">
-<title>obfuscated (UTF-8 safe)</title>
-<script>
-(function(){
-  var _b64 = "LyoqDQogKiDtmozsm5Ag7IS47IWYIOyghOyXrSDrs4DsiJgg6rSA66asDQogKiDrqqjrk6AgSFRNTCDtjpjsnbTsp4Dsl5DshJwg7IKs7JqpIOqwgOuKpe2VnCDsoITsl60g67OA7IiYDQogKi8NCg0KLy8g7KCE7JetIOuzgOyImCDshKDslrgNCndpbmRvdy5NRU1CRVJfU0VTU0lPTiA9IHsNCiAgc01lbV9pZDogbnVsbCwNCiAgc01lbV9uYW1lOiBudWxsLA0KICBzTWVtX25pY2tuYW1lOiBudWxsLA0KICBzTWVtX3N0YXR1czogbnVsbCwNCiAgYWR2aXNlcl9yb2xlOiBudWxsLA0KICBpc0xvZ2dlZEluOiBmYWxzZSwNCn07DQoNCi8qKg0KICog7ZqM7JuQIOyEuOyFmCDsoJXrs7Qg7ISk7KCVDQogKiBAcGFyYW0ge09iamVjdH0gbWVtYmVyRGF0YSAtIO2ajOybkCDsoJXrs7Qge3NNZW1faWQsIHNNZW1fbmFtZSwgc01lbV9uaWNrbmFtZSwgc01lbV9zdGF0dXMsIGFkdmlzZXJfcm9sZX0NCiAqLw0Kd2luZG93LnNldE1lbWJlclNlc3Npb24gPSBmdW5jdGlvbiAobWVtYmVyRGF0YSkgew0KICBjb25zb2xlLmxvZygn8J+UkCDtmozsm5Ag7IS47IWYIOyEpOyglTonLCBtZW1iZXJEYXRhKTsNCg0KICBpZiAobWVtYmVyRGF0YSkgew0KICAgIHdpbmRvdy5NRU1CRVJfU0VTU0lPTi5zTWVtX2lkID0gbWVtYmVyRGF0YS5zTWVtX2lkIHx8IG51bGw7DQogICAgd2luZG93Lk1FTUJFUl9TRVNTSU9OLnNNZW1fbmFtZSA9IG1lbWJlckRhdGEuc01lbV9uYW1lIHx8IG51bGw7DQogICAgd2luZG93Lk1FTUJFUl9TRVNTSU9OLnNNZW1fbmlja25hbWUgPSBtZW1iZXJEYXRhLnNNZW1fbmlja25hbWUgfHwgbnVsbDsNCiAgICB3aW5kb3cuTUVNQkVSX1NFU1NJT04uc01lbV9zdGF0dXMgPSBtZW1iZXJEYXRhLnNNZW1fc3RhdHVzIHx8IG51bGw7DQogICAgd2luZG93Lk1FTUJFUl9TRVNTSU9OLmFkdmlzZXJfcm9sZSA9IG1lbWJlckRhdGEuYWR2aXNlcl9yb2xlIHx8IG51bGw7DQogICAgd2luZG93Lk1FTUJFUl9TRVNTSU9OLmlzTG9nZ2VkSW4gPSB0cnVlOw0KDQogICAgY29uc29sZS5sb2coDQogICAgICAn8J+TiyDtmozsm5Ag7IOB7YOcKHNNZW1fc3RhdHVzKTonLA0KICAgICAgd2luZG93Lk1FTUJFUl9TRVNTSU9OLnNNZW1fc3RhdHVzDQogICAgKTsNCiAgICBjb25zb2xlLmxvZygNCiAgICAgICfwn5GkIOyDgeuLtOyCrCDsl63tlaAoYWR2aXNlcl9yb2xlKTonLA0KICAgICAgd2luZG93Lk1FTUJFUl9TRVNTSU9OLmFkdmlzZXJfcm9sZQ0KICAgICk7DQoNCiAgICAvLyBzZXNzaW9uU3RvcmFnZeyXkCDsoIDsnqUgKOu4jOudvOyasOyggCDri6vsnLzrqbQg7IKt7KCcKQ0KICAgIHRyeSB7DQogICAgICBzZXNzaW9uU3RvcmFnZS5zZXRJdGVtKA0KICAgICAgICAnbWVtYmVyX3Nlc3Npb24nLA0KICAgICAgICBKU09OLnN0cmluZ2lmeSh3aW5kb3cuTUVNQkVSX1NFU1NJT04pDQogICAgICApOw0KICAgICAgY29uc29sZS5sb2coJ+KchSDtmozsm5Ag7IS47IWYIHNlc3Npb25TdG9yYWdlIOyggOyepSDsmYTro4wnKTsNCiAgICB9IGNhdGNoIChlKSB7DQogICAgICBjb25zb2xlLndhcm4oJ+KaoO+4jyBzZXNzaW9uU3RvcmFnZSDsoIDsnqUg7Iuk7YyoOicsIGUpOw0KICAgIH0NCiAgfQ0KfTsNCg0KLyoqDQogKiDtmozsm5Ag7IS47IWYIOygleuztCDstIjquLDtmZQgKOyZhOyghCDstIjquLDtmZQpDQogKi8NCndpbmRvdy5jbGVhck1lbWJlclNlc3Npb24gPSBmdW5jdGlvbiAoKSB7DQogIGNvbnNvbGUubG9nKCfwn5STIO2ajOybkCDshLjshZgg7JmE7KCEIOy0iOq4sO2ZlCDsi5zsnpEuLi4nKTsNCg0KICAvLyAxLiDsoITsl60g67OA7IiYIOy0iOq4sO2ZlA0KICB3aW5kb3cuTUVNQkVSX1NFU1NJT04gPSB7DQogICAgc01lbV9pZDogbnVsbCwNCiAgICBzTWVtX25hbWU6IG51bGwsDQogICAgc01lbV9uaWNrbmFtZTogbnVsbCwNCiAgICBzTWVtX3N0YXR1czogbnVsbCwNCiAgICBhZHZpc2VyX3JvbGU6IG51bGwsDQogICAgaXNMb2dnZWRJbjogZmFsc2UsDQogIH07DQogIGNvbnNvbGUubG9nKCcgICDinJMg7KCE7JetIOuzgOyImCDstIjquLDtmZQg7JmE66OMJyk7DQoNCiAgLy8gMi4gc2Vzc2lvblN0b3JhZ2Ug7JmE7KCEIOyCreygnA0KICB0cnkgew0KICAgIHNlc3Npb25TdG9yYWdlLnJlbW92ZUl0ZW0oJ21lbWJlcl9zZXNzaW9uJyk7DQogICAgc2Vzc2lvblN0b3JhZ2UucmVtb3ZlSXRlbSgnbWVtYmVyRGF0YScpOyAvLyDquLDsobQgbWVtYmVyRGF0YeuPhCDsoJzqsbANCiAgICBzZXNzaW9uU3RvcmFnZS5yZW1vdmVJdGVtKCdtb2NrX2FjY2Vzc190b2tlbicpOyAvLyDthqDtgbDrj4Qg7KCc6rGwDQogICAgc2Vzc2lvblN0b3JhZ2UucmVtb3ZlSXRlbSgnc01lbV9pZCcpOyAvLyDqsJzrs4Qg7ZWt66qp64+EIOygnOqxsA0KICAgIHNlc3Npb25TdG9yYWdlLnJlbW92ZUl0ZW0oJ3NNZW1fbmFtZScpOw0KICAgIHNlc3Npb25TdG9yYWdlLnJlbW92ZUl0ZW0oJ3NNZW1fbmlja25hbWUnKTsNCiAgICBjb25zb2xlLmxvZygnICAg4pyTIHNlc3Npb25TdG9yYWdlIOyZhOyghCDsgq3soJwg7JmE66OMJyk7DQogIH0gY2F0Y2ggKGUpIHsNCiAgICBjb25zb2xlLndhcm4oJyAgIOKaoO+4jyBzZXNzaW9uU3RvcmFnZSDsgq3soJwg7Iuk7YyoOicsIGUpOw0KICB9DQoNCiAgLy8gMy4gbG9jYWxTdG9yYWdlIO2ajOybkCDqtIDroKgg642w7J207YSw64+EIOygnOqxsCAo7Zi57IucIOuqqOulvCDqsr3smrAg64yA67mEKQ0KICB0cnkgew0KICAgIGxvY2FsU3RvcmFnZS5yZW1vdmVJdGVtKCdtZW1iZXJfc2Vzc2lvbicpOw0KICAgIGxvY2FsU3RvcmFnZS5yZW1vdmVJdGVtKCdtZW1iZXJEYXRhJyk7DQogICAgbG9jYWxTdG9yYWdlLnJlbW92ZUl0ZW0oJ21vY2tfYWNjZXNzX3Rva2VuJyk7DQogICAgY29uc29sZS5sb2coJyAgIOKckyBsb2NhbFN0b3JhZ2Ug7KCV66asIOyZhOujjCcpOw0KICB9IGNhdGNoIChlKSB7DQogICAgY29uc29sZS53YXJuKCcgICDimqDvuI8gbG9jYWxTdG9yYWdlIOygleumrCDsi6TtjKg6JywgZSk7DQogIH0NCg0KICBjb25zb2xlLmxvZygn4pyFIO2ajOybkCDshLjshZgg7JmE7KCEIOy0iOq4sO2ZlCDsmYTro4wnKTsNCiAgY29uc29sZS5sb2coJyAgIOy1nOyihSDsg4Htg5w6Jywgd2luZG93Lk1FTUJFUl9TRVNTSU9OKTsNCn07DQoNCi8qKg0KICog7ZqM7JuQIOyEuOyFmCDsoJXrs7Qg6rCA7KC47Jik6riwDQogKiBAcmV0dXJucyB7T2JqZWN0fSDtmozsm5Ag7IS47IWYIOygleuztA0KICovDQp3aW5kb3cuZ2V0TWVtYmVyU2Vzc2lvbiA9IGZ1bmN0aW9uICgpIHsNCiAgcmV0dXJuIHdpbmRvdy5NRU1CRVJfU0VTU0lPTjsNCn07DQoNCi8qKg0KICogc2Vzc2lvblN0b3JhZ2Xsl5DshJwg7IS47IWYIOygleuztCDrs7Xsm5ANCiAqLw0Kd2luZG93LnJlc3RvcmVNZW1iZXJTZXNzaW9uID0gZnVuY3Rpb24gKCkgew0KICB0cnkgew0KICAgIGNvbnN0IHNhdmVkID0gc2Vzc2lvblN0b3JhZ2UuZ2V0SXRlbSgnbWVtYmVyX3Nlc3Npb24nKTsNCiAgICBpZiAoc2F2ZWQpIHsNCiAgICAgIGNvbnN0IGRhdGEgPSBKU09OLnBhcnNlKHNhdmVkKTsNCiAgICAgIHdpbmRvdy5NRU1CRVJfU0VTU0lPTiA9IGRhdGE7DQogICAgICBjb25zb2xlLmxvZygn4pyFIHNlc3Npb25TdG9yYWdl7JeQ7IScIO2ajOybkCDshLjshZgg67O17JuQOicsIGRhdGEpOw0KICAgICAgcmV0dXJuIHRydWU7DQogICAgfQ0KDQogICAgLy8g6riw7KG0IG1lbWJlckRhdGHrj4Qg7ZmV7J24ICjtlZjsnIQg7Zi47ZmY7ISxKQ0KICAgIGNvbnN0IG1lbWJlckRhdGEgPSBzZXNzaW9uU3RvcmFnZS5nZXRJdGVtKCdtZW1iZXJEYXRhJyk7DQogICAgaWYgKG1lbWJlckRhdGEpIHsNCiAgICAgIGNvbnN0IGRhdGEgPSBKU09OLnBhcnNlKG1lbWJlckRhdGEpOw0KICAgICAgd2luZG93Lk1FTUJFUl9TRVNTSU9OLnNNZW1faWQgPSBkYXRhLnNNZW1faWQ7DQogICAgICB3aW5kb3cuTUVNQkVSX1NFU1NJT04uc01lbV9uYW1lID0gZGF0YS5zTWVtX25hbWU7DQogICAgICB3aW5kb3cuTUVNQkVSX1NFU1NJT04uc01lbV9uaWNrbmFtZSA9IGRhdGEuc01lbV9uaWNrbmFtZTsNCiAgICAgIHdpbmRvdy5NRU1CRVJfU0VTU0lPTi5zTWVtX3N0YXR1cyA9IGRhdGEuc01lbV9zdGF0dXM7DQogICAgICB3aW5kb3cuTUVNQkVSX1NFU1NJT04uYWR2aXNlcl9yb2xlID0gZGF0YS5hZHZpc2VyX3JvbGU7DQogICAgICB3aW5kb3cuTUVNQkVSX1NFU1NJT04uaXNMb2dnZWRJbiA9IHRydWU7DQogICAgICBjb25zb2xlLmxvZygn4pyFIG1lbWJlckRhdGHsl5DshJwg7ZqM7JuQIOyEuOyFmCDrs7Xsm5A6JywgZGF0YSk7DQogICAgICByZXR1cm4gdHJ1ZTsNCiAgICB9DQogIH0gY2F0Y2ggKGUpIHsNCiAgICBjb25zb2xlLndhcm4oJ+KaoO+4jyBzZXNzaW9uU3RvcmFnZSDshLjshZgg67O17JuQIOyLpO2MqDonLCBlKTsNCiAgfQ0KICByZXR1cm4gZmFsc2U7DQp9Ow0KDQovKioNCiAqIO2ajOybkCDroZzqt7jsnbgg7Jes67aAIO2ZleyduA0KICogQHJldHVybnMge2Jvb2xlYW59IOuhnOq3uOyduCDsl6zrtoANCiAqLw0Kd2luZG93LmlzTWVtYmVyTG9nZ2VkSW4gPSBmdW5jdGlvbiAoKSB7DQogIHJldHVybiAoDQogICAgd2luZG93Lk1FTUJFUl9TRVNTSU9OLmlzTG9nZ2VkSW4gJiYgd2luZG93Lk1FTUJFUl9TRVNTSU9OLnNNZW1faWQgIT09IG51bGwNCiAgKTsNCn07DQoNCi8vIO2OmOydtOyngCDroZzrk5wg7IucIOyEuOyFmCDrs7Xsm5Ag7Iuc64+EDQp3aW5kb3cucmVzdG9yZU1lbWJlclNlc3Npb24oKTsNCg0KY29uc29sZS5sb2coJ+KchSBtZW1iZXJfc2Vzc2lvbi5qcyDroZzrk5wg7JmE66OMIC0g7KCE7JetIOuzgOyImCDspIDruYTrkKgnKTsNCg==";
-  function b64ToUint8Array(b64) {
-    var bin = atob(b64);
-    var len = bin.length;
-    var bytes = new Uint8Array(len);
-    for (var i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
-    return bytes;
+/**
+ * 회원 세션 전역 변수 관리
+ * 모든 HTML 페이지에서 사용 가능한 전역 변수
+ */
+
+// 전역 변수 선언
+window.MEMBER_SESSION = {
+  sMem_id: null,
+  sMem_name: null,
+  sMem_nickname: null,
+  sMem_status: null,
+  adviser_role: null,
+  isLoggedIn: false,
+};
+
+/**
+ * 회원 세션 정보 설정
+ * @param {Object} memberData - 회원 정보 {sMem_id, sMem_name, sMem_nickname, sMem_status, adviser_role}
+ */
+window.setMemberSession = function (memberData) {
+  console.log('🔐 회원 세션 설정:', memberData);
+
+  if (memberData) {
+    window.MEMBER_SESSION.sMem_id = memberData.sMem_id || null;
+    window.MEMBER_SESSION.sMem_name = memberData.sMem_name || null;
+    window.MEMBER_SESSION.sMem_nickname = memberData.sMem_nickname || null;
+    window.MEMBER_SESSION.sMem_status = memberData.sMem_status || null;
+    window.MEMBER_SESSION.adviser_role = memberData.adviser_role || null;
+    window.MEMBER_SESSION.isLoggedIn = true;
+
+    console.log(
+      '📋 회원 상태(sMem_status):',
+      window.MEMBER_SESSION.sMem_status
+    );
+    console.log(
+      '👤 상담사 역할(adviser_role):',
+      window.MEMBER_SESSION.adviser_role
+    );
+
+    // sessionStorage에 저장 (브라우저 닫으면 삭제)
+    try {
+      sessionStorage.setItem(
+        'member_session',
+        JSON.stringify(window.MEMBER_SESSION)
+      );
+      console.log('✅ 회원 세션 sessionStorage 저장 완료');
+    } catch (e) {
+      console.warn('⚠️ sessionStorage 저장 실패:', e);
+    }
   }
+};
+
+/**
+ * 회원 세션 정보 초기화 (완전 초기화)
+ */
+window.clearMemberSession = function () {
+  console.log('🔓 회원 세션 완전 초기화 시작...');
+
+  // 1. 전역 변수 초기화
+  window.MEMBER_SESSION = {
+    sMem_id: null,
+    sMem_name: null,
+    sMem_nickname: null,
+    sMem_status: null,
+    adviser_role: null,
+    isLoggedIn: false,
+  };
+  console.log('   ✓ 전역 변수 초기화 완료');
+
+  // 2. sessionStorage 완전 삭제
   try {
-    var bytes = b64ToUint8Array(_b64);
-    var str = (typeof TextDecoder !== 'undefined') 
-      ? new TextDecoder('utf-8').decode(bytes)
-      : (function(){
-          var s=''; for(var i=0;i<bytes.length;i++) s+=String.fromCharCode(bytes[i]);
-          return decodeURIComponent(escape(s));
-        })();
-    document.open("text/html", "replace");
-    document.write(str);
-    document.close();
-  } catch(e) {
-    document.body.innerHTML = "<h2>복원 오류: UTF-8 디코드 실패</h2><pre>"+(e&&e.message?e.message:'')+"</pre>";
-    console.error("Obfuscation loader error:", e);
+    sessionStorage.removeItem('member_session');
+    sessionStorage.removeItem('memberData'); // 기존 memberData도 제거
+    sessionStorage.removeItem('mock_access_token'); // 토큰도 제거
+    sessionStorage.removeItem('sMem_id'); // 개별 항목도 제거
+    sessionStorage.removeItem('sMem_name');
+    sessionStorage.removeItem('sMem_nickname');
+    console.log('   ✓ sessionStorage 완전 삭제 완료');
+  } catch (e) {
+    console.warn('   ⚠️ sessionStorage 삭제 실패:', e);
   }
-})();
-</script>
+
+  // 3. localStorage 회원 관련 데이터도 제거 (혹시 모를 경우 대비)
+  try {
+    localStorage.removeItem('member_session');
+    localStorage.removeItem('memberData');
+    localStorage.removeItem('mock_access_token');
+    console.log('   ✓ localStorage 정리 완료');
+  } catch (e) {
+    console.warn('   ⚠️ localStorage 정리 실패:', e);
+  }
+
+  console.log('✅ 회원 세션 완전 초기화 완료');
+  console.log('   최종 상태:', window.MEMBER_SESSION);
+};
+
+/**
+ * 회원 세션 정보 가져오기
+ * @returns {Object} 회원 세션 정보
+ */
+window.getMemberSession = function () {
+  return window.MEMBER_SESSION;
+};
+
+/**
+ * sessionStorage에서 세션 정보 복원
+ */
+window.restoreMemberSession = function () {
+  try {
+    const saved = sessionStorage.getItem('member_session');
+    if (saved) {
+      const data = JSON.parse(saved);
+      window.MEMBER_SESSION = data;
+      console.log('✅ sessionStorage에서 회원 세션 복원:', data);
+      return true;
+    }
+
+    // 기존 memberData도 확인 (하위 호환성)
+    const memberData = sessionStorage.getItem('memberData');
+    if (memberData) {
+      const data = JSON.parse(memberData);
+      window.MEMBER_SESSION.sMem_id = data.sMem_id;
+      window.MEMBER_SESSION.sMem_name = data.sMem_name;
+      window.MEMBER_SESSION.sMem_nickname = data.sMem_nickname;
+      window.MEMBER_SESSION.sMem_status = data.sMem_status;
+      window.MEMBER_SESSION.adviser_role = data.adviser_role;
+      window.MEMBER_SESSION.isLoggedIn = true;
+      console.log('✅ memberData에서 회원 세션 복원:', data);
+      return true;
+    }
+  } catch (e) {
+    console.warn('⚠️ sessionStorage 세션 복원 실패:', e);
+  }
+  return false;
+};
+
+/**
+ * 회원 로그인 여부 확인
+ * @returns {boolean} 로그인 여부
+ */
+window.isMemberLoggedIn = function () {
+  return (
+    window.MEMBER_SESSION.isLoggedIn && window.MEMBER_SESSION.sMem_id !== null
+  );
+};
+
+// 페이지 로드 시 세션 복원 시도
+window.restoreMemberSession();
+
+console.log('✅ member_session.js 로드 완료 - 전역 변수 준비됨');
