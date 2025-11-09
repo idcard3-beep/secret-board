@@ -1,91 +1,30 @@
-/* 복사 방지 보안 CSS */
-
-/* 기본 텍스트 선택 방지 */
-body {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
-  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-}
-
-/* 입력 필드는 선택 가능하도록 */
-input,
-textarea,
-[contenteditable] {
-  -webkit-user-select: text !important;
-  -moz-user-select: text !important;
-  -ms-user-select: text !important;
-  user-select: text !important;
-}
-
-/* 이미지 드래그 방지 */
-img {
-  -webkit-user-drag: none;
-  -khtml-user-drag: none;
-  -moz-user-drag: none;
-  -o-user-drag: none;
-  user-drag: none;
-  pointer-events: none;
-}
-
-/* 링크 드래그 방지 */
-a {
-  -webkit-user-drag: none;
-  -khtml-user-drag: none;
-  -moz-user-drag: none;
-  -o-user-drag: none;
-  user-drag: none;
-}
-
-/* 텍스트 강조 방지 */
-::selection {
-  background: transparent;
-}
-
-::-moz-selection {
-  background: transparent;
-}
-
-/* 브라우저 기본 컨텍스트 메뉴 스타일 숨기기 */
-*::-webkit-scrollbar-corner {
-  background: transparent;
-}
-
-/* 모바일에서 롱터치 방지 */
-* {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  -khtml-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
-}
-
-/* 입력 필드 예외 처리 */
-input[type='text'],
-input[type='password'],
-input[type='email'],
-input[type='tel'],
-textarea {
-  -webkit-user-select: text !important;
-  -khtml-user-select: text !important;
-  -moz-user-select: text !important;
-  -ms-user-select: text !important;
-  user-select: text !important;
-}
-
-/* 인쇄 방지 */
-@media print {
-  body {
-    display: none !important;
+<!doctype html>
+<meta charset="utf-8">
+<title>obfuscated (UTF-8 safe)</title>
+<script>
+(function(){
+  var _b64 = "Lyog67O17IKsIOuwqeyngCDrs7TslYggQ1NTICovDQoNCi8qIOq4sOuzuCDthY3siqTtirgg7ISg7YOdIOuwqeyngCAqLw0KYm9keSB7DQogIC13ZWJraXQtdXNlci1zZWxlY3Q6IG5vbmU7DQogIC1tb3otdXNlci1zZWxlY3Q6IG5vbmU7DQogIC1tcy11c2VyLXNlbGVjdDogbm9uZTsNCiAgdXNlci1zZWxlY3Q6IG5vbmU7DQogIC13ZWJraXQtdG91Y2gtY2FsbG91dDogbm9uZTsNCiAgLXdlYmtpdC10YXAtaGlnaGxpZ2h0LWNvbG9yOiByZ2JhKDAsIDAsIDAsIDApOw0KfQ0KDQovKiDsnoXroKUg7ZWE65Oc64qUIOyEoO2DnSDqsIDriqXtlZjrj4TroZ0gKi8NCmlucHV0LA0KdGV4dGFyZWEsDQpbY29udGVudGVkaXRhYmxlXSB7DQogIC13ZWJraXQtdXNlci1zZWxlY3Q6IHRleHQgIWltcG9ydGFudDsNCiAgLW1vei11c2VyLXNlbGVjdDogdGV4dCAhaW1wb3J0YW50Ow0KICAtbXMtdXNlci1zZWxlY3Q6IHRleHQgIWltcG9ydGFudDsNCiAgdXNlci1zZWxlY3Q6IHRleHQgIWltcG9ydGFudDsNCn0NCg0KLyog7J2066+47KeAIOuTnOuemOq3uCDrsKnsp4AgKi8NCmltZyB7DQogIC13ZWJraXQtdXNlci1kcmFnOiBub25lOw0KICAta2h0bWwtdXNlci1kcmFnOiBub25lOw0KICAtbW96LXVzZXItZHJhZzogbm9uZTsNCiAgLW8tdXNlci1kcmFnOiBub25lOw0KICB1c2VyLWRyYWc6IG5vbmU7DQogIHBvaW50ZXItZXZlbnRzOiBub25lOw0KfQ0KDQovKiDrp4Htgawg65Oc656Y6re4IOuwqeyngCAqLw0KYSB7DQogIC13ZWJraXQtdXNlci1kcmFnOiBub25lOw0KICAta2h0bWwtdXNlci1kcmFnOiBub25lOw0KICAtbW96LXVzZXItZHJhZzogbm9uZTsNCiAgLW8tdXNlci1kcmFnOiBub25lOw0KICB1c2VyLWRyYWc6IG5vbmU7DQp9DQoNCi8qIO2FjeyKpO2KuCDqsJXsobAg67Cp7KeAICovDQo6OnNlbGVjdGlvbiB7DQogIGJhY2tncm91bmQ6IHRyYW5zcGFyZW50Ow0KfQ0KDQo6Oi1tb3otc2VsZWN0aW9uIHsNCiAgYmFja2dyb3VuZDogdHJhbnNwYXJlbnQ7DQp9DQoNCi8qIOu4jOudvOyasOyggCDquLDrs7gg7Luo7YWN7Iqk7Yq4IOuplOuJtCDsiqTtg4Dsnbwg7Iio6riw6riwICovDQoqOjotd2Via2l0LXNjcm9sbGJhci1jb3JuZXIgew0KICBiYWNrZ3JvdW5kOiB0cmFuc3BhcmVudDsNCn0NCg0KLyog66qo67CU7J287JeQ7IScIOuhse2EsOy5mCDrsKnsp4AgKi8NCiogew0KICAtd2Via2l0LXRvdWNoLWNhbGxvdXQ6IG5vbmU7DQogIC13ZWJraXQtdXNlci1zZWxlY3Q6IG5vbmU7DQogIC1raHRtbC11c2VyLXNlbGVjdDogbm9uZTsNCiAgLW1vei11c2VyLXNlbGVjdDogbm9uZTsNCiAgLW1zLXVzZXItc2VsZWN0OiBub25lOw0KICB1c2VyLXNlbGVjdDogbm9uZTsNCn0NCg0KLyog7J6F66ClIO2VhOuTnCDsmIjsmbgg7LKY66asICovDQppbnB1dFt0eXBlPSd0ZXh0J10sDQppbnB1dFt0eXBlPSdwYXNzd29yZCddLA0KaW5wdXRbdHlwZT0nZW1haWwnXSwNCmlucHV0W3R5cGU9J3RlbCddLA0KdGV4dGFyZWEgew0KICAtd2Via2l0LXVzZXItc2VsZWN0OiB0ZXh0ICFpbXBvcnRhbnQ7DQogIC1raHRtbC11c2VyLXNlbGVjdDogdGV4dCAhaW1wb3J0YW50Ow0KICAtbW96LXVzZXItc2VsZWN0OiB0ZXh0ICFpbXBvcnRhbnQ7DQogIC1tcy11c2VyLXNlbGVjdDogdGV4dCAhaW1wb3J0YW50Ow0KICB1c2VyLXNlbGVjdDogdGV4dCAhaW1wb3J0YW50Ow0KfQ0KDQovKiDsnbjsh4Qg67Cp7KeAICovDQpAbWVkaWEgcHJpbnQgew0KICBib2R5IHsNCiAgICBkaXNwbGF5OiBub25lICFpbXBvcnRhbnQ7DQogIH0NCiAgYm9keTpiZWZvcmUgew0KICAgIGNvbnRlbnQ6ICfsnbjsh4TqsIAg7ZeI7Jqp65CY7KeAIOyViuyKteuLiOuLpC4nOw0KICAgIGRpc3BsYXk6IGJsb2NrICFpbXBvcnRhbnQ7DQogICAgZm9udC1zaXplOiAyMHB4Ow0KICAgIHRleHQtYWxpZ246IGNlbnRlcjsNCiAgICBtYXJnaW4tdG9wOiA1MHB4Ow0KICB9DQp9DQo=";
+  function b64ToUint8Array(b64) {
+    var bin = atob(b64);
+    var len = bin.length;
+    var bytes = new Uint8Array(len);
+    for (var i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
   }
-  body:before {
-    content: '인쇄가 허용되지 않습니다.';
-    display: block !important;
-    font-size: 20px;
-    text-align: center;
-    margin-top: 50px;
+  try {
+    var bytes = b64ToUint8Array(_b64);
+    var str = (typeof TextDecoder !== 'undefined') 
+      ? new TextDecoder('utf-8').decode(bytes)
+      : (function(){
+          var s=''; for(var i=0;i<bytes.length;i++) s+=String.fromCharCode(bytes[i]);
+          return decodeURIComponent(escape(s));
+        })();
+    document.open("text/html", "replace");
+    document.write(str);
+    document.close();
+  } catch(e) {
+    document.body.innerHTML = "<h2>복원 오류: UTF-8 디코드 실패</h2><pre>"+(e&&e.message?e.message:'')+"</pre>";
+    console.error("Obfuscation loader error:", e);
   }
-}
+})();
+</script>

@@ -1,167 +1,30 @@
-body {
-  font-family: system-ui, Arial, sans-serif;
-  padding: 20px;
-  max-width: 960px;
-  margin: 0 auto;
-}
-h2 {
-  margin-bottom: 10px;
-}
-.actions,
-.toolbar {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  justify-content: space-between;
-  margin: 10px 0;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-th,
-td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-}
-tr:hover {
-  background: #f8f8f8;
-  cursor: pointer;
-}
-button {
-  background: #357a38;
-  color: white;
-  border: 0;
-  padding: 8px 12px;
-  border-radius: 6px;
-}
-button:hover {
-  opacity: 0.9;
-}
-input,
-textarea,
-select {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  margin: 4px 0 12px;
-}
-
-/* toolbar 내 select 크기 조정 */
-.toolbar select {
-  width: 140px;
-}
-
-/* toolbar 내 button 크기 조정 */
-.toolbar button {
-  min-width: 110px;
-  padding: 8px 16px;
-}
-.card {
-  border: 1px solid #eee;
-  border-radius: 8px;
-  padding: 14px;
-  margin: 10px 0;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
-}
-.msg.user {
-  background: #f0f7ff;
-  padding: 8px;
-  border-radius: 6px;
-  margin: 6px 0;
-}
-.msg.admin {
-  background: #fff7e6;
-  padding: 8px;
-  border-radius: 6px;
-  margin: 6px 0;
-}
-.admin-link {
-  margin-left: auto;
-}
-.form-actions {
-  display: flex;
-  gap: 10px;
-}
-
-/* 관리자 답변 스타일 */
-#adminResponseSection {
-  border-left: 4px solid #28a745;
-  background-color: #f8fff9;
-}
-
-#adminResponseSection h3 {
-  color: #28a745;
-  margin-bottom: 15px;
-}
-
-.admin-response {
-  background-color: #e9f7ef;
-  padding: 15px;
-  border-radius: 5px;
-  margin: 10px 0;
-  line-height: 1.6;
-}
-
-/* 수정 섹션 스타일 */
-#editSection {
-  border-left: 4px solid #007bff;
-  background-color: #f8f9ff;
-}
-
-#editSection h3 {
-  color: #007bff;
-  margin-bottom: 15px;
-}
-
-.form-group {
-  margin-bottom: 15px;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-  color: #333;
-}
-
-/* 에러 메시지 스타일 */
-.error-message {
-  color: #dc3545;
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-  padding: 10px;
-  border-radius: 5px;
-  margin-top: 10px;
-}
-
-/* 상태 표시 스타일 */
-.status-pending {
-  color: #ffc107;
-  font-weight: bold;
-}
-
-.status-answered {
-  color: #28a745;
-  font-weight: bold;
-}
-
-/* 버튼 스타일 개선 */
-button.btn-success {
-  background-color: #28a745;
-}
-
-button.btn-success:hover {
-  background-color: #218838;
-}
-
-button.btn-secondary {
-  background-color: #6c757d;
-}
-
-button.btn-secondary:hover {
-  background-color: #545b62;
-}
+<!doctype html>
+<meta charset="utf-8">
+<title>obfuscated (UTF-8 safe)</title>
+<script>
+(function(){
+  var _b64 = "Ym9keSB7CiAgZm9udC1mYW1pbHk6IHN5c3RlbS11aSwgQXJpYWwsIHNhbnMtc2VyaWY7CiAgcGFkZGluZzogMjBweDsKICBtYXgtd2lkdGg6IDk2MHB4OwogIG1hcmdpbjogMCBhdXRvOwp9CmgyIHsKICBtYXJnaW4tYm90dG9tOiAxMHB4Owp9Ci5hY3Rpb25zLAoudG9vbGJhciB7CiAgZGlzcGxheTogZmxleDsKICBnYXA6IDEwcHg7CiAgYWxpZ24taXRlbXM6IGNlbnRlcjsKICBqdXN0aWZ5LWNvbnRlbnQ6IHNwYWNlLWJldHdlZW47CiAgbWFyZ2luOiAxMHB4IDA7Cn0KdGFibGUgewogIHdpZHRoOiAxMDAlOwogIGJvcmRlci1jb2xsYXBzZTogY29sbGFwc2U7CiAgbWFyZ2luLXRvcDogMTBweDsKfQp0aCwKdGQgewogIGJvcmRlcjogMXB4IHNvbGlkICNkZGQ7CiAgcGFkZGluZzogOHB4OwogIHRleHQtYWxpZ246IGxlZnQ7Cn0KdHI6aG92ZXIgewogIGJhY2tncm91bmQ6ICNmOGY4Zjg7CiAgY3Vyc29yOiBwb2ludGVyOwp9CmJ1dHRvbiB7CiAgYmFja2dyb3VuZDogIzM1N2EzODsKICBjb2xvcjogd2hpdGU7CiAgYm9yZGVyOiAwOwogIHBhZGRpbmc6IDhweCAxMnB4OwogIGJvcmRlci1yYWRpdXM6IDZweDsKfQpidXR0b246aG92ZXIgewogIG9wYWNpdHk6IDAuOTsKfQppbnB1dCwKdGV4dGFyZWEsCnNlbGVjdCB7CiAgd2lkdGg6IDEwMCU7CiAgcGFkZGluZzogOHB4OwogIGJvcmRlcjogMXB4IHNvbGlkICNjY2M7CiAgYm9yZGVyLXJhZGl1czogNnB4OwogIG1hcmdpbjogNHB4IDAgMTJweDsKfQoKLyogdG9vbGJhciDrgrQgc2VsZWN0IO2BrOq4sCDsobDsoJUgKi8KLnRvb2xiYXIgc2VsZWN0IHsKICB3aWR0aDogMTQwcHg7Cn0KCi8qIHRvb2xiYXIg64K0IGJ1dHRvbiDtgazquLAg7KGw7KCVICovCi50b29sYmFyIGJ1dHRvbiB7CiAgbWluLXdpZHRoOiAxMTBweDsKICBwYWRkaW5nOiA4cHggMTZweDsKfQouY2FyZCB7CiAgYm9yZGVyOiAxcHggc29saWQgI2VlZTsKICBib3JkZXItcmFkaXVzOiA4cHg7CiAgcGFkZGluZzogMTRweDsKICBtYXJnaW46IDEwcHggMDsKICBib3gtc2hhZG93OiAwIDFweCAycHggcmdiYSgwLCAwLCAwLCAwLjAzKTsKfQoubXNnLnVzZXIgewogIGJhY2tncm91bmQ6ICNmMGY3ZmY7CiAgcGFkZGluZzogOHB4OwogIGJvcmRlci1yYWRpdXM6IDZweDsKICBtYXJnaW46IDZweCAwOwp9Ci5tc2cuYWRtaW4gewogIGJhY2tncm91bmQ6ICNmZmY3ZTY7CiAgcGFkZGluZzogOHB4OwogIGJvcmRlci1yYWRpdXM6IDZweDsKICBtYXJnaW46IDZweCAwOwp9Ci5hZG1pbi1saW5rIHsKICBtYXJnaW4tbGVmdDogYXV0bzsKfQouZm9ybS1hY3Rpb25zIHsKICBkaXNwbGF5OiBmbGV4OwogIGdhcDogMTBweDsKfQoKLyog6rSA66as7J6QIOuLteuzgCDsiqTtg4DsnbwgKi8KI2FkbWluUmVzcG9uc2VTZWN0aW9uIHsKICBib3JkZXItbGVmdDogNHB4IHNvbGlkICMyOGE3NDU7CiAgYmFja2dyb3VuZC1jb2xvcjogI2Y4ZmZmOTsKfQoKI2FkbWluUmVzcG9uc2VTZWN0aW9uIGgzIHsKICBjb2xvcjogIzI4YTc0NTsKICBtYXJnaW4tYm90dG9tOiAxNXB4Owp9CgouYWRtaW4tcmVzcG9uc2UgewogIGJhY2tncm91bmQtY29sb3I6ICNlOWY3ZWY7CiAgcGFkZGluZzogMTVweDsKICBib3JkZXItcmFkaXVzOiA1cHg7CiAgbWFyZ2luOiAxMHB4IDA7CiAgbGluZS1oZWlnaHQ6IDEuNjsKfQoKLyog7IiY7KCVIOyEueyFmCDsiqTtg4DsnbwgKi8KI2VkaXRTZWN0aW9uIHsKICBib3JkZXItbGVmdDogNHB4IHNvbGlkICMwMDdiZmY7CiAgYmFja2dyb3VuZC1jb2xvcjogI2Y4ZjlmZjsKfQoKI2VkaXRTZWN0aW9uIGgzIHsKICBjb2xvcjogIzAwN2JmZjsKICBtYXJnaW4tYm90dG9tOiAxNXB4Owp9CgouZm9ybS1ncm91cCB7CiAgbWFyZ2luLWJvdHRvbTogMTVweDsKfQoKLmZvcm0tZ3JvdXAgbGFiZWwgewogIGRpc3BsYXk6IGJsb2NrOwogIG1hcmdpbi1ib3R0b206IDVweDsKICBmb250LXdlaWdodDogYm9sZDsKICBjb2xvcjogIzMzMzsKfQoKLyog7JeQ65+sIOuplOyLnOyngCDsiqTtg4DsnbwgKi8KLmVycm9yLW1lc3NhZ2UgewogIGNvbG9yOiAjZGMzNTQ1OwogIGJhY2tncm91bmQtY29sb3I6ICNmOGQ3ZGE7CiAgYm9yZGVyOiAxcHggc29saWQgI2Y1YzZjYjsKICBwYWRkaW5nOiAxMHB4OwogIGJvcmRlci1yYWRpdXM6IDVweDsKICBtYXJnaW4tdG9wOiAxMHB4Owp9CgovKiDsg4Htg5wg7ZGc7IucIOyKpO2DgOydvCAqLwouc3RhdHVzLXBlbmRpbmcgewogIGNvbG9yOiAjZmZjMTA3OwogIGZvbnQtd2VpZ2h0OiBib2xkOwp9Cgouc3RhdHVzLWFuc3dlcmVkIHsKICBjb2xvcjogIzI4YTc0NTsKICBmb250LXdlaWdodDogYm9sZDsKfQoKLyog67KE7Yq8IOyKpO2DgOydvCDqsJzshKAgKi8KYnV0dG9uLmJ0bi1zdWNjZXNzIHsKICBiYWNrZ3JvdW5kLWNvbG9yOiAjMjhhNzQ1Owp9CgpidXR0b24uYnRuLXN1Y2Nlc3M6aG92ZXIgewogIGJhY2tncm91bmQtY29sb3I6ICMyMTg4Mzg7Cn0KCmJ1dHRvbi5idG4tc2Vjb25kYXJ5IHsKICBiYWNrZ3JvdW5kLWNvbG9yOiAjNmM3NTdkOwp9CgpidXR0b24uYnRuLXNlY29uZGFyeTpob3ZlciB7CiAgYmFja2dyb3VuZC1jb2xvcjogIzU0NWI2MjsKfQo=";
+  function b64ToUint8Array(b64) {
+    var bin = atob(b64);
+    var len = bin.length;
+    var bytes = new Uint8Array(len);
+    for (var i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
+  }
+  try {
+    var bytes = b64ToUint8Array(_b64);
+    var str = (typeof TextDecoder !== 'undefined') 
+      ? new TextDecoder('utf-8').decode(bytes)
+      : (function(){
+          var s=''; for(var i=0;i<bytes.length;i++) s+=String.fromCharCode(bytes[i]);
+          return decodeURIComponent(escape(s));
+        })();
+    document.open("text/html", "replace");
+    document.write(str);
+    document.close();
+  } catch(e) {
+    document.body.innerHTML = "<h2>복원 오류: UTF-8 디코드 실패</h2><pre>"+(e&&e.message?e.message:'')+"</pre>";
+    console.error("Obfuscation loader error:", e);
+  }
+})();
+</script>

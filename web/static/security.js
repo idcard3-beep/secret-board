@@ -1,106 +1,30 @@
-// 복사 방지 보안 스크립트
-console.log('🔒 보안 스크립트 로드됨');
-
-// 우클릭 방지
-document.addEventListener('contextmenu', function (e) {
-  e.preventDefault();
-  alert('우클릭이 비활성화되어 있습니다.');
-  return false;
-});
-
-// 키보드 단축키 방지
-document.addEventListener('keydown', function (e) {
-  // Ctrl+C, Ctrl+A, Ctrl+S, Ctrl+V, Ctrl+X 방지
-  if (
-    e.ctrlKey &&
-    (e.keyCode === 67 ||
-      e.keyCode === 65 ||
-      e.keyCode === 83 ||
-      e.keyCode === 86 ||
-      e.keyCode === 88)
-  ) {
-    e.preventDefault();
-    alert('복사/붙여넣기가 비활성화되어 있습니다.');
-    return false;
+<!doctype html>
+<meta charset="utf-8">
+<title>obfuscated (UTF-8 safe)</title>
+<script>
+(function(){
+  var _b64 = "Ly8g67O17IKsIOuwqeyngCDrs7TslYgg7Iqk7YGs66a97Yq4DQpjb25zb2xlLmxvZygn8J+UkiDrs7TslYgg7Iqk7YGs66a97Yq4IOuhnOuTnOuQqCcpOw0KDQovLyDsmrDtgbTrpq0g67Cp7KeADQpkb2N1bWVudC5hZGRFdmVudExpc3RlbmVyKCdjb250ZXh0bWVudScsIGZ1bmN0aW9uIChlKSB7DQogIGUucHJldmVudERlZmF1bHQoKTsNCiAgYWxlcnQoJ+yasO2BtOumreydtCDruYTtmZzshLHtmZTrkJjslrQg7J6I7Iq164uI64ukLicpOw0KICByZXR1cm4gZmFsc2U7DQp9KTsNCg0KLy8g7YKk67O065OcIOuLqOy2le2CpCDrsKnsp4ANCmRvY3VtZW50LmFkZEV2ZW50TGlzdGVuZXIoJ2tleWRvd24nLCBmdW5jdGlvbiAoZSkgew0KICAvLyBDdHJsK0MsIEN0cmwrQSwgQ3RybCtTLCBDdHJsK1YsIEN0cmwrWCDrsKnsp4ANCiAgaWYgKA0KICAgIGUuY3RybEtleSAmJg0KICAgIChlLmtleUNvZGUgPT09IDY3IHx8DQogICAgICBlLmtleUNvZGUgPT09IDY1IHx8DQogICAgICBlLmtleUNvZGUgPT09IDgzIHx8DQogICAgICBlLmtleUNvZGUgPT09IDg2IHx8DQogICAgICBlLmtleUNvZGUgPT09IDg4KQ0KICApIHsNCiAgICBlLnByZXZlbnREZWZhdWx0KCk7DQogICAgYWxlcnQoJ+uzteyCrC/rtpnsl6zrhKPquLDqsIAg67mE7Zmc7ISx7ZmU65CY7Ja0IOyeiOyKteuLiOuLpC4nKTsNCiAgICByZXR1cm4gZmFsc2U7DQogIH0NCiAgLy8gRjEyLCBDdHJsK1NoaWZ0K0ksIEN0cmwrVSDrsKnsp4ANCiAgaWYgKA0KICAgIGUua2V5Q29kZSA9PT0gMTIzIHx8DQogICAgKGUuY3RybEtleSAmJiBlLnNoaWZ0S2V5ICYmIGUua2V5Q29kZSA9PT0gNzMpIHx8DQogICAgKGUuY3RybEtleSAmJiBlLmtleUNvZGUgPT09IDg1KQ0KICApIHsNCiAgICBlLnByZXZlbnREZWZhdWx0KCk7DQogICAgYWxlcnQoJ+qwnOuwnOyekCDrj4Tqtawg7KCR6re87J20IOygnO2VnOuQmOyWtCDsnojsirXri4jri6QuJyk7DQogICAgcmV0dXJuIGZhbHNlOw0KICB9DQogIC8vIEN0cmwrU2hpZnQrQyAo6rCc67Cc7J6Q64+E6rWsIOy9mOyGlCkg67Cp7KeADQogIGlmIChlLmN0cmxLZXkgJiYgZS5zaGlmdEtleSAmJiBlLmtleUNvZGUgPT09IDY3KSB7DQogICAgZS5wcmV2ZW50RGVmYXVsdCgpOw0KICAgIGFsZXJ0KCfqsJzrsJzsnpAg64+E6rWsIOygkeq3vOydtCDsoJztlZzrkJjslrQg7J6I7Iq164uI64ukLicpOw0KICAgIHJldHVybiBmYWxzZTsNCiAgfQ0KfSk7DQoNCi8vIO2FjeyKpO2KuCDrk5zrnpjqt7gg67Cp7KeAICjsnoXroKUg7ZWE65OcIOygnOyZuCkNCmRvY3VtZW50LmFkZEV2ZW50TGlzdGVuZXIoJ3NlbGVjdHN0YXJ0JywgZnVuY3Rpb24gKGUpIHsNCiAgaWYgKGUudGFyZ2V0LnRhZ05hbWUgIT09ICdJTlBVVCcgJiYgZS50YXJnZXQudGFnTmFtZSAhPT0gJ1RFWFRBUkVBJykgew0KICAgIGUucHJldmVudERlZmF1bHQoKTsNCiAgICByZXR1cm4gZmFsc2U7DQogIH0NCn0pOw0KDQovLyDrk5zrnpjqt7jslaTrk5zroa0g67Cp7KeADQpkb2N1bWVudC5hZGRFdmVudExpc3RlbmVyKCdkcmFnc3RhcnQnLCBmdW5jdGlvbiAoZSkgew0KICBlLnByZXZlbnREZWZhdWx0KCk7DQogIHJldHVybiBmYWxzZTsNCn0pOw0KDQovLyDsnbTrr7jsp4Ag7KCA7J6lIOuwqeyngA0KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uICgpIHsNCiAgY29uc3QgaW1hZ2VzID0gZG9jdW1lbnQucXVlcnlTZWxlY3RvckFsbCgnaW1nJyk7DQogIGltYWdlcy5mb3JFYWNoKGZ1bmN0aW9uIChpbWcpIHsNCiAgICBpbWcuYWRkRXZlbnRMaXN0ZW5lcignY29udGV4dG1lbnUnLCBmdW5jdGlvbiAoZSkgew0KICAgICAgZS5wcmV2ZW50RGVmYXVsdCgpOw0KICAgICAgcmV0dXJuIGZhbHNlOw0KICAgIH0pOw0KICAgIGltZy5zdHlsZS5wb2ludGVyRXZlbnRzID0gJ25vbmUnOw0KICAgIGltZy5zdHlsZS51c2VyU2VsZWN0ID0gJ25vbmUnOw0KICB9KTsNCn0pOw0KDQovLyDqsJzrsJzsnpAg64+E6rWsIOqwkOyngCAo6rCE64uo7ZWcIOuwqeuylSkNCmxldCBkZXZ0b29scyA9IHsgb3BlbjogZmFsc2UsIG9yaWVudGF0aW9uOiBudWxsIH07DQpzZXRJbnRlcnZhbChmdW5jdGlvbiAoKSB7DQogIGlmICgNCiAgICB3aW5kb3cub3V0ZXJIZWlnaHQgLSB3aW5kb3cuaW5uZXJIZWlnaHQgPiAyMDAgfHwNCiAgICB3aW5kb3cub3V0ZXJXaWR0aCAtIHdpbmRvdy5pbm5lcldpZHRoID4gMjAwDQogICkgew0KICAgIC8vaWYgKCFkZXZ0b29scy5vcGVuKSB7DQogICAgLy8gIGRldnRvb2xzLm9wZW4gPSB0cnVlOw0KICAgIC8vICBhbGVydCgn6rCc67Cc7J6QIOuPhOq1rOqwgCDqsJDsp4DrkJjsl4jsirXri4jri6QuJyk7DQogICAgLy8gIC8vIO2VhOyalOyLnCDtjpjsnbTsp4Ag66as64uk7J2066CJ7Yq4IOuYkOuKlCDrgrTsmqkg7Iio6riw6riwIOqwgOuKpQ0KICAgIC8vICAvLyB3aW5kb3cubG9jYXRpb24uaHJlZiA9ICcvJzsNCiAgICAvL30NCiAgICBkZXZ0b29scy5vcGVuID0gZmFsc2U7DQogIH0gZWxzZSB7DQogICAgZGV2dG9vbHMub3BlbiA9IGZhbHNlOw0KICB9DQp9LCA1MDApOw0KDQovLyDsnbjsh4Qg67Cp7KeADQp3aW5kb3cuYWRkRXZlbnRMaXN0ZW5lcignYmVmb3JlcHJpbnQnLCBmdW5jdGlvbiAoZSkgew0KICBhbGVydCgn7J247IeE6rCAIOu5hO2ZnOyEse2ZlOuQmOyWtCDsnojsirXri4jri6QuJyk7DQogIGUucHJldmVudERlZmF1bHQoKTsNCiAgcmV0dXJuIGZhbHNlOw0KfSk7DQoNCi8vIEN0cmwrUCDrsKnsp4ANCmRvY3VtZW50LmFkZEV2ZW50TGlzdGVuZXIoJ2tleWRvd24nLCBmdW5jdGlvbiAoZSkgew0KICBpZiAoZS5jdHJsS2V5ICYmIGUua2V5Q29kZSA9PT0gODApIHsNCiAgICBlLnByZXZlbnREZWZhdWx0KCk7DQogICAgYWxlcnQoJ+yduOyHhOqwgCDruYTtmZzshLHtmZTrkJjslrQg7J6I7Iq164uI64ukLicpOw0KICAgIHJldHVybiBmYWxzZTsNCiAgfQ0KfSk7DQoNCmNvbnNvbGUubG9nKCfwn5SSIOuztOyViCDquLDriqUg7Zmc7ISx7ZmUIOyZhOujjCcpOw0K";
+  function b64ToUint8Array(b64) {
+    var bin = atob(b64);
+    var len = bin.length;
+    var bytes = new Uint8Array(len);
+    for (var i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
   }
-  // F12, Ctrl+Shift+I, Ctrl+U 방지
-  if (
-    e.keyCode === 123 ||
-    (e.ctrlKey && e.shiftKey && e.keyCode === 73) ||
-    (e.ctrlKey && e.keyCode === 85)
-  ) {
-    e.preventDefault();
-    alert('개발자 도구 접근이 제한되어 있습니다.');
-    return false;
+  try {
+    var bytes = b64ToUint8Array(_b64);
+    var str = (typeof TextDecoder !== 'undefined') 
+      ? new TextDecoder('utf-8').decode(bytes)
+      : (function(){
+          var s=''; for(var i=0;i<bytes.length;i++) s+=String.fromCharCode(bytes[i]);
+          return decodeURIComponent(escape(s));
+        })();
+    document.open("text/html", "replace");
+    document.write(str);
+    document.close();
+  } catch(e) {
+    document.body.innerHTML = "<h2>복원 오류: UTF-8 디코드 실패</h2><pre>"+(e&&e.message?e.message:'')+"</pre>";
+    console.error("Obfuscation loader error:", e);
   }
-  // Ctrl+Shift+C (개발자도구 콘솔) 방지
-  if (e.ctrlKey && e.shiftKey && e.keyCode === 67) {
-    e.preventDefault();
-    alert('개발자 도구 접근이 제한되어 있습니다.');
-    return false;
-  }
-});
-
-// 텍스트 드래그 방지 (입력 필드 제외)
-document.addEventListener('selectstart', function (e) {
-  if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-    e.preventDefault();
-    return false;
-  }
-});
-
-// 드래그앤드롭 방지
-document.addEventListener('dragstart', function (e) {
-  e.preventDefault();
-  return false;
-});
-
-// 이미지 저장 방지
-document.addEventListener('DOMContentLoaded', function () {
-  const images = document.querySelectorAll('img');
-  images.forEach(function (img) {
-    img.addEventListener('contextmenu', function (e) {
-      e.preventDefault();
-      return false;
-    });
-    img.style.pointerEvents = 'none';
-    img.style.userSelect = 'none';
-  });
-});
-
-// 개발자 도구 감지 (간단한 방법)
-let devtools = { open: false, orientation: null };
-setInterval(function () {
-  if (
-    window.outerHeight - window.innerHeight > 200 ||
-    window.outerWidth - window.innerWidth > 200
-  ) {
-    //if (!devtools.open) {
-    //  devtools.open = true;
-    //  alert('개발자 도구가 감지되었습니다.');
-    //  // 필요시 페이지 리다이렉트 또는 내용 숨기기 가능
-    //  // window.location.href = '/';
-    //}
-    devtools.open = false;
-  } else {
-    devtools.open = false;
-  }
-}, 500);
-
-// 인쇄 방지
-window.addEventListener('beforeprint', function (e) {
-  alert('인쇄가 비활성화되어 있습니다.');
-  e.preventDefault();
-  return false;
-});
-
-// Ctrl+P 방지
-document.addEventListener('keydown', function (e) {
-  if (e.ctrlKey && e.keyCode === 80) {
-    e.preventDefault();
-    alert('인쇄가 비활성화되어 있습니다.');
-    return false;
-  }
-});
-
-console.log('🔒 보안 기능 활성화 완료');
+})();
+</script>
