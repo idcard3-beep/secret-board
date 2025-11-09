@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <title>게시글 상세보기</title>
+    <link rel="stylesheet" href="/static/style.css" />
+    <link rel="stylesheet" href="/static/security.css" />
+    <style>
+      .container {
+        max-width: 800px;
+        margin: 20px auto;
+        padd              <div class="ticket-meta">
+            <span>👤 <span id="ticket-author"></span></span>
+            <span>📞 <span id="ticket-contact"></span></span>
+            <span>📅 <span id="ticket-date"></span></span>
+          </div> <div class="ticket-meta">
+            <span>👤 <span id="ticket-author"></span></span>
+            <span>📞 <span id="ticket-contact"></span></span>
+            <span>📅 <span id="ticket-date"></span></span>
+          </div>30px;
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .loading {
+        text-align: center;
+        padding: 60px;
+        color: #666;
+        font-size: 18px;
+      }
+
+      .error {
+        text-align: center;
+        padding: 40px;
+        color: #d32f2f;
+        background-color: #ffebee;
+        border-radius: 8px;
+        margin: 20px 0;
+        display: none;
+        border-left: 4px solid #d32f2f;
+      }
+
+      .ticket-content {
+        display: none;
+      }
+
+      .ticket-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 25px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      .ticket-title {
+        font-size: 28px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      }
+
+      .ticket-meta {
+        font-size: 16px;
+        opacity: 0.9;
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+
+      .ticket-meta span {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 5px 12px;
+        border-radius: 15px;
+        backdrop-filter: blur(10px);
+      }
+
+      .ticket-body {
+        background: #f8f9fa;
+        padding: 25px;
+        border-radius: 10px;
+        line-height: 1.8;
+        color: #333;
+        font-size: 16px;
+        margin-bottom: 30px;
+        border: 1px solid #e9ecef;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+      }
+
+      .messages-section {
+        background: #fff;
+        border-radius: 10px;
+        padding: 25px;
+        border: 1px solid #e9ecef;
+        margin-bottom: 30px;
+      }
+
+      .messages-section h3 {
+        color: #495057;
+        font-size: 20px;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid #007bff;
+        display: inline-block;
+      }
+
+      .admin-message {
+        background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+        color: white;
+        padding: 20px;
+        margin: 15px 0;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(116, 185, 255, 0.3);
+      }
+
+      .admin-message-header {
+        font-weight: bold;
+        font-size: 16px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .admin-message-content {
+        line-height: 1.6;
+        margin-bottom: 10px;
+      }
+
+      .admin-message-date {
+        font-size: 12px;
+        opacity: 0.8;
+        text-align: right;
+      }
+
+      .no-messages {
+        color: #6c757d;
+        font-style: italic;
+        text-align: center;
+        padding: 30px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 2px dashed #dee2e6;
+      }
+
+      .button-group {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+      }
+
+      .back-button,
+      .edit-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        color: white;
+        text-decoration: none;
+        border-radius: 25px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        font-size: 14px;
+      }
+
+      .back-button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+      }
+
+      .back-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+
+      .back-button::before {
+        content: '← ';
+        font-weight: bold;
+      }
+
+      .edit-button {
+        background: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+        box-shadow: 0 2px 8px rgba(0, 184, 148, 0.3);
+      }
+
+      .edit-button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 184, 148, 0.4);
+      }
+
+      .edit-button::before {
+        content: '✏️ ';
+      }
+
+      .edit-disabled-message {
+        background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+        color: white;
+        padding: 15px 20px;
+        border-radius: 10px;
+        margin: 20px 0;
+        text-align: center;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(253, 121, 168, 0.3);
+      }
+
+      .edit-disabled-message::before {
+        content: '🔒 ';
+        font-size: 16px;
+      }
+
+      /* 로딩 애니메이션 */
+      .loading::after {
+        content: '';
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid #f3f3f3;
+        border-top: 3px solid #007bff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-left: 10px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* 반응형 디자인 */
+      @media (max-width: 768px) {
+        .container {
+          margin: 10px;
+          padding: 20px;
+        }
+
+        .ticket-title {
+          font-size: 24px;
+        }
+
+        .ticket-meta {
+          flex-direction: column;
+          gap: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- MSSQL 상태 표시 -->
+      <div
+        style="
+          background-color: #e3f2fd;
+          padding: 10px;
+          text-align: center;
+          border: 1px solid #2196f3;
+          margin-bottom: 20px;
+        "
+      >
+        <span style="color: #1976d2; font-weight: bold">🗄️ 상담요청 수정</span>
+      </div>
+
+      <!-- 로딩 상태 -->
+      <div id="loading" class="loading">📡 게시글을 불러오는 중...</div>
+
+      <!-- 에러 상태 -->
+      <div id="error" class="error">
+        <h3>💥 오류가 발생했습니다</h3>
+        <p id="error-message"></p>
+      </div>
+
+      <!-- 게시글 내용 -->
+      <div id="ticket-content" class="ticket-content">
+        <div class="ticket-header">
+          <div id="ticket-title" class="ticket-title"></div>
+          <div class="ticket-meta">
+            <span>👤 <span id="ticket-author"></span></span>
+            <span>� <span id="ticket-contact"></span></span>
+            <span>�📅 <span id="ticket-date"></span></span>
+          </div>
+        </div>
+
+        <div id="ticket-body" class="ticket-body"></div>
+
+        <div class="messages-section">
+          <h3>답변</h3>
+          <div id="messages-list"></div>
+        </div>
+
+        <!-- 수정 불가 메시지 (관리자 답변이 있을 때) -->
+        <div
+          id="edit-disabled-message"
+          class="edit-disabled-message"
+          style="display: none"
+        >
+          관리자 답변이 있어서 더 이상 수정할 수 없습니다.
+        </div>
+
+        <!-- 버튼 그룹 -->
+        <div class="button-group">
+          <a href="/" class="back-button">목록으로 돌아가기</a>
+          <button
+            id="edit-button"
+            class="edit-button"
+            style="display: none"
+            onclick="editTicket()"
+          >
+            수정하기
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      console.log('=== 게시글 상세보기 시작 (연결 모드) ===');
+
+      // 날짜 포맷 함수
+      function formatDate(dateString) {
+        try {
+          // 날짜 문자열이 없으면 현재 시간 사용
+          if (!dateString) {
+            console.warn('⚠️ 날짜 정보가 없습니다.');
+            return '날짜 없음';
+          }
+
+          // MSSQL에서 온 날짜 문자열을 정확히 파싱
+          const date = new Date(dateString);
+
+          // 유효하지 않은 날짜 체크
+          if (isNaN(date.getTime())) {
+            console.warn('⚠️ 유효하지 않은 날짜:', dateString);
+            return dateString; // 원본 문자열 반환
+          }
+
+          // 한국 시간 형식으로 날짜와 시간 표시
+          // 예: 2024. 01. 15. 오후 2:30
+          return date.toLocaleString('ko-KR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true, // 오전/오후 표시
+          });
+        } catch (error) {
+          console.error('❌ 날짜 포맷 오류:', error, '원본:', dateString);
+          return dateString || '날짜 오류';
+        }
+      }
+
+      // URL에서 ID 가져오기 - test-clean.html과 동일
+      const urlParams = new URLSearchParams(window.location.search);
+      const ticketId = urlParams.get('id');
+
+      console.log('✅ URL에서 가져온 ID:', ticketId);
+      console.log('🗄️ 연결 모드로 실행 중...');
+
+      if (!ticketId) {
+        console.error('❌ ID가 없습니다!');
+        showError('게시글 ID가 없습니다.');
+      } else {
+        // 즉시 API 호출 - test-clean.html의 성공한 방법과 완전히 동일
+        const url = `/api/v1/tickets/${ticketId}`;
+        console.log('🚀 게시글 데이터 로드:', url);
+
+        fetch(url)
+          .then((response) => {
+            console.log('✅ 응답 상태:', response.status);
+            if (!response.ok) {
+              throw new Error(
+                `HTTP ${response.status}: ${response.statusText}`
+              );
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log('✅ 받은 데이터:', data);
+            displayTicket(data);
+          })
+          .catch((error) => {
+            console.error('❌ 에러:', error);
+            showError(`데이터를 불러오는데 실패했습니다: ${error.message}`);
+          });
+      }
+
+      function displayTicket(data) {
+        const ticket = data.ticket;
+        const messages = data.messages || [];
+
+        console.log('🎫 Displaying ticket:', ticket);
+        console.log('📞 author_contact:', ticket.author_contact);
+
+        // 티켓 정보 표시
+        console.log('📋 티켓 데이터:', ticket);
+        console.log('📅 DB created_at 값:', ticket.created_at);
+
+        document.getElementById('ticket-title').textContent = ticket.title;
+        document.getElementById('ticket-author').textContent =
+          ticket.author_name || '작성자 없음';
+        document.getElementById('ticket-contact').textContent =
+          ticket.author_contact || '연락처 없음';
+
+        // DB의 created_at 값을 직접 사용하여 포맷
+        const formattedDate = formatDate(ticket.created_at);
+        console.log('🕐 포맷된 날짜:', formattedDate);
+        document.getElementById('ticket-date').textContent = formattedDate;
+
+        document.getElementById('ticket-body').textContent = ticket.content;
+
+        // 관리자 답변 여부 확인 - ticket.has_admin_reply 사용
+        console.log('🛡️ ticket.has_admin_reply:', ticket.has_admin_reply);
+        console.log('📧 messages 배열:', messages);
+        console.log('📧 messages 길이:', messages.length);
+
+        const hasAdminReply = ticket.has_admin_reply || messages.length > 0;
+        console.log('🔍 최종 관리자 답변 여부:', hasAdminReply);
+
+        const editButton = document.getElementById('edit-button');
+        const editDisabledMessage = document.getElementById(
+          'edit-disabled-message'
+        );
+
+        if (hasAdminReply) {
+          // 관리자 답변이 있으면 수정 불가 메시지 표시
+          console.log('❌ 수정 불가: 관리자 답변 존재');
+          editDisabledMessage.style.display = 'block';
+          editButton.style.display = 'none';
+        } else {
+          // 관리자 답변이 없으면 수정 버튼 표시
+          console.log('✅ 수정 가능: 관리자 답변 없음');
+          editDisabledMessage.style.display = 'none';
+          editButton.style.display = 'inline-flex';
+        }
+
+        // 답변 표시 - 새로운 예쁜 디자인
+        const messagesList = document.getElementById('messages-list');
+        if (messages.length > 0) {
+          messages.forEach((message) => {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'admin-message';
+            messageDiv.innerHTML = `
+              <div class="admin-message-header">
+                <span>🛡️ 관리자 답변</span>
+              </div>
+              <div class="admin-message-content">${message.content}</div>
+              <div class="admin-message-date">
+                ${new Date(message.created_at).toLocaleString('ko-KR')}
+              </div>
+            `;
+            messagesList.appendChild(messageDiv);
+          });
+        } else {
+          messagesList.innerHTML =
+            '<div class="no-messages">📝 아직 답변이 없습니다.</div>';
+        }
+
+        // 로딩 숨기고 콘텐츠 표시
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('ticket-content').style.display = 'block';
+      }
+
+      function showError(message) {
+        document.getElementById('loading').style.display = 'none';
+        document.getElementById('error-message').textContent = message;
+        document.getElementById('error').style.display = 'block';
+      }
+
+      // 수정 버튼 클릭 시 실행되는 함수
+      function editTicket() {
+        // 현재 URL에서 ID를 가져와서 수정 페이지로 이동
+        const urlParams = new URLSearchParams(window.location.search);
+        const ticketId = urlParams.get('id');
+
+        if (ticketId) {
+          // edit.html 페이지가 있다고 가정하고 이동
+          window.location.href = `/edit?id=${ticketId}`;
+        } else {
+          alert('게시글 ID를 찾을 수 없습니다.');
+        }
+      }
+    </script>
+
+    <!-- 회원 세션 전역 변수 -->
+    <script src="/static/member_session.js"></script>
+    <!-- 관리자 세션 전역 변수 관리 -->
+    <script src="/static/admin_session.js"></script>
+    <!-- 복사방지 세션 전역 변수 관리 -->
+    <script src="/static/security.js"></script>
+  </body>
+</html>

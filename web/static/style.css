@@ -1,0 +1,167 @@
+body {
+  font-family: system-ui, Arial, sans-serif;
+  padding: 20px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+h2 {
+  margin-bottom: 10px;
+}
+.actions,
+.toolbar {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px 0;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+th,
+td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+tr:hover {
+  background: #f8f8f8;
+  cursor: pointer;
+}
+button {
+  background: #357a38;
+  color: white;
+  border: 0;
+  padding: 8px 12px;
+  border-radius: 6px;
+}
+button:hover {
+  opacity: 0.9;
+}
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin: 4px 0 12px;
+}
+
+/* toolbar 내 select 크기 조정 */
+.toolbar select {
+  width: 140px;
+}
+
+/* toolbar 내 button 크기 조정 */
+.toolbar button {
+  min-width: 110px;
+  padding: 8px 16px;
+}
+.card {
+  border: 1px solid #eee;
+  border-radius: 8px;
+  padding: 14px;
+  margin: 10px 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+.msg.user {
+  background: #f0f7ff;
+  padding: 8px;
+  border-radius: 6px;
+  margin: 6px 0;
+}
+.msg.admin {
+  background: #fff7e6;
+  padding: 8px;
+  border-radius: 6px;
+  margin: 6px 0;
+}
+.admin-link {
+  margin-left: auto;
+}
+.form-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* 관리자 답변 스타일 */
+#adminResponseSection {
+  border-left: 4px solid #28a745;
+  background-color: #f8fff9;
+}
+
+#adminResponseSection h3 {
+  color: #28a745;
+  margin-bottom: 15px;
+}
+
+.admin-response {
+  background-color: #e9f7ef;
+  padding: 15px;
+  border-radius: 5px;
+  margin: 10px 0;
+  line-height: 1.6;
+}
+
+/* 수정 섹션 스타일 */
+#editSection {
+  border-left: 4px solid #007bff;
+  background-color: #f8f9ff;
+}
+
+#editSection h3 {
+  color: #007bff;
+  margin-bottom: 15px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* 에러 메시지 스타일 */
+.error-message {
+  color: #dc3545;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  padding: 10px;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+/* 상태 표시 스타일 */
+.status-pending {
+  color: #ffc107;
+  font-weight: bold;
+}
+
+.status-answered {
+  color: #28a745;
+  font-weight: bold;
+}
+
+/* 버튼 스타일 개선 */
+button.btn-success {
+  background-color: #28a745;
+}
+
+button.btn-success:hover {
+  background-color: #218838;
+}
+
+button.btn-secondary {
+  background-color: #6c757d;
+}
+
+button.btn-secondary:hover {
+  background-color: #545b62;
+}
