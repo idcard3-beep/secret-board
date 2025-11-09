@@ -39,7 +39,7 @@ def list_tickets():
             "author_gender": r.get('author_gender', ''),
             "birth_year": r.get('birth_year'),
             "snsgu": r.get('snsgu', ''),
-            "sMember_id": r.get('sMember_id', ''),
+            "sMember_id": r.get('smember_id', ''),  # PostgreSQL 소문자 컬럼명에서 가져옴
             "status": r.get('status', 'OPEN'),
             "created_at": created_at_str,
             "updated_at": updated_at_str,
@@ -98,6 +98,10 @@ def create_ticket():
         snsgu = d.get('snsgu', 'A0001')
         print(f"🏢 snsgu 값: {snsgu}")
         
+        # sMember_id 값 처리 (전역변수에서 받은 회원 ID)
+        sMember_id = d.get('sMember_id', None)
+        print(f"👤 sMember_id 값: {sMember_id}")
+        
         # 딕셔너리 형태로 티켓 데이터 구성
         ticket = {
             'title': d['title'],
@@ -107,7 +111,8 @@ def create_ticket():
             'password_hash': hashed,  # 또는 post_pwd_hash
             'post_pwd_hash': hashed,
             'agreement': agreement,
-            'snsgu': snsgu
+            'snsgu': snsgu,
+            'sMember_id': sMember_id  # 회원 ID 추가
         }
         
         print(f"🔄 Repository로 티켓 생성 시작")

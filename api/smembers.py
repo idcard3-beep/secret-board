@@ -47,6 +47,22 @@ def get_all_members():
         print(f"❌ 회원 목록 조회 실패: {e}")
         return jsonify({'ok': False, 'error': str(e)}), 500
 
+@bp.get('/check/<smem_id>')
+def check_member_id(smem_id):
+    """회원 ID 중복 확인"""
+    try:
+        print(f"🔍 ID 중복 확인 요청: {smem_id}")
+        members = repo.get_smembers()
+        
+        # 입력한 ID와 정확히 일치하는 회원이 있는지 확인
+        exists = any(member.get('sMem_id') == smem_id for member in members)
+        
+        print(f"✅ 중복 여부: {exists}")
+        return jsonify({'exists': exists})
+    except Exception as e:
+        print(f"❌ ID 중복 확인 실패: {e}")
+        return jsonify({'exists': False, 'error': str(e)}), 500
+
 @bp.get('/<int:sm_id>')
 def get_member(sm_id):
     """특정 회원 조회"""

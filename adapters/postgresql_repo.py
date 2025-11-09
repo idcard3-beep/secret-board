@@ -97,6 +97,7 @@ class PostgreSQLRepo:
             'author_gender': ticket_data.get('author_gender'),
             'birth_year': ticket_data.get('birth_year'),
             'snsgu': ticket_data.get('snsgu'),
+            'sMember_id': ticket_data.get('sMember_id'),  # 회원 ID 추가
             'choice1': ticket_data.get('choice1', 0),
             'choice2': ticket_data.get('choice2', 0),
             'choice3': ticket_data.get('choice3', 0),
@@ -227,6 +228,7 @@ class PostgreSQLRepo:
                     'author_gender': kwargs.get('author_gender'),
                     'birth_year': kwargs.get('birth_year'),
                     'snsgu': kwargs.get('snsgu'),
+                    'smember_id': kwargs.get('sMember_id'),  # 회원 ID 추가 (소문자 컬럼명)
                     'choice1': kwargs.get('choice1', 0),
                     'choice2': kwargs.get('choice2', 0),
                     'choice3': kwargs.get('choice3', 0),
@@ -247,7 +249,7 @@ class PostgreSQLRepo:
                         title_masked, content_enc, post_pwd_hash,
                         author_name, author_nickname, author_contact,
                         author_phone, author_email, author_gender,
-                        birth_year, snsgu,
+                        birth_year, snsgu, smember_id,
                         choice1, choice2, choice3, choice4,
                         choice5, choice6, choice7, choice8,
                         choice9, choice10, choice11, choice12,
@@ -256,7 +258,7 @@ class PostgreSQLRepo:
                         %(title_masked)s, %(content_enc)s, %(post_pwd_hash)s,
                         %(author_name)s, %(author_nickname)s, %(author_contact)s,
                         %(author_phone)s, %(author_email)s, %(author_gender)s,
-                        %(birth_year)s, %(snsgu)s,
+                        %(birth_year)s, %(snsgu)s, %(smember_id)s,
                         %(choice1)s, %(choice2)s, %(choice3)s, %(choice4)s,
                         %(choice5)s, %(choice6)s, %(choice7)s, %(choice8)s,
                         %(choice9)s, %(choice10)s, %(choice11)s, %(choice12)s,
@@ -289,7 +291,7 @@ class PostgreSQLRepo:
                         author_gender,
                         birth_year,
                         snsgu,
-                        sMember_id,
+                        smember_id,
                         post_pwd_hash,
                         created_at,
                         updated_at,
@@ -765,7 +767,7 @@ class PostgreSQLRepo:
             with self._get_connection() as conn:
                 with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
                     cursor.execute("""
-                        SELECT * FROM sMembers 
+                        SELECT * FROM smembers 
                         ORDER BY created_at DESC
                     """)
                     members = cursor.fetchall()
@@ -783,7 +785,7 @@ class PostgreSQLRepo:
             with self._get_connection() as conn:
                 with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
                     cursor.execute("""
-                        SELECT * FROM sMembers WHERE sM_id = %s
+                        SELECT * FROM smembers WHERE sm_id = %s
                     """, (sm_id,))
                     member = cursor.fetchone()
                     if member:
@@ -808,67 +810,67 @@ class PostgreSQLRepo:
                     values = []
                     placeholders = []
                     
-                    # 모든 필드 처리
+                    # 모든 필드 처리 (PostgreSQL 소문자 변환됨)
                     field_mapping = {
-                        'sMem_id': 'sMem_id',
-                        'sMem_pwdHash': 'sMem_pwdHash',
-                        'sMem_pwd_salt': 'sMem_pwd_salt',
-                        'sMem_name': 'sMem_name',
-                        'sMem_nickname': 'sMem_nickname',
-                        'sMem_birthdt': 'sMem_birthdt',
-                        'sMem_birth_year': 'sMem_birth_year',
-                        'sMem_calendar_type': 'sMem_calendar_type',
-                        'sMem_gender': 'sMem_gender',
-                        'sMem_buss_name': 'sMem_buss_name',
-                        'sMem_comp_name': 'sMem_comp_name',
-                        'sMem_phone': 'sMem_phone',
-                        'sMem_mobile': 'sMem_mobile',
-                        'sMem_email': 'sMem_email',
+                        'sMem_id': 'smem_id',
+                        'sMem_pwdHash': 'smem_pwdhash',
+                        'sMem_pwd_salt': 'smem_pwd_salt',
+                        'sMem_name': 'smem_name',
+                        'sMem_nickname': 'smem_nickname',
+                        'sMem_birthdt': 'smem_birthdt',
+                        'sMem_birth_year': 'smem_birth_year',
+                        'sMem_calendar_type': 'smem_calendar_type',
+                        'sMem_gender': 'smem_gender',
+                        'sMem_buss_name': 'smem_buss_name',
+                        'sMem_comp_name': 'smem_comp_name',
+                        'sMem_phone': 'smem_phone',
+                        'sMem_mobile': 'smem_mobile',
+                        'sMem_email': 'smem_email',
                         'zipcode': 'zipcode',
                         'address1': 'address1',
                         'address2': 'address2',
                         'zipcode_s': 'zipcode_s',
                         'address1_s': 'address1_s',
                         'address2_s': 'address2_s',
-                        'sMem_snsgu': 'sMem_snsgu',
-                        'sMem_choice1': 'sMem_choice1',
-                        'sMem_choice2': 'sMem_choice2',
-                        'sMem_choice3': 'sMem_choice3',
-                        'sMem_choice4': 'sMem_choice4',
-                        'sMem_choice5': 'sMem_choice5',
-                        'sMem_choice6': 'sMem_choice6',
-                        'sMem_choice7': 'sMem_choice7',
-                        'sMem_choice8': 'sMem_choice8',
-                        'sMem_choice9': 'sMem_choice9',
-                        'sMem_choice10': 'sMem_choice10',
-                        'sMem_choice11': 'sMem_choice11',
-                        'sMem_choice12': 'sMem_choice12',
-                        'sMem_quest': 'sMem_quest',
-                        'sMem_content_enc': 'sMem_content_enc',
+                        'sMem_snsgu': 'smem_snsgu',
+                        'sMem_choice1': 'smem_choice1',
+                        'sMem_choice2': 'smem_choice2',
+                        'sMem_choice3': 'smem_choice3',
+                        'sMem_choice4': 'smem_choice4',
+                        'sMem_choice5': 'smem_choice5',
+                        'sMem_choice6': 'smem_choice6',
+                        'sMem_choice7': 'smem_choice7',
+                        'sMem_choice8': 'smem_choice8',
+                        'sMem_choice9': 'smem_choice9',
+                        'sMem_choice10': 'smem_choice10',
+                        'sMem_choice11': 'smem_choice11',
+                        'sMem_choice12': 'smem_choice12',
+                        'sMem_quest': 'smem_quest',
+                        'sMem_content_enc': 'smem_content_enc',
                         'old_name': 'old_name',
                         'new_name': 'new_name',
-                        'sMemfam_id': 'sMemfam_id',
+                        'sMemfam_id': 'smemfam_id',
                         'recommender': 'recommender',
                         'applicant': 'applicant',
                         'signature_file': 'signature_file',
                         'reference': 'reference',
-                        'sMem_agreement': 'sMem_agreement',
-                        'sMem_agree': 'sMem_agree',
-                        'sMem_admin_id': 'sMem_admin_id',
-                        'sMem_grade': 'sMem_grade',
-                        'sMem_status': 'sMem_status',
+                        'sMem_agreement': 'smem_agreement',
+                        'sMem_agree': 'smem_agree',
+                        'sMem_admin_id': 'smem_admin_id',
+                        'sMem_grade': 'smem_grade',
+                        'sMem_status': 'smem_status',
                         'family_gu': 'family_gu',
                         'adviser_role': 'adviser_role'
                     }
                     
                     for key, db_field in field_mapping.items():
                         if key in member_data:
-                            fields.append(db_field)
+                            fields.append(db_field)  # 소문자 테이블이므로 따옴표 불필요
                             values.append(member_data[key])
                             placeholders.append('%s')
                     
                     sql = f"""
-                        INSERT INTO sMembers ({', '.join(fields)})
+                        INSERT INTO smembers ({', '.join(fields)})
                         VALUES ({', '.join(placeholders)})
                         RETURNING *
                     """
@@ -896,60 +898,60 @@ class PostgreSQLRepo:
                     values = []
                     
                     field_mapping = {
-                        'sMem_id': 'sMem_id',
-                        'sMem_pwdHash': 'sMem_pwdHash',
-                        'sMem_pwd_salt': 'sMem_pwd_salt',
-                        'sMem_name': 'sMem_name',
-                        'sMem_nickname': 'sMem_nickname',
-                        'sMem_birthdt': 'sMem_birthdt',
-                        'sMem_birth_year': 'sMem_birth_year',
-                        'sMem_calendar_type': 'sMem_calendar_type',
-                        'sMem_gender': 'sMem_gender',
-                        'sMem_buss_name': 'sMem_buss_name',
-                        'sMem_comp_name': 'sMem_comp_name',
-                        'sMem_phone': 'sMem_phone',
-                        'sMem_mobile': 'sMem_mobile',
-                        'sMem_email': 'sMem_email',
+                        'sMem_id': 'smem_id',
+                        'sMem_pwdHash': 'smem_pwdhash',
+                        'sMem_pwd_salt': 'smem_pwd_salt',
+                        'sMem_name': 'smem_name',
+                        'sMem_nickname': 'smem_nickname',
+                        'sMem_birthdt': 'smem_birthdt',
+                        'sMem_birth_year': 'smem_birth_year',
+                        'sMem_calendar_type': 'smem_calendar_type',
+                        'sMem_gender': 'smem_gender',
+                        'sMem_buss_name': 'smem_buss_name',
+                        'sMem_comp_name': 'smem_comp_name',
+                        'sMem_phone': 'smem_phone',
+                        'sMem_mobile': 'smem_mobile',
+                        'sMem_email': 'smem_email',
                         'zipcode': 'zipcode',
                         'address1': 'address1',
                         'address2': 'address2',
                         'zipcode_s': 'zipcode_s',
                         'address1_s': 'address1_s',
                         'address2_s': 'address2_s',
-                        'sMem_snsgu': 'sMem_snsgu',
-                        'sMem_choice1': 'sMem_choice1',
-                        'sMem_choice2': 'sMem_choice2',
-                        'sMem_choice3': 'sMem_choice3',
-                        'sMem_choice4': 'sMem_choice4',
-                        'sMem_choice5': 'sMem_choice5',
-                        'sMem_choice6': 'sMem_choice6',
-                        'sMem_choice7': 'sMem_choice7',
-                        'sMem_choice8': 'sMem_choice8',
-                        'sMem_choice9': 'sMem_choice9',
-                        'sMem_choice10': 'sMem_choice10',
-                        'sMem_choice11': 'sMem_choice11',
-                        'sMem_choice12': 'sMem_choice12',
-                        'sMem_quest': 'sMem_quest',
-                        'sMem_content_enc': 'sMem_content_enc',
+                        'sMem_snsgu': 'smem_snsgu',
+                        'sMem_choice1': 'smem_choice1',
+                        'sMem_choice2': 'smem_choice2',
+                        'sMem_choice3': 'smem_choice3',
+                        'sMem_choice4': 'smem_choice4',
+                        'sMem_choice5': 'smem_choice5',
+                        'sMem_choice6': 'smem_choice6',
+                        'sMem_choice7': 'smem_choice7',
+                        'sMem_choice8': 'smem_choice8',
+                        'sMem_choice9': 'smem_choice9',
+                        'sMem_choice10': 'smem_choice10',
+                        'sMem_choice11': 'smem_choice11',
+                        'sMem_choice12': 'smem_choice12',
+                        'sMem_quest': 'smem_quest',
+                        'sMem_content_enc': 'smem_content_enc',
                         'old_name': 'old_name',
                         'new_name': 'new_name',
-                        'sMemfam_id': 'sMemfam_id',
+                        'sMemfam_id': 'smemfam_id',
                         'recommender': 'recommender',
                         'applicant': 'applicant',
                         'signature_file': 'signature_file',
                         'reference': 'reference',
-                        'sMem_agreement': 'sMem_agreement',
-                        'sMem_agree': 'sMem_agree',
-                        'sMem_admin_id': 'sMem_admin_id',
-                        'sMem_grade': 'sMem_grade',
-                        'sMem_status': 'sMem_status',
+                        'sMem_agreement': 'smem_agreement',
+                        'sMem_agree': 'smem_agree',
+                        'sMem_admin_id': 'smem_admin_id',
+                        'sMem_grade': 'smem_grade',
+                        'sMem_status': 'smem_status',
                         'family_gu': 'family_gu',
                         'adviser_role': 'adviser_role'
                     }
                     
                     for key, db_field in field_mapping.items():
                         if key in member_data:
-                            update_fields.append(f"{db_field} = %s")
+                            update_fields.append(f"{db_field} = %s")  # 소문자 테이블이므로 따옴표 불필요
                             values.append(member_data[key])
                     
                     # updated_at 추가
@@ -959,9 +961,9 @@ class PostgreSQLRepo:
                     values.append(sm_id)
                     
                     sql = f"""
-                        UPDATE sMembers 
+                        UPDATE smembers 
                         SET {', '.join(update_fields)}
-                        WHERE sM_id = %s
+                        WHERE sm_id = %s
                         RETURNING *
                     """
                     
@@ -988,7 +990,7 @@ class PostgreSQLRepo:
             with self._get_connection() as conn:
                 with conn.cursor() as cursor:
                     cursor.execute("""
-                        DELETE FROM sMembers WHERE sM_id = %s
+                        DELETE FROM smembers WHERE sm_id = %s
                     """, (sm_id,))
                     rows_affected = cursor.rowcount
                     conn.commit()
