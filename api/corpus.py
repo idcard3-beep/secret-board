@@ -5,7 +5,8 @@
 """
 
 from flask import Blueprint, request, jsonify
-import psycopg
+import psycopg2
+import psycopg2.extras
 import json
 from datetime import datetime
 from config.settings import DATABASE_URL
@@ -33,7 +34,8 @@ def backup_corpus():
 
         # PostgreSQL 직접 연결 (autocommit 사용)
         try:
-            conn = psycopg.connect(DATABASE_URL, autocommit=True)
+            conn = psycopg2.connect(DATABASE_URL)
+            conn.autocommit = True
             print("✅ PostgreSQL 연결 성공")
         except Exception as e:
             print(f"❌ DB 연결 실패: {e}")
@@ -122,7 +124,7 @@ def restore_corpus():
     """
     try:
         print("🔄 코퍼스 데이터 복원 시작 (로그인 체크 없음)")
-        conn = psycopg.connect(DATABASE_URL)
+        conn = psycopg2.connect(DATABASE_URL)
         
         with conn.cursor() as cursor:
             cursor.execute("SELECT gua_no, gua_data FROM corpus_data ORDER BY gua_no LIMIT 1")
@@ -209,7 +211,7 @@ def get_all_corpus():
     """
     try:
         print("📖 64괘 전체 코퍼스 데이터 조회 시작 (로그인 체크 없음)")
-        conn = psycopg.connect(DATABASE_URL)
+        conn = psycopg2.connect(DATABASE_URL)
         
         with conn.cursor() as cursor:
             # 64괘 전체 조회
@@ -301,7 +303,7 @@ def get_all_corpus():
 def test_db():
     """DB 연결 테스트"""
     try:
-        conn = psycopg.connect(DATABASE_URL)
+        conn = psycopg2.connect(DATABASE_URL)
         with conn.cursor() as cursor:
             cursor.execute("SELECT 1")
             cursor.execute("SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'corpus_data'")
@@ -321,7 +323,7 @@ def test_db():
 def check_data(gua_no):
     """특정 괘의 저장된 데이터 확인"""
     try:
-        conn = psycopg.connect(DATABASE_URL)
+        conn = psycopg2.connect(DATABASE_URL)
         with conn.cursor() as cursor:
             cursor.execute("SELECT gua_data FROM corpus_data WHERE gua_no = %s", (gua_no,))
             row = cursor.fetchone()
