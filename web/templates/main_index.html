@@ -282,6 +282,9 @@
         display: none;
         border-radius: 8px;
       }
+      .slider .slides img:first-child {
+        display: block;
+      }
 
       .dots {
         text-align: center;
@@ -595,14 +598,30 @@
           <li>
             <button class="menu-trigger">분야별 역학자료</button>
             <ul class="submenu">
-              <li><a href="#">타로카드 (Tarot Card)</a></li>
+              <li></li>
+                <a
+                  href="#"
+                  class="load-form"
+                  data-target="1101_tarot_cards.html"
+                  >타로카드 (Tarot Card)</a
+                >
+              </li>
+
               <li>
                 <a href="#" class="load-form" data-target="1102_6yao.html"
                   >육효(六爻)</a
                 >
               </li>
-              <li><a href="#">사주팔자(四柱八字)</a></li>
-              <li><a href="#">토정비결(土亭秘訣)</a></li>
+              <li>
+                <a href="#" class="load-form" data-target="1103_4Pillar.html"
+                  >사주팔자(四柱八字)</a
+                >
+              </li>
+              <li>
+                <a href="#" class="load-form" data-target="1104_tosecret.html"
+                  >토정비결(土亭秘訣)</a
+                >
+              </li>
             </ul>
           </li>
           <li>

@@ -15,6 +15,7 @@ from api.messages import bp as messages_bp
 from api.admin import bp as admin_bp
 from api.files import bp as files_bp
 from api.smembers import bp as smembers_bp
+from api.corpus import bp as corpus_bp
 from config.settings import UPLOAD_ROOT
 
 app = Flask(__name__, template_folder='web/templates', static_folder='web/static')
@@ -37,6 +38,8 @@ app.register_blueprint(files_bp, url_prefix="/api/v1/files")
 print("✅ files_bp 등록 완료")
 app.register_blueprint(smembers_bp, url_prefix="/api/v1/smembers")
 print("✅ smembers_bp 등록 완료")
+app.register_blueprint(corpus_bp, url_prefix="/api/v1/corpus")
+print("✅ corpus_bp 등록 완료")
 print("✅ 모든 Blueprint 등록 완료")
 
 # Pages
@@ -109,7 +112,16 @@ def page_0305_color_psychology120(): return render_template("0305_color_psycholo
 def page_0306_color_psychology1202(): return render_template("0306_color_psychology1202.html")
 
 @app.route("/1102_6yao.html")
-def page_1102_6yao(): return render_template("1102_6yao.html")
+@app.route("/1102_6yao")
+def page_1102_6yao(): 
+    # 로그인 체크 없이 바로 페이지 반환 (코퍼스 데이터는 API에서 직접 가져옴)
+    return render_template("1102_6yao.html")
+
+@app.route("/corpus_debug")
+@app.route("/corpus_debug.html")
+def page_corpus_debug():
+    """코퍼스 데이터 디버깅 페이지"""
+    return render_template("corpus_debug.html")
 
 @app.route("/1102_6yao_test.html")
 def page_1102_6yao_test(): return render_template("1102_6yao_test.html")
@@ -123,6 +135,17 @@ def page_1102_6yao_debug(): return render_template("1102_6yao_debug.html")
 #    is_admin = user_role == 'ADMIN'
 #    return render_template("1102_6yao.html", user_role=user_role, is_admin=is_admin)
 
+
+
+
+@app.route("/1101_tarot_cards.html")
+def page_1101_tarot_cards(): return render_template("1101_tarot_cards.html")
+
+@app.route("/1103_4Pillar.html")
+def page_1103_4Pillar(): return render_template("1103_4Pillar.html")    
+
+@app.route("/1104_tosecret.html")
+def page_1104_tosecret(): return render_template("1104_tosecret.html")
 
 @app.route("/member_login.html")
 def page_member_login(): return render_template("member_login.html")
