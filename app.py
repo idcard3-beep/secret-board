@@ -147,6 +147,20 @@ def page_1103_4Pillar(): return render_template("1103_4Pillar.html")
 @app.route("/1104_tosecret.html")
 def page_1104_tosecret(): return render_template("1104_tosecret.html")
 
+
+
+@app.route("/6101_tarot_exec.html")
+def page_6101_tarot_exec(): return render_template("6101_tarot_exec.html")
+
+@app.route("/6103_4Pillar_exec.html")
+def page_6103_4Pillar_exec(): return render_template("6103_4Pillar_exec.html")    
+
+@app.route("/6104_tosecret_exec.html")
+def page_6104_tosecret_exec(): return render_template("6104_tosecret_exec.html")
+
+
+
+
 @app.route("/member_login.html")
 def page_member_login(): return render_template("member_login.html")
 
