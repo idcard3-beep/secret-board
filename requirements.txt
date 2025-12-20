@@ -1,8 +1,0 @@
-Flask
-openpyxl
-bcrypt
-python-dotenv
-pyodbc
-pycryptodome
-psycopg2-binary
-gunicorn==22.0.0
