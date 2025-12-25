@@ -1,0 +1,2086 @@
+// Integrated I-Ching Najia System with Auto-Loading Saju Pillars
+class IntegratedNajiaSystem {
+  constructor() {
+    this.hexagram = []; // Stores 6,7,8,9 values
+    this.movingLines = [];
+    this.currentPosition = 0;
+    this.consultationInfo = {};
+    this.najiaResult = null;
+    this.currentSaju = null;
+
+    this.initializeEventListeners();
+    this.loadCurrentSaju(); // Auto-load current time saju
+  }
+
+  initializeEventListeners() {
+    document.querySelectorAll('.coin-option').forEach((option) => {
+      option.addEventListener('click', () => {
+        const type = option.dataset.type;
+        this.selectCoin(type);
+      });
+    });
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      this.resetHexagram();
+    });
+
+    document.getElementById('analyzeBtn').addEventListener('click', () => {
+      this.analyzeHexagram();
+    });
+  }
+
+  // 현재 시점의 사주 자동 로딩
+  async loadCurrentSaju() {
+    try {
+      const response = await fetch('/y6/current-saju');
+      const data = await response.json();
+
+      if (data.success) {
+        this.currentSaju = data;
+        this.displayCurrentSaju(data);
+      } else {
+        console.error('Saju loading failed:', data.error);
+        this.showSajuError(data.error);
+      }
+    } catch (error) {
+      console.error('Network error:', error);
+      this.showSajuError('네트워크 오류가 발생했습니다.');
+    }
+  }
+
+  displayCurrentSaju(data) {
+    const { saju, formatted_time } = data;
+
+    // Update time display
+    document.getElementById('currentTimeDisplay').innerHTML = `
+            <h4 style="color: var(--saju-color); margin-bottom: 1rem;">📅 ${formatted_time}</h4>
+            <p style="font-size: 0.9rem; color: var(--text-secondary);">현재 시점의 사주 기둥이 자동으로 계산되었습니다</p>
+        `;
+
+    // Update pillar values
+    document.getElementById('yearPillar').textContent = saju.year;
+    document.getElementById('monthPillar').textContent = saju.month;
+    document.getElementById('dayPillar').textContent = saju.day;
+    document.getElementById('hourPillar').textContent = saju.hour;
+
+    // Update info text
+    document.getElementById('sajuTimeInfo').innerHTML = `
+            <strong>현재 시각:</strong> ${formatted_time}<br>
+            <strong>점사 시점:</strong> ${saju.info.birth} (${saju.info.time_type})<br>
+            <small style="color: var(--text-secondary);">이 사주 정보가 납갑 계산에 자동으로 반영됩니다</small>
+        `;
+
+    // Show saju section
+    document.getElementById('sajuPillars').style.display = 'block';
+
+    // Add animation
+    document.querySelector('.pillar-container').style.opacity = '0';
+    setTimeout(() => {
+      document.querySelector('.pillar-container').style.transition =
+        'opacity 0.5s ease';
+      document.querySelector('.pillar-container').style.opacity = '1';
+    }, 100);
+  }
+
+  showSajuError(error) {
+    document.getElementById('currentTimeDisplay').innerHTML = `
+            <p style="color: var(--accent-color);">❌ 사주 로딩 실패</p>
+            <p style="font-size: 0.8rem; color: var(--text-secondary);">${error}</p>
+        `;
+  }
+
+  selectCoin(type) {
+    if (this.currentPosition >= 6) return;
+
+    const lineSlot = document.querySelector(
+      `[data-line="${this.currentPosition + 1}"]`
+    );
+    let number;
+
+    switch (type) {
+      case 'yang':
+        number = 7; // 소양
+        lineSlot.className = 'line-slot filled yang-line';
+        break;
+      case 'yin':
+        number = 8; // 소음
+        lineSlot.className = 'line-slot filled yin-line';
+        break;
+      case 'yang-moving':
+        number = 9; // 노양
+        lineSlot.className = 'line-slot filled yang-moving-line';
+        this.movingLines.push(this.currentPosition);
+        break;
+      case 'yin-moving':
+        number = 6; // 노음
+        lineSlot.className = 'line-slot filled yin-moving-line';
+        this.movingLines.push(this.currentPosition);
+        break;
+    }
+
+    this.hexagram[this.currentPosition] = number;
+    this.currentPosition++;
+
+    this.updateCurrentLineDisplay();
+    this.updateNajiaPreview();
+
+    if (this.currentPosition >= 6) {
+      document.getElementById('analyzeBtn').disabled = false;
+      document.getElementById('currentLineText').textContent =
+        '괘 완성! 분석 버튼을 눌러주세요.';
+    }
+  }
+
+  async updateNajiaPreview() {
+    if (!this.currentSaju || this.hexagram.length === 0) return;
+
+    try {
+      const response = await fetch('/y6/calculate-najia', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          yao_input: this.hexagram.concat(
+            Array(6 - this.hexagram.length).fill(0)
+          ),
+          yue_jian: this.currentSaju.month_branch,
+          ri_gan: this.currentSaju.day_stem,
+          ri_chen: this.currentSaju.day_branch,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (
+        data.success &&
+        data.result.najia_info &&
+        data.result.najia_info.length > 0
+      ) {
+        // 각 효에 납갑 지지 표시
+        for (let i = 0; i < this.hexagram.length; i++) {
+          const lineSlot = document.querySelector(`[data-line="${i + 1}"]`);
+          const najiaInfo = data.result.najia_info[i];
+
+          if (lineSlot && najiaInfo) {
+            // 기존 납갑 정보 제거
+            const existingNajia = lineSlot.querySelector('.najia-label');
+            if (existingNajia) existingNajia.remove();
+
+            // 새 납갑 정보 추가
+            const najiaLabel = document.createElement('div');
+            najiaLabel.className = 'najia-label';
+            najiaLabel.textContent = najiaInfo['지지'];
+            lineSlot.appendChild(najiaLabel);
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Najia preview error:', error);
+    }
+  }
+
+  updateCurrentLineDisplay() {
+    const lineNames = ['초효', '이효', '삼효', '사효', '오효', '상효'];
+    if (this.currentPosition < 6) {
+      const nextLine = lineNames[this.currentPosition];
+      document.getElementById('currentLineText').textContent = `${nextLine} (${
+        this.currentPosition + 1
+      }효)`;
+    }
+  }
+
+  resetHexagram() {
+    this.hexagram = [];
+    this.movingLines = [];
+    this.currentPosition = 0;
+    this.najiaResult = null;
+
+    document.querySelectorAll('.line-slot').forEach((slot) => {
+      slot.className = 'line-slot';
+    });
+
+    document.getElementById('analyzeBtn').disabled = true;
+    document.getElementById('currentLineText').textContent = '초효 (1효)';
+    document.getElementById('analysisSection').style.display = 'none';
+  }
+
+  // 괘 분석 시작
+  async analyzeHexagram() {
+    try {
+      this.getConsultationInfo();
+
+      if (!this.currentSaju) {
+        alert('사주 정보를 불러오는 중입니다. 잠시 후 다시 시도해주세요.');
+        return;
+      }
+
+      // 현재 사주에서 월건, 일간, 일지 추출
+      const monthBranch = this.currentSaju.month_branch;
+      const dayStem = this.currentSaju.day_stem;
+      const dayBranch = this.currentSaju.day_branch;
+
+      // 서버에 납갑 계산 요청
+      const response = await fetch('/y6/calculate-najia', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          yao_input: this.hexagram,
+          yue_jian: monthBranch,
+          ri_gan: dayStem,
+          ri_chen: dayBranch,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        this.najiaResult = data.result;
+        this.displayNajiaResult();
+
+        // 분석 섹션 표시
+        document.getElementById('analysisSection').style.display = 'block';
+        document
+          .getElementById('analysisSection')
+          .scrollIntoView({ behavior: 'smooth' });
+      } else {
+        alert(`분석 중 오류가 발생했습니다: ${data.error}`);
+      }
+    } catch (error) {
+      console.error('Analysis error:', error);
+      alert(`분석 중 오류가 발생했습니다: ${error.message}`);
+    }
+  }
+
+  getConsultationInfo() {
+    this.consultationInfo = {
+      questionType: document.getElementById('questionType').value || '일반',
+      question:
+        document.getElementById('questionText').value || '전반적인 운세',
+      name: document.getElementById('consultantName').value || '',
+      birthDate: document.getElementById('birthDate').value || '',
+      time: new Date(),
+    };
+  }
+
+  displayNajiaResult() {
+    // 기본 정보 표시
+    document.getElementById('hexagramName').textContent =
+      this.najiaResult.main_info;
+    document.getElementById(
+      'hexagramMeaning'
+    ).textContent = `점시: 월건 ${this.najiaResult.base_info['월건']}, 일진 ${this.najiaResult.base_info['일진']}, 세효: ${this.najiaResult.base_info['세효']}효`;
+
+    // 납갑 결과 테이블 생성
+    const resultContainer = document.getElementById('najiaResultContainer');
+    resultContainer.innerHTML = `
+            <div class="professional-najia-section">
+                <h4>📊 전문 납갑 계산 결과</h4>
+                <div class="base-info">
+                    <p><strong>괘명:</strong> ${this.najiaResult.main_info}</p>
+                    <p><strong>점시:</strong> 월건 ${
+                      this.najiaResult.base_info['월건']
+                    }, 일진 ${
+      this.najiaResult.base_info['일진']
+    } (현재 시각 기준)</p>
+                    <p><strong>세효 위치:</strong> ${
+                      this.najiaResult.base_info['세효']
+                    }효</p>
+                    <p><strong>현재 사주:</strong> ${
+                      this.currentSaju.saju.year
+                    } ${this.currentSaju.saju.month} ${
+      this.currentSaju.saju.day
+    } ${this.currentSaju.saju.hour}</p>
+                    <p><strong>2진 코드:</strong> 본괘 ${
+                      this.najiaResult.base_info['본괘코드']
+                    } → 변괘 ${this.najiaResult.base_info['변괘코드']}</p>
+                </div>
+                
+                <!-- 특별 괘 분석 -->
+                <div class="special-hexagram-analysis">
+                    <h5>🔮 특별 괘 분석</h5>
+                    <div class="special-hexagram-grid">
+                        <div class="original-special">
+                            <h6>본괘 분석</h6>
+                            <p><strong>괘상:</strong> ${this.formatTrigramDisplay(
+                              this.najiaResult.special_analysis
+                                ?.original_trigrams || '미상'
+                            )}</p>
+                            ${
+                              this.najiaResult.special_analysis?.original_type
+                                ? `<p><strong>특별 그룹:</strong> <span class="special-type-badge ${
+                                    this.najiaResult.special_analysis
+                                      .original_type
+                                  }">${
+                                    this.najiaResult.special_analysis
+                                      .original_type
+                                  }</span></p>
+                                 <p class="special-meaning">${this.getSpecialMeaning(
+                                   this.najiaResult.special_analysis
+                                     .original_type,
+                                   this.najiaResult.special_analysis
+                                     .original_description
+                                 )}</p>`
+                                : '<p><strong>특별 그룹:</strong> 일반괘</p>'
+                            }
+                        </div>
+                        <div class="changing-special">
+                            <h6>변괘 분석</h6>
+                            <p><strong>괘상:</strong> ${this.formatTrigramDisplay(
+                              this.najiaResult.special_analysis
+                                ?.changing_trigrams || '미상'
+                            )}</p>
+                            ${
+                              this.najiaResult.special_analysis?.changing_type
+                                ? `<p><strong>특별 그룹:</strong> <span class="special-type-badge ${
+                                    this.najiaResult.special_analysis
+                                      .changing_type
+                                  }">${
+                                    this.najiaResult.special_analysis
+                                      .changing_type
+                                  }</span></p>
+                                 <p class="special-meaning">${this.getSpecialMeaning(
+                                   this.najiaResult.special_analysis
+                                     .changing_type,
+                                   this.najiaResult.special_analysis
+                                     .changing_description
+                                 )}</p>`
+                                : '<p><strong>특별 그룹:</strong> 일반괘</p>'
+                            }
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 괘신 분석 -->
+                ${
+                  this.najiaResult.gua_shen
+                    ? `<div class="gua-shen-analysis">
+                        <h5>🔮 괘신(卦身) 분석</h5>
+                        <div class="gua-shen-info">
+                            <div class="gua-shen-basic">
+                                <p><strong>괘신 지지:</strong> ${this.najiaResult.gua_shen.괘신지지}</p>
+                                <p><strong>괘신 효위:</strong> ${this.najiaResult.gua_shen.괘신효위}효</p>
+                                <p><strong>괘신 육친:</strong> <span class="six-kin-badge ${this.najiaResult.gua_shen.괘신육친}">${this.najiaResult.gua_shen.괘신육친}</span></p>
+                                <p><strong>괘신 왕약:</strong> <span class="wang-shuai-badge ${this.najiaResult.gua_shen.괘신왕약}">${this.najiaResult.gua_shen.괘신왕약}</span></p>
+                            </div>
+                            <div class="gua-shen-meaning">
+                                <h6>괘신 의미</h6>
+                                <p class="gua-shen-symbol">${this.najiaResult.gua_shen.괘신의미}</p>
+                                <h6>괘신 작용</h6>
+                                <p class="gua-shen-effect">${this.najiaResult.gua_shen.괘신작용}</p>
+                            </div>
+                        </div>
+                    </div>`
+                    : `<div class="gua-shen-analysis">
+                        <h5>🔮 괘신(卦身) 분석</h5>
+                        <p class="no-gua-shen">일진 ${this.najiaResult.base_info[
+                          '일진'
+                        ].charAt(
+                          1
+                        )}과 육합하는 지지가 괘에 없어 괘신이 없습니다.</p>
+                    </div>`
+                }
+                
+                <!-- 공망 분석 -->
+                <div class="kong-wang-analysis">
+                    <h5>🕳️ 공망(空亡) 분석</h5>
+                    ${
+                      this.najiaResult.kong_wang &&
+                      this.najiaResult.kong_wang.공망수 > 0
+                        ? `<div class="kong-wang-info">
+                            <div class="kong-wang-summary">
+                                <p><strong>공망 지지:</strong> ${this.najiaResult.kong_wang.공망지지.join(
+                                  ', '
+                                )}</p>
+                                <p><strong>공망 효 수:</strong> ${
+                                  this.najiaResult.kong_wang.공망수
+                                }개</p>
+                            </div>
+                            <div class="kong-wang-details">
+                                ${this.najiaResult.kong_wang.공망효
+                                  .map(
+                                    (kw) => `
+                                    <div class="kong-wang-yao">
+                                        <span class="yao-position">${kw.효위}효</span>
+                                        <span class="kong-wang-branch">${kw.지지}</span>
+                                        <span class="kong-wang-kin">${kw.육친}</span>
+                                        <p class="kong-wang-meaning">${kw.의미}</p>
+                                    </div>
+                                `
+                                  )
+                                  .join('')}
+                            </div>
+                        </div>`
+                        : '<p class="no-kong-wang">현재 공망에 해당하는 효가 없습니다.</p>'
+                    }
+                </div>
+                
+                <!-- 복신 분석 -->
+                <div class="fu-shen-analysis">
+                    <h5>🛡️ 복신(伏神) 분석</h5>
+                    ${
+                      this.najiaResult.fu_shen &&
+                      this.najiaResult.fu_shen.복신수 > 0
+                        ? `<div class="fu-shen-info">
+                            <div class="fu-shen-summary">
+                                <p><strong>월건 복신 지지:</strong> ${this.najiaResult.fu_shen.월건복신지지.join(
+                                  ', '
+                                )}</p>
+                                <p><strong>복신 수:</strong> ${
+                                  this.najiaResult.fu_shen.복신수
+                                }개</p>
+                            </div>
+                            <div class="fu-shen-details">
+                                ${this.najiaResult.fu_shen.복신목록
+                                  .map(
+                                    (fs) => `
+                                    <div class="fu-shen-item">
+                                        <span class="fu-shen-branch">${fs.복신지지}</span>
+                                        <span class="fu-shen-kin">${fs.복신육친}</span>
+                                        <p class="fu-shen-meaning">${fs.복신의미}</p>
+                                        <p class="fu-shen-action">${fs.복신작용}</p>
+                                    </div>
+                                `
+                                  )
+                                  .join('')}
+                            </div>
+                        </div>`
+                        : '<p class="no-fu-shen">현재 복신이 없습니다.</p>'
+                    }
+                </div>
+                
+                <!-- 변효 상세 분석 -->
+                ${
+                  this.najiaResult.changing_yao_detailed &&
+                  this.najiaResult.changing_yao_detailed.length > 0
+                    ? `<div class="changing-yao-detailed-analysis">
+                        <h5>🔄 변효 상세 분석</h5>
+                        <div class="changing-yao-grid">
+                            ${this.najiaResult.changing_yao_detailed
+                              .map(
+                                (cyd) => `
+                                <div class="changing-yao-item">
+                                    <div class="yao-header">
+                                        <h6>${cyd.효위}효 변화</h6>
+                                        <span class="change-nature">${cyd.변화성질}</span>
+                                    </div>
+                                    <div class="yao-transformation">
+                                        <div class="original-state">
+                                            <span class="label">원래</span>
+                                            <span class="branch">${cyd.원지지}</span>
+                                            <span class="kin">${cyd.원육친}</span>
+                                        </div>
+                                        <span class="arrow">→</span>
+                                        <div class="changed-state">
+                                            <span class="label">변화</span>
+                                            <span class="branch">${cyd.변지지}</span>
+                                            <span class="kin">${cyd.변육친}</span>
+                                        </div>
+                                    </div>
+                                    <p class="change-meaning">${cyd.변효의미}</p>
+                                </div>
+                            `
+                              )
+                              .join('')}
+                        </div>
+                    </div>`
+                    : ''
+                }
+                
+                <table class="professional-najia-table">
+                    <thead>
+                        <tr>
+                            <th>육신</th>
+                            <th>득괘</th>
+                            <th>육친</th>
+                            <th>납갑 지지</th>
+                            <th>효위</th>
+                            <th>월건 강약</th>
+                            <th>일진 관계</th>
+                            <th>변효</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${this.generateTableRows()}
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- 10단계 종합 분석 (필수) -->
+            <div class="comprehensive-analysis-section">
+                <h3>🔮 10단계 종합 분석</h3>
+                <div class="analysis-steps">
+                    ${this.generateComprehensiveAnalysis()}
+                </div>
+            </div>
+            
+            <div class="saju-integration-note" style="background: #f0f9ff; border: 2px solid var(--saju-color); border-radius: var(--radius-lg); padding: var(--spacing-lg); margin-top: var(--spacing-lg);">
+                <h4 style="color: var(--saju-color); margin-bottom: var(--spacing-md);">🎯 사주 연계 분석</h4>
+                <div class="saju-najia-connection">
+                    <p><strong>점사 시간과 사주의 연관성:</strong></p>
+                    <ul style="margin: var(--spacing-md) 0; padding-left: var(--spacing-lg);">
+                        <li><strong>월건(${
+                          this.najiaResult.base_info['월건']
+                        }):</strong> 현재 ${
+      this.currentSaju.saju.month
+    } 월주에서 추출</li>
+                        <li><strong>일간(${this.najiaResult.base_info[
+                          '일진'
+                        ].charAt(0)}):</strong> 현재 ${
+      this.currentSaju.saju.day
+    } 일주에서 추출</li>
+                        <li><strong>일지(${this.najiaResult.base_info[
+                          '일진'
+                        ].charAt(1)}):</strong> 현재 ${
+      this.currentSaju.saju.day
+    } 일주에서 추출</li>
+                        <li><strong>시간:</strong> ${
+                          this.currentSaju.formatted_time
+                        } (${this.currentSaju.saju.hour} 시주)</li>
+                    </ul>
+                    <p class="integration-explanation" style="background: var(--surface); padding: var(--spacing-md); border-radius: var(--radius-sm); border-left: 4px solid var(--saju-color); font-style: italic;">
+                        현재 시점의 사주가 자동으로 납갑 계산에 반영되어 정확한 월건 강약과 일진 관계를 계산했습니다.
+                        이는 전통 육효학의 정법에 따른 것으로, 점사하는 순간의 시간적 에너지가 괘의 해석에 중요한 영향을 미칩니다.
+                    </p>
+                </div>
+            </div>
+        `;
+
+    // 괘 형성 영역에 납갑 지지 표시
+    this.displayNajiaInHexagramArea();
+  }
+
+  // 괘 형성 영역에 납갑 지지 정보 표시
+  displayNajiaInHexagramArea() {
+    if (!this.najiaResult || !this.najiaResult.hexagram) return;
+
+    // 초효부터 상효까지 순서대로 처리 (hexagram 배열은 상효부터 초효 순서)
+    this.najiaResult.hexagram.forEach((yao, index) => {
+      // index 0 = 상효(6), 1 = 오효(5), ..., 5 = 초효(1)
+      const lineNumber = 6 - index; // 1~6으로 변환 (초효=1, 상효=6)
+      const lineSlot = document.querySelector(
+        `.line-slot[data-line="${lineNumber}"]`
+      );
+
+      if (lineSlot) {
+        const container = lineSlot.parentElement; // line-slots-container
+        const extraSlots = container.querySelectorAll('.extra-slot');
+
+        // 테이블과 동일한 체크 로직
+        const isMoving = yao.note.includes('動');
+        const isKongWang =
+          this.najiaResult.kong_wang &&
+          this.najiaResult.kong_wang.공망지지.includes(yao.branch);
+        const kongWangMarker = isKongWang ? '●' : '';
+
+        // 원래 yao 값 찾기 (테이블과 동일)
+        const originalYaoValue = this.hexagram[5 - index];
+
+        // 변효 정보 생성 (테이블과 동일)
+        let changingInfo = yao.changing_info;
+        if (isMoving && this.najiaResult.changing_yao_detailed) {
+          const changingDetail = this.najiaResult.changing_yao_detailed.find(
+            (cyd) => cyd.효위 === yao.yao_pos
+          );
+          if (changingDetail) {
+            changingInfo = `원: ${changingDetail.원지지} ${changingDetail.원육친} → 변: ${changingDetail.변지지} ${changingDetail.변육친} (${changingDetail.변왕약})`;
+          }
+        }
+
+        if (extraSlots.length >= 11) {
+          // 좌측 1번: 육신 (테이블 1열: ${yao.spirit})
+          extraSlots[0].textContent = yao.spirit;
+          extraSlots[0].style.fontWeight = 'normal';
+          extraSlots[0].style.color = '#333';
+          extraSlots[0].style.fontSize = '0.75rem';
+
+          // 좌측 2번: 득괘 (테이블 2열: ${statusHtml})
+          const statusText = isMoving
+            ? `${yao.status} ${yao.note}`
+            : `${yao.status} ${yao.note}`;
+          extraSlots[1].textContent = statusText;
+          extraSlots[1].style.fontSize = '0.7rem';
+          extraSlots[1].style.fontWeight = isMoving ? 'bold' : 'normal';
+          extraSlots[1].style.color = '#333';
+
+          // 좌측 3번: 육친 (테이블 3열: <strong>${yao.six_kin}</strong>)
+          extraSlots[2].textContent = yao.six_kin;
+          extraSlots[2].style.fontWeight = 'bold';
+          extraSlots[2].style.color = '#333';
+          extraSlots[2].style.fontSize = '0.8rem';
+
+          // 좌측 4번: 납갑 지지 (테이블 4열: ${yao.branch} ${kongWangMarker})
+          extraSlots[3].textContent =
+            yao.branch + (kongWangMarker ? ' ' + kongWangMarker : '');
+          extraSlots[3].style.fontWeight = '600';
+          extraSlots[3].style.color = 'var(--primary-color)';
+          extraSlots[3].style.fontSize = '0.9rem';
+
+          // 좌측 5번: 효위 (테이블 5열: ${yao.yao_pos}효${yao.note ? ' ' + yao.note : ''} ${kongWangMarker})
+          extraSlots[4].textContent = `${yao.yao_pos}효${
+            yao.note ? ' ' + yao.note : ''
+          }${kongWangMarker ? ' ' + kongWangMarker : ''}`;
+          extraSlots[4].style.fontSize = '0.75rem';
+          extraSlots[4].style.fontWeight = 'normal';
+          extraSlots[4].style.color = '#333';
+
+          // 우측 1번: 월건 강약 (테이블 6열: ${yao.wang_shuai})
+          extraSlots[5].textContent = yao.wang_shuai;
+          extraSlots[5].style.fontWeight = 'normal';
+          extraSlots[5].style.color = '#333';
+          extraSlots[5].style.fontSize = '0.75rem';
+
+          // 우측 2번: 일진 관계 (테이블 7열: ${yao.day_relation})
+          extraSlots[6].textContent = yao.day_relation;
+          extraSlots[6].style.fontSize = '0.75rem';
+          extraSlots[6].style.fontWeight = 'normal';
+          extraSlots[6].style.color = '#333';
+
+          // 우측 3번: 변효 (테이블 8열: ${changingInfo})
+          extraSlots[7].textContent = changingInfo;
+          extraSlots[7].style.fontSize = '0.65rem';
+          extraSlots[7].style.fontWeight = 'normal';
+          extraSlots[7].style.color = '#666';
+          extraSlots[7].style.whiteSpace = 'nowrap';
+          extraSlots[7].style.overflow = 'hidden';
+          extraSlots[7].style.textOverflow = 'ellipsis';
+        }
+      }
+    });
+  }
+
+  // 괘상을 2층 구조로 표시하는 함수
+  formatTrigramDisplay(trigramInfo) {
+    // "乾(☰) + 坤(☷)" 형태에서 기호 추출
+    const matches = trigramInfo.match(
+      /([^(]*)\(([^)]*)\)\s*\+\s*([^(]*)\(([^)]*)\)/
+    );
+    if (matches) {
+      const upperName = matches[1].trim();
+      const upperSymbol = matches[2];
+      const lowerName = matches[3].trim();
+      const lowerSymbol = matches[4];
+
+      return `<div class="trigram-stack">
+                        <div class="upper-trigram">${upperSymbol}<span class="trigram-name">${upperName}</span></div>
+                        <div class="lower-trigram">${lowerSymbol}<span class="trigram-name">${lowerName}</span></div>
+                    </div>`;
+    }
+    return trigramInfo;
+  }
+
+  generateTableRows() {}
+
+  // 10단계 종합 분석 생성 (필수 기능)
+  generateComprehensiveAnalysis() {
+    return `
+            <div class="analysis-step">
+                <h4>🔍 1단계: 기본 괘 구조</h4>
+                <div class="step-content">
+                    ${this.displayCompleteHexagramNumbers()}
+                </div>
+            </div>
+            
+            <div class="analysis-step">
+                <h4>👁️ 2단계: 육신 판정 & 납갑 분석</h4>
+                <div class="step-content">
+                    ${this.generateNajiaAnalysisSummary()}
+                    ${this.analyzeLinePositions()}
+                </div>
+            </div>
+            
+            <div class="analysis-step">
+                <h4>⚡ 3단계: 강약 분석</h4>
+                <div class="step-content">
+                    ${this.analyzeStrengthWeakness()}
+                    ${this.analyzeMovingLinesStrength()}
+                </div>
+            </div>
+            
+            <div class="analysis-step">
+                <h4>🔄 4단계: 동효와 변괘</h4>
+                <div class="step-content">
+                    ${this.analyzeHexagramTransformation()}
+                    ${this.analyzeMovingLinesEffect()}
+                    ${this.analyzeHexagramChange()}
+                </div>
+            </div>
+            
+            <div class="analysis-step">
+                <h4>🤝 5단계: 용신/기신/원신</h4>
+                <div class="step-content">
+                    ${this.analyzeHelpingHinderingSpirits()}
+                </div>
+            </div>
+            
+            <div class="analysis-step">
+                <h4>👻 6단계: 복신과 공망</h4>
+                <div class="step-content">
+                    ${this.analyzeHiddenSpiritsAndVoid()}
+                </div>
+            </div>
+            
+            <div class="analysis-step">
+                <h4>⚖️ 7단계: 세응 관계</h4>
+                <div class="step-content">
+                    ${this.analyzeWorldResponseRelation()}
+                </div>
+            </div>
+            
+            <div class="analysis-step">
+                <h4>⏰ 8단계: 응기 예측</h4>
+                <div class="step-content">
+                    ${this.predictTiming()}
+                </div>
+            </div>
+            
+            <div class="analysis-step">
+                <h4>⚖️ 9단계: 종합 판단</h4>
+                <div class="step-content">
+                    ${this.generateJudgmentChecklist()}
+                    ${this.makeFinalJudgment()}
+                </div>
+            </div>
+            
+            <div class="analysis-step">
+                <h4>💡 10단계: 상담 및 조언</h4>
+                <div class="step-content">
+                    ${this.generateFinalAdvice()}
+                </div>
+            </div>
+        `;
+  }
+
+  // 1단계: 완전한 괘 구조 표시 (숫자 포함)
+  displayCompleteHexagramNumbers() {
+    let html = '<div class="complete-hexagram-display">';
+    html += '<h5>완전한 괘 구조 (본괘 → 변괘)</h5>';
+    html += '<div class="hexagram-comparison">';
+
+    // 본괘 표시
+    html += '<div class="original-hexagram">';
+    html += '<h6>본괘 (原卦)</h6>';
+    html += '<div class="hexagram-numbers-grid">';
+
+    for (let i = 5; i >= 0; i--) {
+      const yao = this.hexagram[i];
+      const lineInfo = this.getLineInfo(yao);
+      const isMoving = [6, 9].includes(yao);
+      const binaryValue = [7, 9].includes(yao) ? '1' : '0';
+      const koreanPosition = ['초효', '이효', '삼효', '사효', '오효', '상효'][
+        i
+      ];
+
+      html += `
+                <div class="hexagram-line-display ${isMoving ? 'moving' : ''}">
+                    <span class="line-label">${koreanPosition}</span>
+                    <div class="line-visual ${this.getLineVisualClass(
+                      yao
+                    )}"></div>
+                    <span class="line-number-badge ${
+                      isMoving ? 'moving' : ''
+                    }">${yao}</span>
+                    <span class="line-binary">${binaryValue}</span>
+                    <span class="line-description">${lineInfo}</span>
+                </div>
+            `;
+    }
+
+    html += '</div>';
+    html += `<p><strong>본괘 이진:</strong> ${this.hexagram
+      .map((y) => ([7, 9].includes(y) ? '1' : '0'))
+      .reverse()
+      .join('')}</p>`;
+    html += '</div>';
+
+    // 변괘 표시 (동효가 있는 경우)
+    const movingLines = this.hexagram.filter((yao, index) =>
+      [6, 9].includes(yao)
+    );
+    if (movingLines.length > 0) {
+      html += '<div class="arrow-divider">→</div>';
+      html += '<div class="changing-hexagram">';
+      html += '<h6>변괘 (變卦)</h6>';
+      html += '<div class="hexagram-numbers-grid">';
+
+      for (let i = 5; i >= 0; i--) {
+        const originalYao = this.hexagram[i];
+        const isMoving = [6, 9].includes(originalYao);
+
+        // 변화된 효 계산
+        let changedYao = originalYao;
+        if (isMoving) {
+          changedYao =
+            originalYao === 6
+              ? 7 // 老陰 → 少陽
+              : originalYao === 9
+              ? 8 // 老陽 → 少陰
+              : originalYao;
+        }
+
+        const lineInfo = this.getLineInfo(changedYao);
+        const binaryValue = [7, 9].includes(changedYao) ? '1' : '0';
+        const koreanPosition = ['초효', '이효', '삼효', '사효', '오효', '상효'][
+          i
+        ];
+
+        html += `
+                    <div class="hexagram-line-display ${
+                      isMoving ? 'changed' : ''
+                    }">
+                        <span class="line-label">${koreanPosition}</span>
+                        <div class="line-visual ${this.getLineVisualClass(
+                          changedYao
+                        )}"></div>
+                        <span class="line-number-badge ${
+                          isMoving ? 'changed' : ''
+                        }">${changedYao}</span>
+                        <span class="line-binary">${binaryValue}</span>
+                        <span class="line-description">${lineInfo}</span>
+                        ${
+                          isMoving
+                            ? '<span class="change-indicator">變</span>'
+                            : ''
+                        }
+                    </div>
+                `;
+      }
+
+      html += '</div>';
+      const changingBinary = this.hexagram
+        .map((yao, index) => {
+          if ([6, 9].includes(yao)) {
+            return yao === 6 ? '1' : '0'; // 老陰→少陽, 老陽→少陰
+          }
+          return [7, 9].includes(yao) ? '1' : '0';
+        })
+        .reverse()
+        .join('');
+      html += `<p><strong>변괘 이진:</strong> ${changingBinary}</p>`;
+      html += '</div>';
+    }
+
+    html += '</div>'; // hexagram-comparison 끝
+    html += '</div>'; // complete-hexagram-display 끝
+    return html;
+  }
+
+  // 2단계: 납갑 분석 요약
+  generateNajiaAnalysisSummary() {
+    const worldLine = this.najiaResult.hexagram.find((line) =>
+      line.note.includes('世')
+    );
+    const movingLines = this.najiaResult.hexagram.filter((line) =>
+      line.note.includes('動')
+    );
+
+    let html = '<div class="najia-summary">';
+    html += '<div class="world-line-info">';
+    html += '<h6>세효 분석</h6>';
+    if (worldLine) {
+      html += `<p>위치: ${worldLine.yao_pos}효</p>`;
+      html += `<p>육친: ${worldLine.six_kin}</p>`;
+      html += `<p>지지: ${worldLine.branch}</p>`;
+      html += `<p>강약: ${worldLine.wang_shuai}</p>`;
+      html += `<p>일진관계: ${worldLine.day_relation}</p>`;
+    }
+    html += '</div>';
+
+    html += '<div class="moving-lines-info">';
+    html += '<h6>동효 요약</h6>';
+    html += `<p>동효 개수: ${movingLines.length}개</p>`;
+    movingLines.forEach((line) => {
+      html += `<div class="moving-line-item">`;
+      html += `${line.yao_pos}효 ${line.status} → ${line.changing_info}`;
+      html += `</div>`;
+    });
+    html += '</div>';
+
+    html += '<div class="strength-summary">';
+    html += '<h6>강약 요약</h6>';
+    const wangLines = this.najiaResult.hexagram.filter(
+      (l) => l.wang_shuai === '旺'
+    ).length;
+    const xiangLines = this.najiaResult.hexagram.filter(
+      (l) => l.wang_shuai === '相'
+    ).length;
+    const xiuLines = this.najiaResult.hexagram.filter(
+      (l) => l.wang_shuai === '休'
+    ).length;
+    const qiuLines = this.najiaResult.hexagram.filter(
+      (l) => l.wang_shuai === '囚'
+    ).length;
+    const siLines = this.najiaResult.hexagram.filter(
+      (l) => l.wang_shuai === '死'
+    ).length;
+
+    html += `<p>왕: ${wangLines}개, 상: ${xiangLines}개, 휴: ${xiuLines}개, 수: ${qiuLines}개, 사: ${siLines}개</p>`;
+    html += '</div>';
+
+    html += '</div>';
+    return html;
+  }
+
+  // 2단계: 효위 분석
+  analyzeLinePositions() {
+    let html = '<div class="line-positions-grid">';
+
+    this.najiaResult.hexagram.forEach((line, index) => {
+      const isMoving = line.note.includes('動');
+      const positionMeaning = this.getPositionMeaning(line.yao_pos);
+      const binaryValue = [7, 9].includes(line.status) ? '1' : '0';
+
+      html += `
+                <div class="line-position-analysis ${
+                  isMoving ? 'moving-line' : ''
+                }">
+                    <div class="line-header">
+                        <span class="position-name">${line.yao_pos}효</span>
+                        <span class="line-number-large">${line.status}</span>
+                        <span class="${
+                          isMoving ? 'moving-badge' : 'static-badge'
+                        }">${isMoving ? '動' : '靜'}</span>
+                    </div>
+                    <p><strong>의미:</strong> ${positionMeaning}</p>
+                    <p><strong>이진:</strong> ${binaryValue} | <strong>육친:</strong> ${
+        line.six_kin
+      }</p>
+                    <p><strong>지지:</strong> ${line.branch} (${
+        line.wang_shuai
+      })</p>
+                </div>
+            `;
+    });
+
+    html += '</div>';
+    return html;
+  }
+
+  // 3단계: 강약 분석
+  analyzeStrengthWeakness() {
+    let html = '<div class="strength-analysis">';
+    html += '<h6>각 효의 왕상휴수사 분석</h6>';
+
+    this.najiaResult.hexagram.forEach((line) => {
+      const description = this.getStrengthDescription(line.wang_shuai);
+      html += `<p><strong>${line.yao_pos}효 ${line.branch}:</strong> ${line.wang_shuai} - ${description}</p>`;
+    });
+
+    html += '</div>';
+    return html;
+  }
+
+  analyzeMovingLinesStrength() {
+    const movingLines = this.najiaResult.hexagram.filter((line) =>
+      line.note.includes('動')
+    );
+    if (movingLines.length === 0) return '<p>동효가 없습니다.</p>';
+
+    let html = '<div class="moving-strength-analysis">';
+    html += '<h6>동효 강약 특별 분석</h6>';
+
+    movingLines.forEach((line) => {
+      const strength = line.wang_shuai;
+      let analysis = '';
+      if (strength === '旺' || strength === '相') {
+        analysis = '동효가 강하므로 변화의 힘이 큽니다.';
+      } else if (strength === '休') {
+        analysis = '동효가 중간 정도이므로 변화가 점진적입니다.';
+      } else {
+        analysis = '동효가 약하므로 변화의 힘이 제한적입니다.';
+      }
+      html += `<p><strong>${line.yao_pos}효:</strong> ${analysis}</p>`;
+    });
+
+    html += '</div>';
+    return html;
+  }
+
+  // 4단계: 괘 변화 분석 (동전 이미지 포함)
+  analyzeHexagramTransformation() {
+    const originalCode = this.hexagram
+      .map((y) => ([7, 9].includes(y) ? '1' : '0'))
+      .reverse()
+      .join('');
+    const changingCode = this.getChangingHexagramCode();
+
+    // 본괘와 변괘 정보 가져오기
+    const originalInfo =
+      this.najiaResult.special_analysis?.original_trigrams || '미상';
+    const changingInfo =
+      this.najiaResult.special_analysis?.changing_trigrams || '미상';
+    const originalType =
+      this.najiaResult.special_analysis?.original_type || null;
+    const changingType =
+      this.najiaResult.special_analysis?.changing_type || null;
+
+    return `
+            <div class="hexagram-transformation-analysis">
+                <div class="hexagram-comparison">
+                    <div class="original-hexagram-section">
+                        <h6>📿 본괘</h6>
+                        <div class="hexagram-display">
+                            ${this.generateCoinDisplay(this.hexagram, '본괘')}
+                        </div>
+                        <div class="hexagram-details">
+                            <p><strong>괘명:</strong> ${this.najiaResult.main_info
+                              .split('之')[0]
+                              .trim()}</p>
+                            <p><strong>2진 코드:</strong> ${originalCode}</p>
+                            <p><strong>괘상:</strong> ${this.formatTrigramDisplay(
+                              originalInfo
+                            )}</p>
+                            ${
+                              originalType
+                                ? `<p><strong>특별 그룹:</strong> <span class="special-type-badge ${originalType}">${originalType}</span></p>
+                                 <p class="special-meaning">${this.getSpecialMeaning(
+                                   originalType,
+                                   this.najiaResult.special_analysis
+                                     .original_description
+                                 )}</p>`
+                                : '<p><strong>특별 그룹:</strong> 일반괘</p>'
+                            }
+                        </div>
+                    </div>
+                    
+                    <div class="transformation-arrow">
+                        <div class="arrow-container">
+                            <span class="arrow-symbol">→</span>
+                            <span class="arrow-label">변화</span>
+                        </div>
+                    </div>
+                    
+                    <div class="changing-hexagram-section">
+                        <h6>📿 변괘</h6>
+                        <div class="hexagram-display">
+                            ${this.generateCoinDisplay(
+                              this.getChangingHexagram(),
+                              '변괘'
+                            )}
+                        </div>
+                        <div class="hexagram-details">
+                            <p><strong>괘명:</strong> ${
+                              this.najiaResult.main_info.split('之')[1]
+                                ? this.najiaResult.main_info
+                                    .split('之')[1]
+                                    .trim()
+                                : '변괘 없음'
+                            }</p>
+                            <p><strong>2진 코드:</strong> ${changingCode}</p>
+                            <p><strong>괘상:</strong> ${this.formatTrigramDisplay(
+                              changingInfo
+                            )}</p>
+                            ${
+                              changingType
+                                ? `<p><strong>특별 그룹:</strong> <span class="special-type-badge ${changingType}">${changingType}</span></p>
+                                 <p class="special-meaning">${this.getSpecialMeaning(
+                                   changingType,
+                                   this.najiaResult.special_analysis
+                                     .changing_description
+                                 )}</p>`
+                                : '<p><strong>특별 그룹:</strong> 일반괘</p>'
+                            }
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="transformation-analysis">
+                    <h6>🔄 변화 분석</h6>
+                    ${this.analyzeTransformationPattern()}
+                </div>
+            </div>
+        `;
+  }
+
+  // 동전 선택 이미지 생성
+  generateCoinDisplay(hexagram, label) {
+    const coinImages = {
+      6: '⚪', // 음효 동
+      7: '⚫', // 양효 정
+      8: '⚪', // 음효 정
+      9: '⚫', // 양효 동
+    };
+
+    const coinLabels = {
+      6: '음 동',
+      7: '양 정',
+      8: '음 정',
+      9: '양 동',
+    };
+
+    return `
+            <div class="coin-hexagram">
+                ${hexagram
+                  .map(
+                    (yao, index) => `
+                    <div class="coin-line" data-position="${6 - index}효">
+                        <span class="coin-symbol ${
+                          [6, 9].includes(yao) ? 'moving' : 'static'
+                        }">${coinImages[yao]}</span>
+                        <span class="coin-label">${coinLabels[yao]}</span>
+                        <span class="line-position">${6 - index}효</span>
+                    </div>
+                `
+                  )
+                  .join('')}
+            </div>
+        `;
+  }
+
+  // 변괘 생성
+  getChangingHexagram() {
+    return this.hexagram.map((yao) => {
+      if (yao === 6) return 7;
+      if (yao === 9) return 8;
+      return yao;
+    });
+  }
+
+  // 변화 패턴 분석
+  analyzeTransformationPattern() {
+    const movingLines = this.hexagram
+      .map((yao, index) => ([6, 9].includes(yao) ? 6 - index : null))
+      .filter((x) => x !== null);
+    const movingCount = movingLines.length;
+
+    let pattern = '';
+    let significance = '';
+
+    switch (movingCount) {
+      case 0:
+        pattern = '정괘 (無動)';
+        significance =
+          '안정된 상황으로 현상 유지. 급격한 변화는 없으나 내재된 기운은 지속됨';
+        break;
+      case 1:
+        pattern = '단동 (一動)';
+        significance = `${movingLines[0]}효 단독 변화. 명확한 방향성으로 해석이 용이하고 변화의 핵심이 뚜렷함`;
+        break;
+      case 2:
+        pattern = '이동 (二動)';
+        significance = `${movingLines.join(
+          '효, '
+        )}효 변화. 복잡한 상황으로 양면성 존재, 신중한 판단 필요`;
+        break;
+      case 3:
+        pattern = '삼동 (三動)';
+        significance = `${movingLines.join(
+          '효, '
+        )}효 변화. 역동적 변화로 기회와 위험이 공존`;
+        break;
+      case 4:
+        pattern = '사동 (四動)';
+        significance = `${movingLines.join(
+          '효, '
+        )}효 변화. 대변혁의 시기로 근본적 변화 임박`;
+        break;
+      case 5:
+        pattern = '오동 (五動)';
+        significance = `${movingLines.join(
+          '효, '
+        )}효 변화. 극도의 변화로 정적인 효가 핵심 역할`;
+        break;
+      case 6:
+        pattern = '육동 (六動)';
+        significance =
+          '전체 변화로 완전한 전환. 기존 틀의 완전한 해체와 재구성';
+        break;
+    }
+
+    return `
+            <div class="pattern-analysis">
+                <p><strong>변화 패턴:</strong> ${pattern}</p>
+                <p><strong>변화 의미:</strong> ${significance}</p>
+                <p><strong>동효 위치:</strong> ${
+                  movingLines.length > 0
+                    ? movingLines.map((x) => `${x}효`).join(', ')
+                    : '없음'
+                }</p>
+            </div>
+        `;
+  }
+
+  analyzeMovingLinesEffect() {
+    const movingCount = this.najiaResult.hexagram.filter((line) =>
+      line.note.includes('動')
+    ).length;
+    let interpretation = '';
+
+    switch (movingCount) {
+      case 0:
+        interpretation = '정괘 - 안정된 상황, 변화가 적음';
+        break;
+      case 1:
+        interpretation = '단동 - 명확한 방향성, 해석이 용이함';
+        break;
+      case 2:
+        interpretation = '이동 - 복잡한 상황, 양면성 존재';
+        break;
+      case 3:
+        interpretation = '삼동 - 혼란스러운 상황, 신중한 판단 필요';
+        break;
+      case 4:
+        interpretation = '사동 - 큰 변화, 전환점';
+        break;
+      case 5:
+        interpretation = '오동 - 극도의 변화, 혁신적 전환';
+        break;
+      case 6:
+        interpretation = '육동 - 완전한 변화, 새로운 시작';
+        break;
+    }
+
+    return `<div class="moving-effect"><h6>동효 개수에 따른 해석</h6><p><strong>${movingCount}개 동효:</strong> ${interpretation}</p></div>`;
+  }
+
+  analyzeHexagramChange() {
+    const changeDirection = this.getChangeDirection();
+    return `<div class="change-analysis"><h6>변화의 성격</h6><p>${changeDirection}</p><p><strong>변화 내용:</strong> ${this.getChangeDescription()}</p></div>`;
+  }
+
+  // 5단계: 용신/기신/원신 분석
+  analyzeHelpingHinderingSpirits() {
+    const questionType = this.consultationInfo.questionType || '일반';
+    const primarySpirit = this.getPrimarySpirit(questionType);
+    const helpingSpirit = this.getHelpingSpirit(primarySpirit);
+    const hinderingSpirit = this.getHinderingSpirit(primarySpirit);
+
+    let html = '<div class="spirit-analysis">';
+    html += `<h6>용신/기신/원신 분석 (${questionType} 질문)</h6>`;
+    html += `<p><strong>용신(主神):</strong> ${primarySpirit}</p>`;
+    html += `<p><strong>원신(助神):</strong> ${helpingSpirit}</p>`;
+    html += `<p><strong>기신(克神):</strong> ${hinderingSpirit}</p>`;
+
+    html += '<div class="spirit-presence">';
+    html += '<h6>괘 내 육친 현황</h6>';
+    const spiritPresence = this.checkSpiritPresence();
+    spiritPresence.forEach((spirit) => {
+      html += `<p>${spirit}</p>`;
+    });
+    html += '</div>';
+
+    html += '</div>';
+    return html;
+  }
+
+  // 6단계: 복신과 공망 (업데이트된 버전)
+  analyzeHiddenSpiritsAndVoid() {
+    let html = '<div class="hidden-void-analysis">';
+
+    // 복신 분석 (계산된 데이터 사용)
+    html += '<div class="hidden-spirits">';
+    html += '<h6>🛡️ 복신 분석</h6>';
+
+    if (this.najiaResult.fu_shen && this.najiaResult.fu_shen.복신수 > 0) {
+      html += `<p><strong>복신 개수:</strong> ${this.najiaResult.fu_shen.복신수}개</p>`;
+      html += '<div class="fu-shen-list">';
+      this.najiaResult.fu_shen.복신목록.forEach((fs) => {
+        html += `<div class="fu-shen-detail">`;
+        html += `<span class="fu-shen-branch-badge">${fs.복신지지}</span>`;
+        html += `<span class="fu-shen-kin-badge">${fs.복신육친}</span>`;
+        html += `<p>${fs.복신의미} - ${fs.복신작용}</p>`;
+        html += `</div>`;
+      });
+      html += '</div>';
+      html +=
+        '<p class="fu-shen-summary"><strong>복신 작용:</strong> 잠재된 도움이나 영향으로 적절한 때에 나타나 상황을 돕습니다.</p>';
+    } else {
+      html +=
+        '<p class="no-fu-shen">현재 복신이 없어 잠재된 도움이 제한적입니다.</p>';
+    }
+    html += '</div>';
+
+    // 공망 분석 (계산된 데이터 사용)
+    html += '<div class="void-calculation">';
+    html += '<h6>🕳️ 공망 분석</h6>';
+
+    if (this.najiaResult.kong_wang && this.najiaResult.kong_wang.공망수 > 0) {
+      html += `<p><strong>공망 지지:</strong> ${this.najiaResult.kong_wang.공망지지.join(
+        ', '
+      )}</p>`;
+      html += `<p><strong>공망 효수:</strong> ${this.najiaResult.kong_wang.공망수}개</p>`;
+
+      html += '<div class="kong-wang-effects">';
+      this.najiaResult.kong_wang.공망효.forEach((kw) => {
+        html += `<div class="kong-wang-effect">`;
+        html += `<span class="kong-wang-yao">${kw.효위}효</span>`;
+        html += `<span class="kong-wang-branch-badge">${kw.지지}</span>`;
+        html += `<span class="kong-wang-kin-badge">${kw.육친}</span>`;
+        html += `<p>${kw.의미}</p>`;
+        html += `</div>`;
+      });
+      html += '</div>';
+
+      // 중요한 효가 공망인지 확인
+      const worldLine = this.najiaResult.hexagram.find((line) =>
+        line.note.includes('世')
+      );
+      const responseLine = this.najiaResult.hexagram.find((line) =>
+        line.note.includes('應')
+      );
+
+      if (
+        worldLine &&
+        this.najiaResult.kong_wang.공망지지.includes(worldLine.branch)
+      ) {
+        html +=
+          '<p class="critical-void">⚠️ <strong>세효가 공망</strong>: 자신의 능력이 현재 발휘되지 못함</p>';
+      }
+      if (
+        responseLine &&
+        this.najiaResult.kong_wang.공망지지.includes(responseLine.branch)
+      ) {
+        html +=
+          '<p class="critical-void">⚠️ <strong>응효가 공망</strong>: 상대방이나 목표가 현실성 부족</p>';
+      }
+    } else {
+      html +=
+        '<p class="no-kong-wang">현재 공망에 해당하는 효가 없어 모든 효가 정상적으로 작용합니다.</p>';
+    }
+    html += '</div>';
+
+    html += '</div>';
+    return html;
+  }
+
+  // 7단계: 세응 관계 (강화된 버전)
+  analyzeWorldResponseRelation() {
+    const worldLine = this.najiaResult.hexagram.find((line) =>
+      line.note.includes('世')
+    );
+    const responseLine = this.najiaResult.hexagram.find((line) =>
+      line.note.includes('應')
+    );
+
+    let html = '<div class="world-response-analysis">';
+    html += '<h6>⚖️ 세효와 응효의 관계</h6>';
+
+    if (worldLine && responseLine) {
+      // 세효 정보
+      html += '<div class="world-line-info">';
+      html += `<h7>🏠 세효 (${worldLine.yao_pos}효)</h7>`;
+      html += `<p><strong>지지:</strong> ${worldLine.branch} | <strong>육친:</strong> ${worldLine.six_kin} | <strong>왕약:</strong> ${worldLine.wang_shuai}</p>`;
+
+      // 세효 공망 체크
+      if (
+        this.najiaResult.kong_wang &&
+        this.najiaResult.kong_wang.공망지지.includes(worldLine.branch)
+      ) {
+        html += '<p class="world-void">⚠️ 세효가 공망 상태입니다</p>';
+      }
+      html += '</div>';
+
+      // 응효 정보
+      html += '<div class="response-line-info">';
+      html += `<h7>🤝 응효 (${responseLine.yao_pos}효)</h7>`;
+      html += `<p><strong>지지:</strong> ${responseLine.branch} | <strong>육친:</strong> ${responseLine.six_kin} | <strong>왕약:</strong> ${responseLine.wang_shuai}</p>`;
+
+      // 응효 공망 체크
+      if (
+        this.najiaResult.kong_wang &&
+        this.najiaResult.kong_wang.공망지지.includes(responseLine.branch)
+      ) {
+        html += '<p class="response-void">⚠️ 응효가 공망 상태입니다</p>';
+      }
+      html += '</div>';
+
+      // 세응 관계 분석
+      html += '<div class="world-response-relation">';
+      html += '<h7>🔗 세응 관계 분석</h7>';
+
+      const relation = this.analyzeElementRelation(
+        worldLine.branch,
+        responseLine.branch
+      );
+      const harmonyRelation = this.analyzeHarmonyRelation(
+        worldLine.branch,
+        responseLine.branch
+      );
+
+      html += `<p><strong>오행 관계:</strong> ${relation}</p>`;
+      html += `<p><strong>합충 관계:</strong> ${harmonyRelation}</p>`;
+
+      // 종합 판단
+      let overall = '';
+      if (harmonyRelation.includes('합')) {
+        overall = '🤝 세응이 서로 조화롭고 협력적인 관계입니다';
+      } else if (harmonyRelation.includes('충')) {
+        overall = '⚡ 세응이 서로 충돌하고 대립적인 관계입니다';
+      } else if (relation.includes('생')) {
+        overall = '🌱 세응이 서로 도움을 주는 관계입니다';
+      } else if (relation.includes('극')) {
+        overall = '⚔️ 세응이 서로 견제하는 관계입니다';
+      } else {
+        overall = '⚖️ 세응이 평행한 관계입니다';
+      }
+
+      html += `<p class="overall-relation"><strong>종합:</strong> ${overall}</p>`;
+      html += '</div>';
+    } else {
+      html += '<p>세효나 응효를 찾을 수 없습니다.</p>';
+    }
+
+    html += '</div>';
+    return html;
+  }
+
+  // 오행 관계 분석
+  analyzeElementRelation(branch1, branch2) {
+    const elements = {
+      子: '水',
+      亥: '水',
+      寅: '木',
+      卯: '木',
+      巳: '火',
+      午: '火',
+      申: '金',
+      酉: '金',
+      辰: '土',
+      戌: '土',
+      丑: '土',
+      未: '土',
+    };
+
+    const elem1 = elements[branch1];
+    const elem2 = elements[branch2];
+
+    if (elem1 === elem2) return `동일 오행 (${elem1})`;
+
+    const generates = {
+      水: '木',
+      木: '火',
+      火: '土',
+      土: '金',
+      金: '水',
+    };
+
+    const destroys = {
+      水: '火',
+      火: '金',
+      金: '木',
+      木: '土',
+      土: '水',
+    };
+
+    if (generates[elem1] === elem2) return `${elem1}이 ${elem2}를 생`;
+    if (generates[elem2] === elem1) return `${elem2}이 ${elem1}를 생`;
+    if (destroys[elem1] === elem2) return `${elem1}이 ${elem2}를 극`;
+    if (destroys[elem2] === elem1) return `${elem2}이 ${elem1}를 극`;
+
+    return '비화 관계';
+  }
+
+  // 합충 관계 분석
+  analyzeHarmonyRelation(branch1, branch2) {
+    const harmony = {
+      子: '丑',
+      丑: '子',
+      寅: '亥',
+      亥: '寅',
+      卯: '戌',
+      戌: '卯',
+      辰: '酉',
+      酉: '辰',
+      巳: '申',
+      申: '巳',
+      午: '未',
+      未: '午',
+    };
+
+    const clash = {
+      子: '午',
+      午: '子',
+      丑: '未',
+      未: '丑',
+      寅: '申',
+      申: '寅',
+      卯: '酉',
+      酉: '卯',
+      辰: '戌',
+      戌: '辰',
+      巳: '亥',
+      亥: '巳',
+    };
+
+    if (harmony[branch1] === branch2) return `${branch1}과 ${branch2}가 육합`;
+    if (clash[branch1] === branch2) return `${branch1}과 ${branch2}가 육충`;
+
+    return '일반 관계';
+  }
+
+  // 8단계: 응기 예측
+  predictTiming() {
+    const movingLines = this.najiaResult.hexagram.filter((line) =>
+      line.note.includes('動')
+    );
+
+    let html = '<div class="timing-prediction">';
+    html += '<h6>응기(應期) 예측</h6>';
+
+    if (movingLines.length === 0) {
+      html += '<p>동효가 없어서 응기 예측이 어렵습니다.</p>';
+    } else {
+      const timingDistance = this.getTimingDistance(movingLines);
+      html += `<p><strong>예상 시기:</strong> ${timingDistance}</p>`;
+
+      html += '<div class="detailed-timing">';
+      html += '<h6>상세 응기</h6>';
+      movingLines.forEach((line) => {
+        const monthTiming = this.getBranchTiming(line.branch);
+        html += `<p>${line.yao_pos}효 ${line.branch}: ${monthTiming}</p>`;
+      });
+      html += '</div>';
+    }
+
+    html += '</div>';
+    return html;
+  }
+
+  // 9단계: 종합 판단
+  generateJudgmentChecklist() {
+    let html = '<div class="judgment-checklist">';
+    html += '<h6>판단 체크리스트</h6>';
+    html += '<ul>';
+    html += `<li>괘명: ${this.najiaResult.main_info}</li>`;
+    html += `<li>동효 개수: ${
+      this.najiaResult.hexagram.filter((l) => l.note.includes('動')).length
+    }개</li>`;
+
+    const worldLine = this.najiaResult.hexagram.find((line) =>
+      line.note.includes('世')
+    );
+    if (worldLine) {
+      html += `<li>세효 상태: ${worldLine.yao_pos}효 ${worldLine.wang_shuai}</li>`;
+    }
+
+    const responseLine = this.najiaResult.hexagram.find((line) =>
+      line.note.includes('應')
+    );
+    if (responseLine) {
+      html += `<li>응효 상태: ${responseLine.yao_pos}효 ${responseLine.wang_shuai}</li>`;
+    }
+
+    html += '</ul>';
+    html += '</div>';
+    return html;
+  }
+
+  makeFinalJudgment() {
+    const score = this.calculateJudgmentScore();
+    const level = this.getJudgmentLevel(score);
+    const probability = this.getJudgmentProbability(level);
+
+    return `
+            <div class="final-judgment">
+                <h6>최종 판단</h6>
+                <p><strong>종합 점수:</strong> ${score}점</p>
+                <p><strong>판단:</strong> <span class="judgment-level ${level.toLowerCase()}">${level}</span></p>
+                <p><strong>성공 확률:</strong> ${probability}</p>
+            </div>
+        `;
+  }
+
+  // 10단계: 최종 조언
+  generateFinalAdvice() {
+    const level = this.getJudgmentLevel(this.calculateJudgmentScore());
+
+    let html = '<div class="final-advice">';
+    html += '<h6>상담 및 조언</h6>';
+
+    html += '<div class="advice-sections">';
+    html += '<div class="situation-diagnosis">';
+    html += '<h6>상황 진단</h6>';
+    html += this.getSituationDiagnosis();
+    html += '</div>';
+
+    html += '<div class="positive-advice">';
+    html += '<h6>긍정적 조언</h6>';
+    html += this.getPositiveAdvice(level);
+    html += '</div>';
+
+    html += '<div class="negative-advice">';
+    html += '<h6>주의사항</h6>';
+    html += this.getNegativeAdvice(level);
+    html += '</div>';
+
+    html += '<div class="timing-advice">';
+    html += '<h6>타이밍 조언</h6>';
+    html += this.getTimingAdvice();
+    html += '</div>';
+
+    html += '<div class="najia-specific-advice">';
+    html += '<h6>납갑 맞춤 조언</h6>';
+    html += this.getNajiaSpecificAdvice();
+    html += '</div>';
+
+    html += '</div>';
+    html += '</div>';
+    return html;
+  }
+
+  // 특별 괘 그룹의 의미 반환 (HEXAGRAMS에서 직접 가져옴)
+  getSpecialMeaning(specialType, description) {
+    // HEXAGRAMS에서 직접 설명을 가져오므로 더 이상 매핑 불필요
+    if (description) {
+      return description;
+    }
+
+    // 폴백용 기본 설명
+    const meanings = {
+      육충괘: '분산, 파열, 변화를 상징. 급격한 변화나 충돌 상황',
+      육합괘: '결합, 안정, 성사를 상징. 느리지만 확실한 진전',
+      귀혼괘: '끝맺음, 마무리, 귀결을 상징. 안정적 귀착이나 종결',
+      유혼괘: '불안정, 떠돌아다님, 미정을 상징. 마음의 방황이나 불확실',
+    };
+    return meanings[specialType] || '';
+  }
+
+  generateTableRows() {
+    let html = '';
+
+    this.najiaResult.hexagram.forEach((yao, index) => {
+      const isMoving = yao.note.includes('動');
+      const statusHtml = isMoving
+        ? `<strong>${yao.status} ${yao.note}</strong>`
+        : `${yao.status} ${yao.note}`;
+
+      // 원래 yao 값 찾기 (hexagram 배열에서)
+      const originalYaoValue = this.hexagram[5 - index]; // 상효부터 초효 순서 맞춤
+
+      // 공망 체크
+      const isKongWang =
+        this.najiaResult.kong_wang &&
+        this.najiaResult.kong_wang.공망지지.includes(yao.branch);
+      const kongWangMarker = isKongWang
+        ? '<span class="kong-wang-marker">●</span>'
+        : '';
+
+      // 변효 정보 생성
+      let changingInfo = yao.changing_info;
+      if (isMoving && this.najiaResult.changing_yao_detailed) {
+        const changingDetail = this.najiaResult.changing_yao_detailed.find(
+          (cyd) => cyd.효위 === yao.yao_pos
+        );
+        if (changingDetail) {
+          changingInfo = `
+                        <div class="changing-yao-detail">
+                            <div class="original-info">
+                                <strong>원:</strong> ${changingDetail.원지지} ${changingDetail.원육친}
+                            </div>
+                            <div class="arrow">→</div>
+                            <div class="changed-info">
+                                <strong>변:</strong> ${changingDetail.변지지} ${changingDetail.변육친}
+                            </div>
+                            <div class="wang-shuai-info">
+                                <small>(${changingDetail.변왕약})</small>
+                            </div>
+                        </div>
+                    `;
+        }
+      }
+
+      html += `
+                <tr ${isMoving ? 'data-moving="true"' : ''} ${
+        isKongWang ? 'data-kong-wang="true"' : ''
+      }>
+                    <td>${yao.spirit}</td>
+                    <td>${statusHtml}</td>
+                    <td><strong>${yao.six_kin}</strong></td>
+                    <td style="color: var(--primary-color); font-weight: 600;">
+                        ${yao.branch}
+                        ${kongWangMarker}
+                    </td>
+                    <td>
+                        <div class="yao-position-cell">
+                            <div class="line-visual ${this.getLineVisualClass(
+                              originalYaoValue
+                            )}"></div>
+                            <span class="yao-pos-text">${yao.yao_pos}효${
+        yao.note ? ' ' + yao.note : ''
+      }</span>
+                            ${kongWangMarker}
+                        </div>
+                    </td>
+                    <td>${yao.wang_shuai}</td>
+                    <td>${yao.day_relation}</td>
+                    <td>${changingInfo}</td>
+                </tr>
+            `;
+    });
+
+    return html;
+  }
+
+  // Helper functions for 10-step analysis
+  getLineInfo(yaoNumber) {
+    const lineTypes = {
+      6: '老陰 (변음)',
+      7: '少陽 (정양)',
+      8: '少陰 (정음)',
+      9: '老陽 (변양)',
+    };
+    return lineTypes[yaoNumber] || '알 수 없음';
+  }
+
+  getLineVisualClass(yaoNumber) {
+    const classes = {
+      6: 'yin-moving-visual',
+      7: 'yang-visual',
+      8: 'yin-visual',
+      9: 'yang-moving-visual',
+    };
+    return classes[yaoNumber] || 'yang-visual';
+  }
+
+  getPositionMeaning(position) {
+    const meanings = {
+      1: '초효 - 시작, 기초, 준비 단계',
+      2: '이효 - 발전, 진행, 실행 단계',
+      3: '삼효 - 전환, 위기, 선택의 기로',
+      4: '사효 - 접근, 기회, 결과 도출',
+      5: '오효 - 성취, 권력, 최고조',
+      6: '상효 - 완성, 종료, 새로운 시작',
+    };
+    return meanings[position] || '일반적 의미';
+  }
+
+  getStrengthDescription(strength) {
+    const descriptions = {
+      旺: '최강 - 매우 유리한 상태',
+      相: '강함 - 유리한 상태',
+      休: '보통 - 중립적 상태',
+      囚: '약함 - 불리한 상태',
+      死: '최약 - 매우 불리한 상태',
+    };
+    return descriptions[strength] || '알 수 없음';
+  }
+
+  getChangingHexagramCode() {
+    return this.hexagram
+      .map((yao) => {
+        if (yao === 6) return '1'; // 음 → 양
+        if (yao === 9) return '0'; // 양 → 음
+        return [7, 9].includes(yao) ? '1' : '0'; // 변하지 않는 것
+      })
+      .reverse()
+      .join('');
+  }
+
+  getHexagramName(code) {
+    // 간단한 괘명 반환 (64괘 전체 구현 필요)
+    const simpleNames = {
+      111111: '乾',
+      '000000': '坤',
+      '010001': '屯',
+      100010: '蒙',
+      111010: '訟',
+      '010111': '需',
+      '010000': '師',
+      '000010': '比',
+    };
+    return simpleNames[code] || '미정의괘';
+  }
+
+  getChangeDirection() {
+    const movingCount = this.najiaResult.hexagram.filter((line) =>
+      line.note.includes('動')
+    ).length;
+    if (movingCount <= 2) return '점진적 변화 - 안정적 전환';
+    if (movingCount <= 4) return '중간 변화 - 주의깊은 대응 필요';
+    return '급격한 변화 - 큰 전환점';
+  }
+
+  getChangeDescription() {
+    const movingLines = this.najiaResult.hexagram.filter((line) =>
+      line.note.includes('動')
+    );
+    return movingLines
+      .map(
+        (line) =>
+          `${line.yao_pos}효: ${line.status} → ${
+            line.changing_info.split('→')[1] || '변화'
+          }`
+      )
+      .join(', ');
+  }
+
+  getPrimarySpirit(questionType) {
+    const spiritMap = {
+      재물: '妻財',
+      직업: '官鬼',
+      건강: '世爻',
+      학업: '父母',
+      연애: '妻財',
+      가족: '父母',
+      자녀: '子孫',
+      친구: '兄弟',
+      소송: '官鬼',
+      일반: '世爻',
+    };
+    return spiritMap[questionType] || '世爻';
+  }
+
+  getHelpingSpirit(primarySpirit) {
+    const helpMap = {
+      妻財: '子孫',
+      官鬼: '父母',
+      父母: '官鬼',
+      子孫: '兄弟',
+      兄弟: '妻財',
+      世爻: '원신',
+    };
+    return helpMap[primarySpirit] || '원신';
+  }
+
+  getHinderingSpirit(primarySpirit) {
+    const hinderMap = {
+      妻財: '兄弟',
+      官鬼: '子孫',
+      父母: '妻財',
+      子孫: '官鬼',
+      兄弟: '父母',
+      世爻: '기신',
+    };
+    return hinderMap[primarySpirit] || '기신';
+  }
+
+  checkSpiritPresence() {
+    const allKins = this.najiaResult.hexagram.map((line) => line.six_kin);
+    const uniqueKins = [...new Set(allKins)];
+    return uniqueKins.map(
+      (kin) => `${kin}: ${allKins.filter((k) => k === kin).length}개`
+    );
+  }
+
+  calculateVoid() {
+    // 간단한 공망 계산 (일지 기준)
+    const dayBranch = this.najiaResult.base_info['일진'].charAt(1);
+    const branchIndex = [
+      '子',
+      '丑',
+      '寅',
+      '卯',
+      '辰',
+      '巳',
+      '午',
+      '未',
+      '申',
+      '酉',
+      '戌',
+      '亥',
+    ].indexOf(dayBranch);
+    const voidIndex1 = (branchIndex + 10) % 12;
+    const voidIndex2 = (branchIndex + 11) % 12;
+    const branches = [
+      '子',
+      '丑',
+      '寅',
+      '卯',
+      '辰',
+      '巳',
+      '午',
+      '未',
+      '申',
+      '酉',
+      '戌',
+      '亥',
+    ];
+    return [branches[voidIndex1], branches[voidIndex2]];
+  }
+
+  getWorldResponseRelation(worldLine, responseLine) {
+    const worldBinary = [7, 9].includes(worldLine.status) ? 1 : 0;
+    const responseBinary = [7, 9].includes(responseLine.status) ? 1 : 0;
+
+    if (worldBinary === responseBinary) {
+      return '세응비화 - 조화로운 관계';
+    } else {
+      return '세응상충 - 대립적 관계';
+    }
+  }
+
+  getTimingDistance(movingLines) {
+    const positions = movingLines.map((line) => line.yao_pos);
+    const nearCount = positions.filter((pos) => pos <= 3).length;
+    const farCount = positions.filter((pos) => pos > 3).length;
+
+    if (nearCount > farCount) return '1-3개월 (가까운 시기)';
+    if (farCount > nearCount) return '6-12개월 (먼 시기)';
+    return '3-6개월 (중간 시기)';
+  }
+
+  getBranchTiming(branch) {
+    const timing = {
+      子: '11월(자월)',
+      丑: '12월(축월)',
+      寅: '1월(인월)',
+      卯: '2월(묘월)',
+      辰: '3월(진월)',
+      巳: '4월(사월)',
+      午: '5월(오월)',
+      未: '6월(미월)',
+      申: '7월(신월)',
+      酉: '8월(유월)',
+      戌: '9월(술월)',
+      亥: '10월(해월)',
+    };
+    return timing[branch] || '미정';
+  }
+
+  calculateJudgmentScore() {
+    let score = 0;
+
+    // 동효 개수에 따른 점수
+    const movingCount = this.najiaResult.hexagram.filter((line) =>
+      line.note.includes('動')
+    ).length;
+    if (movingCount === 0) score += 5;
+    else if (movingCount === 1) score += 15;
+    else if (movingCount <= 3) score += 10;
+    else score -= 5;
+
+    // 음양 균형
+    const yangCount = this.hexagram.filter((y) => [7, 9].includes(y)).length;
+    if (yangCount >= 2 && yangCount <= 4) score += 10;
+
+    // 세효 강약
+    const worldLine = this.najiaResult.hexagram.find((line) =>
+      line.note.includes('世')
+    );
+    if (worldLine) {
+      if (['旺', '相'].includes(worldLine.wang_shuai)) score += 10;
+      else if (worldLine.wang_shuai === '死') score -= 10;
+    }
+
+    // 용신 강약 (간단 버전)
+    const strongSpirits = this.najiaResult.hexagram.filter((line) =>
+      ['旺', '相'].includes(line.wang_shuai)
+    ).length;
+    if (strongSpirits >= 3) score += 15;
+    else if (strongSpirits <= 1) score -= 10;
+
+    return score;
+  }
+
+  getJudgmentLevel(score) {
+    if (score >= 25) return '대길';
+    if (score >= 15) return '길';
+    if (score >= 5) return '평';
+    if (score >= -5) return '흉';
+    return '대흉';
+  }
+
+  getJudgmentProbability(level) {
+    const probabilities = {
+      대길: '85-95%',
+      길: '70-85%',
+      평: '50-70%',
+      흉: '25-50%',
+      대흉: '5-25%',
+    };
+    return probabilities[level] || '50%';
+  }
+
+  getSituationDiagnosis() {
+    const movingCount = this.najiaResult.hexagram.filter((line) =>
+      line.note.includes('動')
+    ).length;
+    if (movingCount === 0)
+      return '<p>현재 상황이 안정적이며 큰 변화가 없는 시기입니다.</p>';
+    if (movingCount === 1)
+      return '<p>명확한 변화의 방향이 보이는 시기입니다.</p>';
+    if (movingCount <= 3)
+      return '<p>복잡한 상황이지만 관리 가능한 범위입니다.</p>';
+    return '<p>급변하는 시기로 신중한 대응이 필요합니다.</p>';
+  }
+
+  getPositiveAdvice(level) {
+    const advice = {
+      대길: '<p>적극적으로 행동하세요. 좋은 결과를 얻을 가능성이 높습니다.</p>',
+      길: '<p>계획을 실행에 옮기기 좋은 시기입니다.</p>',
+      평: '<p>신중하게 접근하면 무난한 결과를 얻을 수 있습니다.</p>',
+      흉: '<p>현상 유지에 집중하고 새로운 시도는 미루세요.</p>',
+      대흉: '<p>방어적 자세를 취하고 손실을 최소화하세요.</p>',
+    };
+    return advice[level] || '<p>균형잡힌 접근이 필요합니다.</p>';
+  }
+
+  getNegativeAdvice(level) {
+    const warnings = {
+      대길: '<p>과도한 자신감은 금물입니다.</p>',
+      길: '<p>안주하지 말고 지속적인 노력이 필요합니다.</p>',
+      평: '<p>성급한 판단을 피하세요.</p>',
+      흉: '<p>위험한 투자나 결정을 피하세요.</p>',
+      대흉: '<p>모든 행동을 신중히 재검토하세요.</p>',
+    };
+    return warnings[level] || '<p>주의깊은 관찰이 필요합니다.</p>';
+  }
+
+  getTimingAdvice() {
+    const movingLines = this.najiaResult.hexagram.filter((line) =>
+      line.note.includes('動')
+    );
+    if (movingLines.length === 0)
+      return '<p>급하지 않으니 충분히 준비하세요.</p>';
+
+    const nearPositions = movingLines.filter(
+      (line) => line.yao_pos <= 3
+    ).length;
+    if (nearPositions > movingLines.length / 2) {
+      return '<p>가까운 시일 내에 행동하세요.</p>';
+    }
+    return '<p>좀 더 기다린 후 행동하는 것이 좋겠습니다.</p>';
+  }
+
+  getNajiaSpecificAdvice() {
+    let html = '<div class="najia-advice">';
+
+    const worldLine = this.najiaResult.hexagram.find((line) =>
+      line.note.includes('世')
+    );
+    if (worldLine) {
+      if (['旺', '相'].includes(worldLine.wang_shuai)) {
+        html +=
+          '<p><strong>세효 강함:</strong> 자신의 의지대로 상황을 이끌 수 있습니다.</p>';
+      } else {
+        html +=
+          '<p><strong>세효 약함:</strong> 외부 도움을 구하거나 시기를 기다리세요.</p>';
+      }
+    }
+
+    const strongLines = this.najiaResult.hexagram.filter((line) =>
+      ['旺', '相'].includes(line.wang_shuai)
+    );
+    const weakLines = this.najiaResult.hexagram.filter((line) =>
+      ['囚', '死'].includes(line.wang_shuai)
+    );
+
+    if (strongLines.length > weakLines.length) {
+      html +=
+        '<p><strong>전체적 강세:</strong> 적극적인 접근이 유리합니다.</p>';
+    } else {
+      html += '<p><strong>전체적 약세:</strong> 보수적 접근이 안전합니다.</p>';
+    }
+
+    // 육친별 조언
+    const kinCounts = {};
+    this.najiaResult.hexagram.forEach((line) => {
+      kinCounts[line.six_kin] = (kinCounts[line.six_kin] || 0) + 1;
+    });
+
+    const dominantKin = Object.keys(kinCounts).reduce((a, b) =>
+      kinCounts[a] > kinCounts[b] ? a : b
+    );
+    html += `<p><strong>주요 육친 ${dominantKin}:</strong> 이 영역에 집중하여 대응하세요.</p>`;
+
+    html += '</div>';
+    return html;
+  }
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+  new IntegratedNajiaSystem();
+});

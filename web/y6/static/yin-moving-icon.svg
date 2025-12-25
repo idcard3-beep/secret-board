@@ -1,0 +1,10 @@
+<svg width="60" height="80" xmlns="http://www.w3.org/2000/svg">
+  <!-- 상단 왼쪽 기둥 -->
+  <rect x="22" y="14" width="4" height="22" fill="#dc2626" rx="1"/>
+  <!-- 상단 오른쪽 기둥 -->
+  <rect x="34" y="14" width="4" height="22" fill="#dc2626" rx="1"/>
+  <!-- 하단 왼쪽 기둥 -->
+  <rect x="22" y="44" width="4" height="22" fill="#dc2626" rx="1"/>
+  <!-- 하단 오른쪽 기둥 -->
+  <rect x="34" y="44" width="4" height="22" fill="#dc2626" rx="1"/>
+</svg>

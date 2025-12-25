@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>전문가 육효 납갑 점사 시스템 - 사주 기둥 통합</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='y6_style.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='security.css') }}"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <header class="header">
+        <h1>🌌 전문가 육효 납갑 점사 시스템</h1>
+        <p class="subtitle">
+          Professional I-Ching Najia Divination System with Saju Pillars
+        </p>
+      </header>
+
+      <!-- Current Saju Display Section -->
+      <section class="current-saju-section" id="currentSajuSection">
+        <div class="saju-container">
+          <h3>🕰️ 현재 시점의 사주 기둥</h3>
+          <div class="current-time-display" id="currentTimeDisplay">
+            <p class="loading-text">현재 시간과 사주를 불러오는 중...</p>
+          </div>
+          <div class="saju-pillars" id="sajuPillars" style="display: none">
+            <div class="pillar-container">
+              <div class="pillar year-pillar">
+                <div class="pillar-label">년주(年柱)</div>
+                <div class="pillar-value" id="yearPillar">--</div>
+                <div class="pillar-description">Year Pillar</div>
+              </div>
+              <div class="pillar month-pillar">
+                <div class="pillar-label">월주(月柱)</div>
+                <div class="pillar-value" id="monthPillar">--</div>
+                <div class="pillar-description">Month Pillar</div>
+              </div>
+              <div class="pillar day-pillar">
+                <div class="pillar-label">일주(日柱)</div>
+                <div class="pillar-value" id="dayPillar">--</div>
+                <div class="pillar-description">Day Pillar</div>
+              </div>
+              <div class="pillar hour-pillar">
+                <div class="pillar-label">시주(時柱)</div>
+                <div class="pillar-value" id="hourPillar">--</div>
+                <div class="pillar-description">Hour Pillar</div>
+              </div>
+            </div>
+            <div class="saju-time-info">
+              <p id="sajuTimeInfo">현재 시각 기준으로 계산된 사주입니다.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Consultation Information -->
+      <section class="consultation-section">
+        <div class="consultation-container">
+          <h3>상담 정보 입력</h3>
+          <div class="consultation-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="questionType">질문 분야</label>
+                <select id="questionType" class="form-control">
+                  <option value="">분야를 선택하세요</option>
+                  <option value="재물">재물/돈</option>
+                  <option value="직업">직업/사업</option>
+                  <option value="건강">건강/질병</option>
+                  <option value="학업">학업/시험</option>
+                  <option value="연애">연애/결혼</option>
+                  <option value="가족">가족 관계</option>
+                  <option value="자녀">자녀 문제</option>
+                  <option value="친구">인간관계</option>
+                  <option value="소송">소송/분쟁</option>
+                  <option value="일반">일반적 상황</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="questionText">구체적 질문</label>
+                <input
+                  type="text"
+                  id="questionText"
+                  class="form-control"
+                  placeholder="구체적이고 명료한 질문을 입력하세요"
+                />
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="consultantName">성명 (선택)</label>
+                <input
+                  type="text"
+                  id="consultantName"
+                  class="form-control"
+                  placeholder="성명"
+                />
+              </div>
+              <div class="form-group">
+                <label for="birthDate">생년월일 (선택)</label>
+                <input type="date" id="birthDate" class="form-control" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <main class="main-content">
+        <!-- Hexagram Building Section -->
+        <section class="hexagram-section">
+          <div class="hexagram-container">
+            <h3>괘 형성 개발중.........</h3>
+            <div class="hexagram-display" id="hexagramDisplay">
+              <div class="line-position" data-position="5">
+                <span class="line-label">상효</span>
+                <div class="line-slots-container">
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="line-slot" data-line="6"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                </div>
+              </div>
+              <div class="line-position" data-position="4">
+                <span class="line-label">오효</span>
+                <div class="line-slots-container">
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="line-slot" data-line="5"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                </div>
+              </div>
+              <div class="line-position" data-position="3">
+                <span class="line-label">사효</span>
+                <div class="line-slots-container">
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="line-slot" data-line="4"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                </div>
+              </div>
+              <div class="line-position" data-position="2">
+                <span class="line-label">삼효</span>
+                <div class="line-slots-container">
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="line-slot" data-line="3"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                </div>
+              </div>
+              <div class="line-position" data-position="1">
+                <span class="line-label">이효</span>
+                <div class="line-slots-container">
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="line-slot" data-line="2"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                </div>
+              </div>
+              <div class="line-position" data-position="0">
+                <span class="line-label">초효</span>
+                <div class="line-slots-container">
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="line-slot" data-line="1"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                  <div class="extra-slot"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="hexagram-controls">
+              <button id="resetBtn" class="reset-btn">다시 시작</button>
+              <button id="analyzeBtn" class="analyze-btn" disabled>
+                전문 분석하기
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Coin Selection Section -->
+        <section class="coin-selection-section" id="coinSection">
+          <div class="instruction-panel">
+            <h2>동전 선택</h2>
+            <p class="current-line">
+              현재: <span id="currentLineText">초효 (1효)</span>
+            </p>
+            <p class="instruction">마음을 집중하고 동전을 선택하세요</p>
+          </div>
+
+          <div class="coin-grid">
+            <div class="coin-option" data-type="yang">
+              <div class="coin yang-coin">
+                <div class="coin-face"></div>
+              </div>
+              <p class="coin-label">양효 (陽爻)</p>
+              <p class="coin-desc">소양 7 - 고정된 양</p>
+            </div>
+
+            <div class="coin-option" data-type="yin">
+              <div class="coin yin-coin">
+                <div class="coin-face"></div>
+              </div>
+              <p class="coin-label">음효 (陰爻)</p>
+              <p class="coin-desc">소음 8 - 고정된 음</p>
+            </div>
+
+            <div class="coin-option" data-type="yang-moving">
+              <div class="coin yang-moving-coin">
+                <div class="coin-face"></div>
+              </div>
+              <p class="coin-label">양동효 (陽動爻)</p>
+              <p class="coin-desc">노양 9 - 변화하는 양</p>
+            </div>
+
+            <div class="coin-option" data-type="yin-moving">
+              <div class="coin yin-moving-coin">
+                <div class="coin-face"></div>
+              </div>
+              <p class="coin-label">음동효 (陰動爻)</p>
+              <p class="coin-desc">노음 6 - 변화하는 음</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Professional Analysis Section -->
+        <section
+          class="analysis-section"
+          id="analysisSection"
+          style="display: none"
+        >
+          <div class="analysis-container">
+            <div class="analysis-header">
+              <h2>🎯 전문가 납갑 분석 결과</h2>
+              <div class="hexagram-info">
+                <div class="main-hexagram">
+                  <h4 id="hexagramName">괘명</h4>
+                  <p id="hexagramMeaning">괘의 의미</p>
+                </div>
+              </div>
+            </div>
+
+            <div id="najiaResultContainer"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='y6_script.js') }}"></script>
+    <!-- 회원 세션 전역 변수 -->
+    <script src="{{ url_for('static', filename='member_session.js') }}"></script>
+    <!-- 관리자 세션 전역 변수 관리 -->
+    <script src="{{ url_for('static', filename='admin_session.js') }}"></script>
+    <!-- 복사방지 세션 전역 변수 관리 -->
+    <script src="{{ url_for('static', filename='security.js') }}"></script>
+  </body>
+</html>

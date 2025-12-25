@@ -1,0 +1,91 @@
+/* 복사 방지 보안 CSS */
+
+/* 기본 텍스트 선택 방지 */
+body {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+/* 입력 필드는 선택 가능하도록 */
+input,
+textarea,
+[contenteditable] {
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+}
+
+/* 이미지 드래그 방지 */
+img {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+  pointer-events: none;
+}
+
+/* 링크 드래그 방지 */
+a {
+  -webkit-user-drag: none;
+  -khtml-user-drag: none;
+  -moz-user-drag: none;
+  -o-user-drag: none;
+  user-drag: none;
+}
+
+/* 텍스트 강조 방지 */
+::selection {
+  background: transparent;
+}
+
+::-moz-selection {
+  background: transparent;
+}
+
+/* 브라우저 기본 컨텍스트 메뉴 스타일 숨기기 */
+*::-webkit-scrollbar-corner {
+  background: transparent;
+}
+
+/* 모바일에서 롱터치 방지 */
+* {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* 입력 필드 예외 처리 */
+input[type='text'],
+input[type='password'],
+input[type='email'],
+input[type='tel'],
+textarea {
+  -webkit-user-select: text !important;
+  -khtml-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  user-select: text !important;
+}
+
+/* 인쇄 방지 */
+@media print {
+  body {
+    display: none !important;
+  }
+  body:before {
+    content: '인쇄가 허용되지 않습니다.';
+    display: block !important;
+    font-size: 20px;
+    text-align: center;
+    margin-top: 50px;
+  }
+}
