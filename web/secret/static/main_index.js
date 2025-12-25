@@ -1,0 +1,231 @@
+// main_index.js
+// main_index.html의 모든 JS 코드 분리
+
+document.addEventListener('DOMContentLoaded', function () {
+  // ===== 회원 세션 관리 =====
+  function updateMemberUI() {
+    if (!window.getMemberSession || !window.isMemberLoggedIn) {
+      console.error('❌ member_session.js가 로드되지 않았습니다!');
+      return;
+    }
+    const session = window.getMemberSession();
+    const isLoggedIn = window.isMemberLoggedIn();
+    const loginLinks = document.getElementById('loginLinks');
+    const memberInfo = document.getElementById('memberInfo');
+    const displayMemberId = document.getElementById('displayMemberId');
+    const displayMemberName = document.getElementById('displayMemberName');
+    const displayMemberNickname = document.getElementById(
+      'displayMemberNickname'
+    );
+    if (!loginLinks || !memberInfo) {
+      console.error('❌ 필수 요소를 찾을 수 없습니다!');
+      return;
+    }
+    const sideMemberInfo = document.getElementById('sideMemberInfo');
+    const sideAuthDefault = document.getElementById('sideAuthDefault');
+    const sideMemberId = document.getElementById('sideMemberId');
+    const sideMemberName = document.getElementById('sideMemberName');
+    if (isLoggedIn && session.sMem_id) {
+      loginLinks.style.display = 'none';
+      memberInfo.style.display = 'flex';
+      displayMemberId.textContent = session.sMem_id;
+      displayMemberName.textContent = session.sMem_name || '이름없음';
+      displayMemberNickname.textContent = session.sMem_nickname || '닉네임없음';
+      sideMemberInfo.style.display = 'block';
+      sideAuthDefault.style.display = 'none';
+      sideMemberId.textContent = session.sMem_id;
+      sideMemberName.textContent = session.sMem_name || '이름없음';
+    } else {
+      loginLinks.style.display = 'flex';
+      memberInfo.style.display = 'none';
+      sideMemberInfo.style.display = 'none';
+      sideAuthDefault.style.display = 'block';
+    }
+  }
+
+  function handleMemberLogout() {
+    if (confirm('로그아웃하시겠습니까?')) {
+      window.clearMemberSession();
+      updateMemberUI();
+      if (contentFrame) {
+        contentFrame.style.display = 'none';
+        contentFrame.src = '';
+      }
+      if (homeContent) {
+        homeContent.style.display = 'block';
+      }
+      alert('✅ 로그아웃되었습니다.');
+    }
+  }
+
+  function attachLogoutEvents() {
+    const memberLogoutBtn = document.getElementById('memberLogoutBtn');
+    const sideMemberLogout = document.getElementById('sideMemberLogout');
+    if (memberLogoutBtn) {
+      memberLogoutBtn.addEventListener('click', handleMemberLogout);
+    }
+    if (sideMemberLogout) {
+      sideMemberLogout.addEventListener('click', handleMemberLogout);
+    }
+  }
+
+  setTimeout(() => {
+    updateMemberUI();
+  }, 100);
+
+  window.addEventListener('message', (event) => {
+    if (event.data === 'memberLoginSuccess') {
+      setTimeout(() => {
+        window.restoreMemberSession();
+        updateMemberUI();
+      }, 200);
+      contentFrame.style.display = 'none';
+      contentFrame.src = '';
+      homeContent.style.display = 'block';
+    } else if (event.data === 'closeIframe') {
+      contentFrame.style.display = 'none';
+      contentFrame.src = '';
+      homeContent.style.display = 'block';
+    }
+  });
+
+  window.testMemberLogin = function () {
+    const testData = {
+      sMem_id: 'test123',
+      sMem_name: '홍길동',
+      sMem_nickname: '테스터',
+    };
+    window.setMemberSession(testData);
+    updateMemberUI();
+  };
+
+  window.testMemberLogout = function () {
+    window.clearMemberSession();
+    updateMemberUI();
+  };
+
+  window.forceUpdateUI = function () {
+    updateMemberUI();
+  };
+
+  const sideMenu = document.getElementById('sideMenu');
+  const mainContent = document.getElementById('mainContent');
+  const homeContent = document.getElementById('homeContent');
+  const contentFrame = document.getElementById('contentFrame');
+
+  function toggleSideMenu() {
+    if (sideMenu.classList.contains('show')) {
+      sideMenu.classList.remove('show');
+      mainContent.style.marginLeft = '0';
+    } else {
+      sideMenu.classList.add('show');
+      mainContent.style.marginLeft = sideMenu.offsetWidth + 'px';
+    }
+  }
+
+  document
+    .getElementById('toggleMenuTop')
+    .addEventListener('click', toggleSideMenu);
+  document
+    .getElementById('closeSideMenu')
+    .addEventListener('click', toggleSideMenu);
+
+  document.addEventListener('mousemove', (e) => {
+    if (e.clientX <= 5) {
+      sideMenu.classList.add('show');
+      mainContent.style.marginLeft = sideMenu.offsetWidth + 'px';
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if (
+      !e.target.closest('.side-menu') &&
+      !e.target.closest('#toggleMenuTop')
+    ) {
+      sideMenu.classList.remove('show');
+      mainContent.style.marginLeft = '0';
+    }
+  });
+
+  document.querySelectorAll('.menu-trigger').forEach((trigger) => {
+    trigger.addEventListener('click', () => {
+      const submenu = trigger.nextElementSibling;
+      const isOpen = submenu.classList.contains('show');
+      document
+        .querySelectorAll('.submenu')
+        .forEach((s) => s.classList.remove('show'));
+      document
+        .querySelectorAll('.menu-trigger')
+        .forEach((btn) => btn.classList.remove('active'));
+      if (!isOpen) {
+        submenu.classList.add('show');
+        trigger.classList.add('active');
+      }
+    });
+  });
+
+  document.querySelectorAll('.submenu a').forEach((link) => {
+    link.addEventListener('click', (e) => {
+      document
+        .querySelectorAll('.submenu a')
+        .forEach((a) => a.classList.remove('active'));
+      e.target.classList.add('active');
+      sideMenu.classList.remove('show');
+      mainContent.style.marginLeft = '0';
+    });
+  });
+
+  document.querySelectorAll('.load-form').forEach((link) => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      homeContent.style.display = 'none';
+      // 상대 경로에 /secret/ 접두사 추가
+      const target = link.dataset.target;
+      const fullPath = target.startsWith('/') ? target : `/secret/${target}`;
+      contentFrame.src = fullPath;
+      contentFrame.style.display = 'block';
+    });
+  });
+
+  contentFrame.addEventListener('load', () => {
+    try {
+      const iframeDoc =
+        contentFrame.contentDocument || contentFrame.contentWindow.document;
+      contentFrame.style.height = iframeDoc.body.scrollHeight + 'px';
+    } catch (err) {
+      contentFrame.style.height = '1000px';
+    }
+  });
+
+  document.getElementById('homeBtn').addEventListener('click', (e) => {
+    e.preventDefault();
+    contentFrame.style.display = 'none';
+    contentFrame.src = '';
+    homeContent.style.display = 'block';
+  });
+
+  // 슬라이드
+  const slides = document.querySelectorAll('#mainSlider .slides img');
+  const dotsContainer = document.getElementById('sliderDots');
+  let currentIndex = 0;
+  slides.forEach((_, i) => {
+    const dot = document.createElement('span');
+    if (i === 0) dot.classList.add('active');
+    dot.addEventListener('click', () => showSlide(i));
+    dotsContainer.appendChild(dot);
+  });
+  function showSlide(index) {
+    slides[currentIndex].style.display = 'none';
+    dotsContainer.children[currentIndex].classList.remove('active');
+    currentIndex = index;
+    slides[currentIndex].style.display = 'block';
+    dotsContainer.children[currentIndex].classList.add('active');
+  }
+  slides.forEach((s, i) => (s.style.display = i === 0 ? 'block' : 'none'));
+  setInterval(() => {
+    let next = (currentIndex + 1) % slides.length;
+    showSlide(next);
+  }, 5000);
+
+  attachLogoutEvents();
+});
