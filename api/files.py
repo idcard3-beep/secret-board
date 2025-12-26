@@ -27,7 +27,8 @@ def upload_signature():
         
         # 서명 파일 저장 폴더
         sign_folder = os.path.join(UPLOAD_ROOT, 'sign_file')
-        os.makedirs(sign_folder, exist_ok=True)
+        # 디렉토리 생성 및 쓰기 권한 설정 (0o755: 소유자는 읽기/쓰기/실행, 그룹/기타는 읽기/실행)
+        os.makedirs(sign_folder, exist_ok=True, mode=0o755)
         
         # 파일명 확인 (sMem_id_sMem_name.png 형식)
         filename = f.filename
@@ -36,7 +37,16 @@ def upload_signature():
         
         # 파일 저장
         file_path = os.path.join(sign_folder, filename)
-        f.save(file_path)
+        try:
+            f.save(file_path)
+            # 파일 쓰기 권한 설정 (0o644: 소유자는 읽기/쓰기, 그룹/기타는 읽기)
+            os.chmod(file_path, 0o644)
+        except PermissionError as pe:
+            # 권한 오류 시 상세 정보 포함
+            return jsonify({
+                'ok': False, 
+                'error': f'파일 저장 권한 오류: {str(pe)}. 경로: {file_path}'
+            }), 500
         
         # 상대 경로 반환
         relative_path = os.path.join('uploads', 'sign_file', filename).replace('\\', '/')
