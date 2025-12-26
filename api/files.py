@@ -27,8 +27,22 @@ def upload_signature():
         
         # 서명 파일 저장 폴더
         sign_folder = os.path.join(UPLOAD_ROOT, 'sign_file')
-        # 디렉토리 생성 및 쓰기 권한 설정 (0o755: 소유자는 읽기/쓰기/실행, 그룹/기타는 읽기/실행)
-        os.makedirs(sign_folder, exist_ok=True, mode=0o755)
+        
+        # 디렉토리 생성 및 쓰기 권한 설정
+        try:
+            # cloudtype.io 환경을 위한 권한 설정
+            os.makedirs(sign_folder, exist_ok=True, mode=0o755)
+            # 디렉토리 권한 명시적 설정 (cloudtype.io 호환)
+            if os.path.exists(sign_folder):
+                os.chmod(sign_folder, 0o755)
+        except (PermissionError, OSError) as e:
+            print(f"⚠️ 디렉토리 생성/권한 설정 오류: {e}")
+            # 권한 오류가 있어도 계속 진행 (이미 존재하는 경우)
+            if not os.path.exists(sign_folder):
+                return jsonify({
+                    'ok': False, 
+                    'error': f'디렉토리 생성 권한 오류: {str(e)}. 경로: {sign_folder}'
+                }), 500
         
         # 파일명 확인 (sMem_id_sMem_name.png 형식)
         filename = f.filename
@@ -38,14 +52,26 @@ def upload_signature():
         # 파일 저장
         file_path = os.path.join(sign_folder, filename)
         try:
+            # 파일 저장
             f.save(file_path)
-            # 파일 쓰기 권한 설정 (0o644: 소유자는 읽기/쓰기, 그룹/기타는 읽기)
-            os.chmod(file_path, 0o644)
+            # 파일 쓰기 권한 설정 (cloudtype.io 호환)
+            try:
+                os.chmod(file_path, 0o644)
+            except (PermissionError, OSError) as chmod_error:
+                # chmod 실패해도 파일은 저장되었으므로 경고만 출력
+                print(f"⚠️ 파일 권한 설정 실패 (파일은 저장됨): {chmod_error}")
         except PermissionError as pe:
             # 권한 오류 시 상세 정보 포함
             return jsonify({
                 'ok': False, 
                 'error': f'파일 저장 권한 오류: {str(pe)}. 경로: {file_path}'
+            }), 500
+        except Exception as e:
+            # 기타 오류
+            print(f"❌ 파일 저장 오류: {e}")
+            return jsonify({
+                'ok': False, 
+                'error': f'파일 저장 오류: {str(e)}. 경로: {file_path}'
             }), 500
         
         # 상대 경로 반환
