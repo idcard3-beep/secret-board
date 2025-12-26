@@ -3,6 +3,15 @@ from datetime import datetime, timedelta
 import json
 import os
 
+# 시간대 처리를 위한 import
+try:
+    from zoneinfo import ZoneInfo  # Python 3.9+
+    USE_ZONEINFO = True
+except ImportError:
+    # Python 3.8 이하를 위한 fallback - pytz 사용
+    import pytz
+    USE_ZONEINFO = False
+
 # mainpillar.py 함수들 임포트
 from mainpillar import calc_saju
 
@@ -809,18 +818,48 @@ def index():
 
 @app.route('/current-saju')
 def current_saju():
-    """현재 시점의 사주 계산 (mainpillar.py 사용)"""
+    """현재 시점의 사주 계산 (mainpillar.py 사용) - 정확한 시각 기준 (한국 시간대)"""
     try:
-        now = datetime.now()
-        current_time = now.strftime('%Y-%m-%d %H:%M')
+        # 한국 시간대(KST, UTC+9)로 현재 시각 가져오기
+        if USE_ZONEINFO:
+            # zoneinfo 사용 (Python 3.9+)
+            kst = ZoneInfo('Asia/Seoul')
+            now_utc = datetime.now(ZoneInfo('UTC'))
+            now = now_utc.astimezone(kst)
+        else:
+            # pytz 사용 (Python 3.8 이하)
+            kst = pytz.timezone('Asia/Seoul')
+            now_utc = datetime.now(pytz.UTC)
+            now = now_utc.astimezone(kst)
         
-        # mainpillar.py의 calc_saju 함수 사용
-        saju_result = calc_saju(current_time, json_path='api/solar_terms.json')
+        # 시주 계산을 위한 정확한 시간 문자열 (분까지, 초는 반올림하여 분에 반영)
+        # 예: 14:35:45 → 14:36 (초가 30 이상이면 분에 반올림)
+        hour = now.hour
+        minute = now.minute
+        second = now.second
+        
+        # 초가 30 이상이면 분에 반올림 (정확한 시각 계산)
+        if second >= 30:
+            minute += 1
+            if minute >= 60:
+                minute = 0
+                hour += 1
+                if hour >= 24:
+                    hour = 0
+        
+        # 정확한 시간 문자열 생성 (시주 계산용, naive datetime으로 변환)
+        current_time = now.strftime('%Y-%m-%d') + f' {hour:02d}:{minute:02d}'
+        
+        # mainpillar.py의 calc_saju 함수 사용 (time_type='normal'로 정확한 시각 계산)
+        saju_result = calc_saju(current_time, json_path='api/solar_terms.json', time_type='normal')
         
         # 현재 월지와 일간지 추출 (납갑 계산용)
         month_branch = saju_result['month'][1]  # 월지
         day_stem = saju_result['day'][0]        # 일간
         day_branch = saju_result['day'][1]      # 일지
+        
+        # 표시용 정확한 시각 (초 포함, 한국 시간대)
+        formatted_time = now.strftime('%Y년 %m월 %d일 %H시 %M분 %S초 (KST)')
         
         return jsonify({
             'success': True,
@@ -829,7 +868,7 @@ def current_saju():
             'month_branch': month_branch,
             'day_stem': day_stem,
             'day_branch': day_branch,
-            'formatted_time': now.strftime('%Y년 %m월 %d일 %H시 %M분')
+            'formatted_time': formatted_time
         })
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)})
