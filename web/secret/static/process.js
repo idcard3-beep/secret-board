@@ -162,7 +162,8 @@ function resetData() {
 
 // 비밀상담요청 링크 강제 설정 (naratt.kr 방지)
 (function() {
-  const CORRECT_URL = 'http://localhost:5000/secret/';
+  // 현재 도메인을 사용하여 동적으로 URL 생성
+  const CORRECT_URL = window.location.origin + '/secret/';
   
   function fixReserveLinks() {
     // 모든 비밀상담요청 관련 링크 찾기
@@ -181,7 +182,8 @@ function resetData() {
       
       // 비밀상담요청 관련 링크이고, naratt.kr이거나 올바른 URL이 아닌 경우
       if (ariaLabel.includes('비밀상담요청') || (href && href.includes('naratt.kr'))) {
-        if (!href || href.includes('naratt.kr') || !href.includes('localhost:5000/secret')) {
+        // localhost 체크 대신 상대 경로나 현재 도메인 체크
+        if (!href || href.includes('naratt.kr') || (!href.startsWith('/secret/') && !href.includes(window.location.hostname + '/secret/'))) {
           link.setAttribute('href', CORRECT_URL);
           link.setAttribute('target', '_blank');
           link.setAttribute('rel', 'noopener');

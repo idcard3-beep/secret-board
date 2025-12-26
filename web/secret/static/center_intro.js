@@ -209,7 +209,7 @@
         // reserve 필드는 항상 올바른 URL로 강제 설정
         if (k === 'reserve') {
           if (F[k] && typeof F[k].value !== 'undefined') {
-            F[k].value = 'http://localhost:5000/secret/';
+            F[k].value = window.location.origin + '/secret/';
           }
         } else if (F[k] && typeof F[k].value !== 'undefined') {
           F[k].value = v;
@@ -261,8 +261,8 @@
       P.phoneBtn.href = `tel:${F.phone.value}`;
       P.phoneText.textContent = F.phone.value;
     }
-    // 비밀상담요청 링크는 항상 올바른 URL로 강제 설정
-    const reserveUrl = 'http://localhost:5000/secret/';
+    // 비밀상담요청 링크는 항상 올바른 URL로 강제 설정 (현재 도메인 사용)
+    const reserveUrl = window.location.origin + '/secret/';
     P.reserveBtn.href = reserveUrl;
     P.reserveText.textContent = 'www.naratt.kr';
     // 입력 필드도 올바른 값으로 설정
