@@ -14,7 +14,7 @@ backlog = 2048
 
 # 워커 프로세스 설정
 # cloudtype.io 같은 클라우드 환경에서는 메모리 제한이 있으므로 워커 수를 제한
-# 환경 변수 GUNICORN_WORKERS로 설정 가능, 기본값은 2 (메모리 절약)
+# 환경 변수 GUNICORN_WORKERS로 설정 가능, 기본값은 1 (메모리 절약 및 빠른 시작)
 # 각 워커가 모든 앱을 로드하므로 메모리 사용량이 큼
 gunicorn_workers_env = os.environ.get('GUNICORN_WORKERS')
 
@@ -24,8 +24,12 @@ if gunicorn_workers_env:
 else:
     # 환경 변수가 없는 경우: 클라우드 환경에 적합한 기본값 사용
     # 로컬 환경에서 더 많은 워커가 필요한 경우 환경 변수로 설정
-    default_workers = 2  # 클라우드 환경에 적합한 기본값
+    default_workers = 1  # 클라우드 환경에 적합한 기본값 (메모리 절약 및 빠른 시작)
     workers = default_workers
+
+# preload_app: 애플리케이션을 마스터 프로세스에서 미리 로드
+# 메모리는 더 사용하지만 워커 시작 시간 단축 및 메모리 공유로 전체 메모리 사용량 감소
+preload_app = True
 
 worker_class = "sync"
 worker_connections = 1000
