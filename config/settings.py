@@ -2,7 +2,23 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 STORAGE = os.getenv("STORAGE", "POSTGRESQL")  # EXCEL | MSSQL | POSTGRESQL - PostgreSQL을 기본값으로 변경
 
-UPLOAD_ROOT = os.getenv("UPLOAD_ROOT", os.path.join(BASE_DIR, "uploads"))
+# cloudtype.io 환경을 위한 업로드 경로 설정
+# 환경 변수가 설정되어 있으면 사용, 없으면 BASE_DIR/uploads 사용
+# cloudtype.io에서는 /tmp 또는 절대 경로 사용 권장
+if os.getenv("UPLOAD_ROOT"):
+    UPLOAD_ROOT = os.getenv("UPLOAD_ROOT")
+else:
+    # cloudtype.io 환경 감지 (환경 변수나 경로로 판단)
+    upload_path = os.path.join(BASE_DIR, "uploads")
+    # cloudtype.io에서는 /tmp/uploads 사용 (쓰기 권한 보장)
+    if os.path.exists("/tmp") and os.access("/tmp", os.W_OK):
+        # /tmp/uploads 사용 (cloudtype.io 호환)
+        UPLOAD_ROOT = "/tmp/uploads"
+        # 디렉토리 생성
+        os.makedirs(UPLOAD_ROOT, exist_ok=True)
+    else:
+        # 로컬 개발 환경
+        UPLOAD_ROOT = upload_path
 ALLOWED_EXT = {'.png','.jpg','.jpeg','.pdf','.txt','.doc','.docx'}
 MAX_FILE_MB = int(os.getenv("MAX_FILE_MB", "10"))
 
