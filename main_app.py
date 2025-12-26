@@ -3,7 +3,7 @@
 6개의 독립 앱을 하나로 통합하여 포트 5000에서 실행
 """
 
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, jsonify
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from werkzeug.serving import run_simple
 import sys
@@ -81,6 +81,15 @@ main_app = Flask(__name__,
                  static_folder='static')
 
 main_app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-change-in-production')
+
+@main_app.route('/health')
+def health_check():
+    """헬스체크 엔드포인트 - cloudtype.io에서 사용"""
+    return jsonify({
+        'status': 'healthy',
+        'service': 'naratt-fortune',
+        'version': '1.0.0'
+    }), 200
 
 @main_app.route('/main_index.html')
 def main_index_redirect():
