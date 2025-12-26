@@ -3,22 +3,40 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 STORAGE = os.getenv("STORAGE", "POSTGRESQL")  # EXCEL | MSSQL | POSTGRESQL - PostgreSQL을 기본값으로 변경
 
 # cloudtype.io 환경을 위한 업로드 경로 설정
-# 환경 변수가 설정되어 있으면 사용, 없으면 BASE_DIR/uploads 사용
-# cloudtype.io에서는 /tmp 또는 절대 경로 사용 권장
+# 환경 변수가 설정되어 있으면 사용, 없으면 cloudtype.io 환경 감지
 if os.getenv("UPLOAD_ROOT"):
     UPLOAD_ROOT = os.getenv("UPLOAD_ROOT")
+    print(f"📁 UPLOAD_ROOT (환경 변수): {UPLOAD_ROOT}")
 else:
-    # cloudtype.io 환경 감지 (환경 변수나 경로로 판단)
-    upload_path = os.path.join(BASE_DIR, "uploads")
+    # cloudtype.io 환경 감지
     # cloudtype.io에서는 /tmp/uploads 사용 (쓰기 권한 보장)
-    if os.path.exists("/tmp") and os.access("/tmp", os.W_OK):
-        # /tmp/uploads 사용 (cloudtype.io 호환)
+    upload_path = os.path.join(BASE_DIR, "uploads")
+    
+    # cloudtype.io 환경 감지 (환경 변수나 경로로 판단)
+    is_cloudtype = (
+        os.getenv("CLOUDTYPE") == "true" or
+        "cloudtype" in os.getenv("HOSTNAME", "").lower() or
+        os.path.exists("/tmp") and os.access("/tmp", os.W_OK)
+    )
+    
+    if is_cloudtype:
+        # cloudtype.io 환경: /tmp/uploads 사용
         UPLOAD_ROOT = "/tmp/uploads"
-        # 디렉토리 생성
-        os.makedirs(UPLOAD_ROOT, exist_ok=True)
+        try:
+            os.makedirs(UPLOAD_ROOT, exist_ok=True)
+            # 쓰기 권한 확인
+            if os.access(UPLOAD_ROOT, os.W_OK):
+                print(f"✅ UPLOAD_ROOT (cloudtype.io): {UPLOAD_ROOT}")
+            else:
+                print(f"⚠️ UPLOAD_ROOT 쓰기 불가, 로컬 경로 사용: {upload_path}")
+                UPLOAD_ROOT = upload_path
+        except Exception as e:
+            print(f"⚠️ /tmp/uploads 생성 실패: {e}, 로컬 경로 사용: {upload_path}")
+            UPLOAD_ROOT = upload_path
     else:
         # 로컬 개발 환경
         UPLOAD_ROOT = upload_path
+        print(f"📁 UPLOAD_ROOT (로컬): {UPLOAD_ROOT}")
 ALLOWED_EXT = {'.png','.jpg','.jpeg','.pdf','.txt','.doc','.docx'}
 MAX_FILE_MB = int(os.getenv("MAX_FILE_MB", "10"))
 

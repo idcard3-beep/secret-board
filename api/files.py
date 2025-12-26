@@ -25,8 +25,18 @@ def upload_signature():
         if not f:
             return jsonify({'ok': False, 'error': '파일이 없습니다.'}), 400
         
-        # 서명 파일 저장 폴더
-        sign_folder = os.path.join(UPLOAD_ROOT, 'sign_file')
+        # 디버깅: UPLOAD_ROOT 확인
+        print(f"📁 [upload_signature] UPLOAD_ROOT: {UPLOAD_ROOT}")
+        print(f"📁 [upload_signature] UPLOAD_ROOT 절대 경로: {os.path.abspath(UPLOAD_ROOT) if UPLOAD_ROOT else 'None'}")
+        
+        # 서명 파일 저장 폴더 (절대 경로 보장)
+        if os.path.isabs(UPLOAD_ROOT):
+            sign_folder = os.path.join(UPLOAD_ROOT, 'sign_file')
+        else:
+            # 상대 경로인 경우 절대 경로로 변환
+            sign_folder = os.path.abspath(os.path.join(UPLOAD_ROOT, 'sign_file'))
+        
+        print(f"📁 [upload_signature] sign_folder: {sign_folder}")
         
         # 디렉토리 생성 및 쓰기 권한 설정 (cloudtype.io 호환)
         try:
