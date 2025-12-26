@@ -6,3 +6,6 @@ pyodbc
 pycryptodome
 psycopg2-binary
 gunicorn==22.0.0
+lunarcalendar
+flask-cors
+ephem
