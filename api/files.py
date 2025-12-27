@@ -29,28 +29,30 @@ def upload_signature():
         print(f"📁 [upload_signature] UPLOAD_ROOT: {UPLOAD_ROOT}")
         print(f"📁 [upload_signature] UPLOAD_ROOT 절대 경로: {os.path.abspath(UPLOAD_ROOT) if UPLOAD_ROOT else 'None'}")
         
-        # 서명 파일 저장 폴더 (절대 경로 보장)
-        if os.path.isabs(UPLOAD_ROOT):
-            sign_folder = os.path.join(UPLOAD_ROOT, 'sign_file')
-        else:
-            # 상대 경로인 경우 절대 경로로 변환
-            sign_folder = os.path.abspath(os.path.join(UPLOAD_ROOT, 'sign_file'))
+        # 서명 파일 저장 폴더 설정 (cloudtype.io 호환)
+        # UPLOAD_ROOT가 이미 설정되어 있으므로 그대로 사용
+        sign_folder = os.path.join(UPLOAD_ROOT, 'sign_file')
+        
+        # 절대 경로 보장
+        if not os.path.isabs(sign_folder):
+            sign_folder = os.path.abspath(sign_folder)
         
         print(f"📁 [upload_signature] sign_folder: {sign_folder}")
         
         # 디렉토리 생성 및 쓰기 권한 설정 (cloudtype.io 호환)
         try:
             # 디렉토리 생성 (mode는 선택적, cloudtype.io에서는 무시될 수 있음)
-            os.makedirs(sign_folder, exist_ok=True)
+            os.makedirs(sign_folder, exist_ok=True, mode=0o755)
             
             # 디렉토리 쓰기 권한 확인
             if not os.access(sign_folder, os.W_OK):
-                # 쓰기 권한이 없으면 /tmp 사용 시도
+                # cloudtype.io 환경에서 /tmp/uploads가 쓰기 불가능한 경우
+                # /tmp를 직접 사용 시도
                 if UPLOAD_ROOT.startswith('/tmp'):
-                    # 이미 /tmp를 사용 중이면 다른 경로 시도
-                    alt_folder = os.path.join(os.path.expanduser('~'), 'uploads', 'sign_file')
+                    # /tmp/sign_file 직접 사용 시도
+                    alt_folder = '/tmp/sign_file'
                     try:
-                        os.makedirs(alt_folder, exist_ok=True)
+                        os.makedirs(alt_folder, exist_ok=True, mode=0o755)
                         if os.access(alt_folder, os.W_OK):
                             sign_folder = alt_folder
                             print(f"✅ 대체 경로 사용: {sign_folder}")
@@ -74,7 +76,7 @@ def upload_signature():
             print(f"   sign_folder: {sign_folder}")
             return jsonify({
                 'ok': False, 
-                'error': f'디렉토리 생성 권한 오류: {str(e)}. 경로: {sign_folder}'
+                'error': f'디렉토리 생성 권한 오류: 디렉토리 쓰기 권한 없음: {sign_folder}. 경로: {sign_folder}'
             }), 500
         
         # 파일명 확인 (sMem_id_sMem_name.png 형식)

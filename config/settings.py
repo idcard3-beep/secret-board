@@ -3,38 +3,57 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 STORAGE = os.getenv("STORAGE", "POSTGRESQL")  # EXCEL | MSSQL | POSTGRESQL - PostgreSQL을 기본값으로 변경
 
 # cloudtype.io 환경을 위한 업로드 경로 설정
-# 환경 변수가 설정되어 있으면 사용, 없으면 cloudtype.io 환경 감지
-if os.getenv("UPLOAD_ROOT"):
-    UPLOAD_ROOT = os.getenv("UPLOAD_ROOT")
-    print(f"📁 UPLOAD_ROOT (환경 변수): {UPLOAD_ROOT}")
-else:
-    # cloudtype.io 환경 감지
-    # cloudtype.io에서는 /tmp/uploads 사용 (쓰기 권한 보장)
-    upload_path = os.path.join(BASE_DIR, "uploads")
-    
-    # cloudtype.io 환경 감지 (환경 변수나 경로로 판단)
-    is_cloudtype = (
-        os.getenv("CLOUDTYPE") == "true" or
-        "cloudtype" in os.getenv("HOSTNAME", "").lower() or
-        os.path.exists("/tmp") and os.access("/tmp", os.W_OK)
-    )
-    
-    if is_cloudtype:
-        # cloudtype.io 환경: /tmp/uploads 사용
-        UPLOAD_ROOT = "/tmp/uploads"
-        try:
-            os.makedirs(UPLOAD_ROOT, exist_ok=True)
-            # 쓰기 권한 확인
-            if os.access(UPLOAD_ROOT, os.W_OK):
-                print(f"✅ UPLOAD_ROOT (cloudtype.io): {UPLOAD_ROOT}")
-            else:
-                print(f"⚠️ UPLOAD_ROOT 쓰기 불가, 로컬 경로 사용: {upload_path}")
+# cloudtype.io 환경 감지 (환경 변수나 경로로 판단)
+is_cloudtype = (
+    os.getenv("CLOUDTYPE") == "true" or
+    "cloudtype" in os.getenv("HOSTNAME", "").lower() or
+    os.path.exists("/tmp") and os.access("/tmp", os.W_OK)
+)
+
+if is_cloudtype:
+    # cloudtype.io 환경: /tmp/uploads 강제 사용 (쓰기 권한 보장)
+    # 환경 변수가 설정되어 있어도 cloudtype.io에서는 /tmp/uploads 사용
+    UPLOAD_ROOT = "/tmp/uploads"
+    try:
+        os.makedirs(UPLOAD_ROOT, exist_ok=True)
+        # 쓰기 권한 확인
+        if os.access(UPLOAD_ROOT, os.W_OK):
+            print(f"✅ UPLOAD_ROOT (cloudtype.io): {UPLOAD_ROOT}")
+        else:
+            # /tmp/uploads 쓰기 불가능한 경우 /tmp 직접 사용
+            upload_path = "/tmp"
+            os.makedirs(upload_path, exist_ok=True)
+            if os.access(upload_path, os.W_OK):
                 UPLOAD_ROOT = upload_path
-        except Exception as e:
-            print(f"⚠️ /tmp/uploads 생성 실패: {e}, 로컬 경로 사용: {upload_path}")
+                print(f"✅ UPLOAD_ROOT (cloudtype.io, /tmp 직접 사용): {UPLOAD_ROOT}")
+            else:
+                # 최후의 수단: 환경 변수 사용
+                env_upload_root = os.getenv("UPLOAD_ROOT")
+                if env_upload_root:
+                    UPLOAD_ROOT = env_upload_root
+                    print(f"⚠️ UPLOAD_ROOT (환경 변수 사용): {UPLOAD_ROOT}")
+                else:
+                    upload_path = os.path.join(BASE_DIR, "uploads")
+                    UPLOAD_ROOT = upload_path
+                    print(f"⚠️ UPLOAD_ROOT 쓰기 불가, 로컬 경로 사용: {UPLOAD_ROOT}")
+    except Exception as e:
+        print(f"⚠️ /tmp/uploads 생성 실패: {e}")
+        # 환경 변수 사용 시도
+        env_upload_root = os.getenv("UPLOAD_ROOT")
+        if env_upload_root:
+            UPLOAD_ROOT = env_upload_root
+            print(f"⚠️ UPLOAD_ROOT (환경 변수 사용): {UPLOAD_ROOT}")
+        else:
+            upload_path = os.path.join(BASE_DIR, "uploads")
             UPLOAD_ROOT = upload_path
+            print(f"⚠️ UPLOAD_ROOT (로컬 경로 사용): {UPLOAD_ROOT}")
+else:
+    # 로컬 개발 환경: 환경 변수 또는 기본 경로 사용
+    if os.getenv("UPLOAD_ROOT"):
+        UPLOAD_ROOT = os.getenv("UPLOAD_ROOT")
+        print(f"📁 UPLOAD_ROOT (환경 변수): {UPLOAD_ROOT}")
     else:
-        # 로컬 개발 환경
+        upload_path = os.path.join(BASE_DIR, "uploads")
         UPLOAD_ROOT = upload_path
         print(f"📁 UPLOAD_ROOT (로컬): {UPLOAD_ROOT}")
 ALLOWED_EXT = {'.png','.jpg','.jpeg','.pdf','.txt','.doc','.docx'}
