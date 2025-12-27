@@ -61,19 +61,9 @@ MAX_FILE_MB = int(os.getenv("MAX_FILE_MB", "10"))
 
 VIEW_TOKEN_SECRET = os.getenv("VIEW_TOKEN_SECRET", "change-me")
 
-# PostgreSQL 설정 (Render.com 운영 서버)
-#POSTGRES_HOST = os.getenv("POSTGRES_HOST", "dpg-d3nhsdadbo4c73d0dehg-a.singapore-postgres.render.com")
-#POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")
-#POSTGRES_DB = os.getenv("POSTGRES_DB", "secretboard_fyqs")
-#POSTGRES_USER = os.getenv("POSTGRES_USER", "secretboard_user")
-#POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "xToIsayLLO9nFmeiAPChiF96d3khj8Eq")
-#
-## Render.com PostgreSQL DATABASE_URL (새 서버)
-#DATABASE_URL = os.getenv("DATABASE_URL", 
-#    "postgresql://secretboard_user:xToIsayLLO9nFmeiAPChiF96d3khj8Eq@dpg-d3nhsdadbo4c73d0dehg-a.singapore-postgres.render.com/secretboard_fyqs")
-
-
-# PostgreSQL 설정 (cloudtype.io 운영 서버)
+# ============================================
+# PostgreSQL 설정 (cloudtype.io 운영 서버 전용)
+# ============================================
 POSTGRES_HOST = os.getenv("POSTGRES_HOST", "svc.sel3.cloudtype.app")
 POSTGRES_PORT = os.getenv("POSTGRES_PORT", "32624")
 POSTGRES_DB = os.getenv("POSTGRES_DB", "secretboard")

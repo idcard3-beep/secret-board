@@ -13,18 +13,26 @@ load_dotenv(override=False)  # 기존 환경 변수(DATABASE_URL)를 덮어쓰�
 # 다시 한번 확실하게 설정
 os.environ["DATABASE_URL"] = CLOUDTYPE_DB_URL
 
-# 설정 확인
+# 설정 확인 및 검증 (cloudtype.io 전용)
 actual_db_url = os.environ.get("DATABASE_URL", "")
 if "singapore-postgres.render.com" in actual_db_url or "dpg-d3nhsdadbo4c73d0dehg-a" in actual_db_url:
     print("=" * 80)
-    print("[ERROR] ⚠️⚠️⚠️ 경고: 환경 변수에 이전 Render.com 서버 정보가 있습니다!")
+    print("[WARNING] ⚠️ 이전 Render.com 서버 정보가 감지되었습니다!")
     print(f"   현재 DATABASE_URL: {actual_db_url[:100]}...")
-    print("   cloudtype.io 서버로 강제 덮어쓰기합니다!")
+    print("   cloudtype.io 서버로 강제 변경합니다!")
     print("=" * 80)
     os.environ["DATABASE_URL"] = CLOUDTYPE_DB_URL
 
-print("🔧 DATABASE_URL을 cloudtype.io 서버로 강제 설정 완료 (모든 환경 변수 무시)")
-print(f"📋 설정된 DATABASE_URL: postgresql://secretboard_user:***@svc.sel3.cloudtype.app:32624/secretboard")
+# cloudtype.io 서버로 최종 확인
+if "cloudtype.app" not in os.environ.get("DATABASE_URL", ""):
+    print("=" * 80)
+    print("[ERROR] ⚠️ DATABASE_URL이 cloudtype.io 서버를 가리키지 않습니다!")
+    print("   cloudtype.io 서버로 강제 설정합니다!")
+    print("=" * 80)
+    os.environ["DATABASE_URL"] = CLOUDTYPE_DB_URL
+
+print("✅ DATABASE_URL 설정 완료 (cloudtype.io 전용)")
+print(f"📋 서버: svc.sel3.cloudtype.app:32624/secretboard")
 
 from api.tickets import bp as tickets_bp
 from api.messages import bp as messages_bp
