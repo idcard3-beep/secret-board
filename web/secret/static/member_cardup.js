@@ -91,13 +91,12 @@
               const fileName = `${payload.sMem_id || 'signature'}_${payload.sMem_name || 'member'}.png`;
               formData.append('file', signatureFileInput.files[0], fileName);
 
-              const uploadResponse = await fetch(
-                '/secret/api/v1/files/upload-signature',
-                {
-                  method: 'POST',
-                  body: formData,
-                }
-              );
+              // Mixed Content 오류 방지: 현재 프로토콜 명시적 사용
+              const uploadUrl = `${window.location.protocol}//${window.location.host}/secret/api/v1/files/upload-signature`;
+              const uploadResponse = await fetch(uploadUrl, {
+                method: 'POST',
+                body: formData,
+              });
 
               if (!uploadResponse.ok) {
                 const errorText = await uploadResponse.text();
@@ -134,13 +133,12 @@
               formData.append('file', blob, fileName);
 
               // 서명 이미지 업로드
-              const uploadResponse = await fetch(
-                '/secret/api/v1/files/upload-signature',
-                {
-                  method: 'POST',
-                  body: formData,
-                }
-              );
+              // Mixed Content 오류 방지: 현재 프로토콜 명시적 사용
+              const uploadUrl = `${window.location.protocol}//${window.location.host}/secret/api/v1/files/upload-signature`;
+              const uploadResponse = await fetch(uploadUrl, {
+                method: 'POST',
+                body: formData,
+              });
 
               if (!uploadResponse.ok) {
                 const errorText = await uploadResponse.text();
@@ -318,9 +316,9 @@
           // 입력한 아이디로 직접 중복 확인
           try {
             console.log('🔍 아이디 중복 확인 시작:', v);
-            const response = await fetch(
-              `/secret/api/v1/smembers/check/${encodeURIComponent(v)}`
-            );
+            // Mixed Content 오류 방지: 현재 프로토콜 명시적 사용
+            const checkUrl = `${window.location.protocol}//${window.location.host}/secret/api/v1/smembers/check/${encodeURIComponent(v)}`;
+            const response = await fetch(checkUrl);
             console.log('📡 API 응답 상태:', response.status);
 
             const result = await response.json();
@@ -896,13 +894,12 @@
               formData.append('file', blob, fileName);
 
               // 서명 이미지 업로드
-              const uploadResponse = await fetch(
-                '/secret/api/v1/files/upload-signature',
-                {
-                  method: 'POST',
-                  body: formData,
-                }
-              );
+              // Mixed Content 오류 방지: 현재 프로토콜 명시적 사용
+              const uploadUrl = `${window.location.protocol}//${window.location.host}/secret/api/v1/files/upload-signature`;
+              const uploadResponse = await fetch(uploadUrl, {
+                method: 'POST',
+                body: formData,
+              });
 
               // 응답 상태 확인
               if (!uploadResponse.ok) {
@@ -991,15 +988,14 @@
           // 4. PostgreSQL DB에 회원 정보 저장 또는 수정
           try {
             let response;
-            // 상대 경로 사용하여 Mixed Content 오류 방지 (현재 프로토콜 자동 사용)
-            // HTTPS 페이지에서는 자동으로 HTTPS로 요청됨
-            const apiBase = '/secret/api/v1/smembers';
+            // Mixed Content 오류 방지: 현재 페이지의 프로토콜을 명시적으로 사용
+            // iframe 내부에서도 올바른 프로토콜 사용 보장
+            const currentProtocol = window.location.protocol; // 'https:' or 'http:'
+            const currentHost = window.location.host; // 'www.naratt.kr' or 'localhost:5000'
+            const apiBase = `${currentProtocol}//${currentHost}/secret/api/v1/smembers`;
             
-            // 프로토콜 확인 (디버깅용)
-            const currentProtocol = window.location.protocol;
-            if (currentProtocol !== 'https:' && window.location.hostname !== 'localhost') {
-              console.warn('⚠️ HTTPS가 아닌 프로토콜 사용:', currentProtocol);
-            }
+            console.log('🔗 API 요청 URL:', apiBase);
+            console.log('🔒 현재 프로토콜:', currentProtocol);
             
             if (memberId) {
               // 수정 모드
@@ -1084,7 +1080,9 @@
           if (!memberId) return;
 
           try {
-            const response = await fetch(`/secret/api/v1/smembers/${memberId}`);
+            // Mixed Content 오류 방지: 현재 프로토콜 명시적 사용
+            const loadUrl = `${window.location.protocol}//${window.location.host}/secret/api/v1/smembers/${memberId}`;
+            const response = await fetch(loadUrl);
             const result = await response.json();
 
             if (result.ok && result.data) {
@@ -1173,7 +1171,9 @@
           }
 
           try {
-            const response = await fetch(`/secret/api/v1/smembers/${memberId}`, {
+            // Mixed Content 오류 방지: 현재 프로토콜 명시적 사용
+            const deleteUrl = `${window.location.protocol}//${window.location.host}/secret/api/v1/smembers/${memberId}`;
+            const response = await fetch(deleteUrl, {
               method: 'DELETE',
             });
 
