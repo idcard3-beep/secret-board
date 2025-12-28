@@ -2,7 +2,7 @@ const SUITS={Wands:{color:'#ffe8c2',elem:'불',sym:'🔥'},Cups:{color:'#cfe8ff'
 function cardHTML(it){const kw=[...(it.up||[]).slice(0,3),...(it.rev||[]).slice(0,2).map((s)=>'(R) '+s),];const chip=(txt)=>`<span class="badge">${txt}</span>`;const color=it.arcana==='Major'?'#ffd7d5':SUITS[it.suit]?.color||'var(--soft)';return`
   <article class="card" data-key="${it.key}">
     <div class="thumb" style="background:${color}">
-      <svg viewBox="0 0 120 160" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="${
+      <svg viewBox="0 0 120 160" xmlns="https://www.w3.org/2000/svg" role="img" aria-label="${
         it.name
       }">
         <rect x="8" y="8" width="104" height="144" rx="8" fill="none" stroke="currentColor" opacity="0.3"/>
@@ -17,8 +17,8 @@ function cardHTML(it){const kw=[...(it.up||[]).slice(0,3),...(it.rev||[]).slice(
     <div class="meta">
       <div class="title">${it.name}</div>
       <div class="sub">${it.arcana}${it.suit ? `• ${it.suit}` : ''}${
-      it.rank ? `• ${it.rank}` : ''
-    }</div>
+    it.rank ? `• ${it.rank}` : ''
+  }</div>
       <div class="kw">${kw.map((s) => `<span>${s}</span>`).join('')}</div>
       <details class="details">
         <summary>상세 해석 열기</summary>
@@ -31,24 +31,18 @@ function cardHTML(it){const kw=[...(it.up||[]).slice(0,3),...(it.rev||[]).slice(
           )} ${it.exp.reversed.overview}</div></div>
           <div class="row"><div class="label">사랑</div><div>${
             it.exp.upright.love
-          } <span class="tips">/ R: ${
-      it.exp.reversed.love
-    }</span></div></div>
+          } <span class="tips">/ R: ${it.exp.reversed.love}</span></div></div>
           <div class="row"><div class="label">일·재정</div><div>${
             it.exp.upright.job
-          } <span class="tips">/ R: ${
-      it.exp.reversed.job
-    }</span></div></div>
+          } <span class="tips">/ R: ${it.exp.reversed.job}</span></div></div>
           <div class="row"><div class="label">건강</div><div>${
             it.exp.upright.health
-          } <span class="tips">/ R: ${
-      it.exp.reversed.health
-    }</span></div></div>
+          } <span class="tips">/ R: ${it.exp.reversed.health}</span></div></div>
           <div class="row"><div class="label">코칭</div><div>${
             it.exp.upright.coaching
           } <span class="tips">/ R: ${
-      it.exp.reversed.coaching
-    }</span></div></div>
+    it.exp.reversed.coaching
+  }</span></div></div>
         </div>
       </details>
     </div>
