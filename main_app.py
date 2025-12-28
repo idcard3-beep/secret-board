@@ -191,23 +191,23 @@ if __name__ == '__main__':
     print("\n" + "="*60)
     print("🌟 심리상담 과 통합운세(나라톡톡)")
     print("="*60)
-    print("📍 메인 메뉴: http://localhost:5000/")
+    print("📍 메인 메뉴: https://localhost:5000/")
     print("-" * 60)
     
     if secret_app:
-        print("🏥 심리상담 센터: http://localhost:5000/")
+        print("🏥 심리상담 센터: https://localhost:5000/")
     if secret_app:
-        print("🏥 비밀게시판: http://localhost:5000/secret/")        
+        print("🏥 비밀게시판: https://localhost:5000/secret/")        
     if mans_app:
-        print("📅 만세력: http://localhost:5000/mans/")
+        print("📅 만세력: https://localhost:5000/mans/")
     if y6_app:
-        print("☯️  육효: http://localhost:5000/y6/")
+        print("☯️  육효: https://localhost:5000/y6/")
     if tarot_app:
-        print("🃏 타로카드: http://localhost:5000/tarot/")
+        print("🃏 타로카드: https://localhost:5000/tarot/")
     if toj_app:
-        print("📖 토정비결: http://localhost:5000/toj/")
+        print("📖 토정비결: https://localhost:5000/toj/")
     if saju_app:
-        print("✨ 사주팔자: http://localhost:5000/saju/")
+        print("✨ 사주팔자: https://localhost:5000/saju/")
     
     print("="*60)
     print("© 2025 심리상담 과 통합운세(나라톡톡) url: naratt.kr")

@@ -254,7 +254,7 @@ if __name__ == "__main__":
     
     print(f"🚀 Flask 서버 시작 (포트 {port})")
     if debug:
-        print(f"🌐 브라우저에서 http://127.0.0.1:{port} 접속하세요")
+        print(f"🌐 브라우저에서 https://127.0.0.1:{port} 접속하세요")
     
     
     app.run(debug=debug, host=host, port=port)

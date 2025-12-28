@@ -547,7 +547,7 @@ if __name__ == '__main__':
     #print("=" * 50)
     #print("🌟 사주팔자 만세력 서버 시작")
     #print("=" * 50)
-    #print("📍 주소: http://localhost:5000")
+    #print("📍 주소: https://localhost:5000")
     #print("📍 API 엔드포인트:")
     #print("   • POST /api/calc-saju - 사주 계산")
     #print("   • POST /api/lunar-to-solar - 음력→양력 변환")
