@@ -27,11 +27,18 @@
         // 프로토콜 강제 함수 (Mixed Content 오류 방지)
         function getSecureProtocol() {
           const host = window.location.host;
+          const hostname = window.location.hostname;
           
-          // 프로덕션 환경에서는 무조건 HTTPS 사용
-          if (host !== 'localhost' && host !== '127.0.0.1' && !host.includes('localhost:')) {
-            // 프로덕션 환경에서는 항상 HTTPS 강제
-            console.log('🔒 프로덕션 환경 감지 - HTTPS 강제 사용');
+          // 프로덕션 환경 감지 (cloudtype.io, naratt.kr 등)
+          const isProduction = 
+            hostname.includes('naratt.kr') ||
+            hostname.includes('cloudtype.io') ||
+            hostname.includes('cloudtype.app') ||
+            (host !== 'localhost' && host !== '127.0.0.1' && !host.includes('localhost:') && !hostname.includes('127.0.0.1'));
+          
+          if (isProduction) {
+            // 프로덕션 환경에서는 무조건 HTTPS 사용
+            console.log('🔒 프로덕션 환경 감지 - HTTPS 강제 사용', hostname);
             return 'https:';
           }
           
@@ -44,6 +51,7 @@
               const parentProtocol = window.parent.location.protocol;
               if (parentProtocol === 'https:') {
                 protocol = 'https:';
+                console.log('🔒 부모 페이지 프로토콜 사용 (HTTPS)');
               }
             } catch (e) {
               // Cross-origin 오류 무시 (정상)
@@ -56,6 +64,7 @@
               const topProtocol = window.top.location.protocol;
               if (topProtocol === 'https:') {
                 protocol = 'https:';
+                console.log('🔒 최상위 창 프로토콜 사용 (HTTPS)');
               }
             } catch (e) {
               // Cross-origin 오류 무시 (정상)
