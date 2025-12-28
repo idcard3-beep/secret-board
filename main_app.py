@@ -87,7 +87,7 @@ def health_check():
     """헬스체크 엔드포인트 - cloudtype.io에서 사용"""
     return jsonify({
         'status': 'healthy',
-        'service': 'naratt-fortune',
+        'service': 'secret-board',
         'version': '1.0.0'
     }), 200
 
