@@ -225,13 +225,6 @@ def calculate_daeun():
         month_zhi = data.get('month_zhi')
         calendar_type = data.get('calendar_type', 'solar')  # 기본값: 양력
         
-        print(f"\n=== 대운 API 요청 수신 ===")
-        print(f"birth_datetime: {birth_str}")
-        print(f"gender: {gender}")
-        print(f"month_gan: {month_gan}, month_zhi: {month_zhi}")
-        print(f"calendar_type: {calendar_type}")
-        print(f"========================\n")
-        
         # 음력/윤달 처리 (사주 계산과 동일한 로직)
         if calendar_type in ['lunar', 'leap']:
             birth_dt = datetime.strptime(birth_str, '%Y-%m-%d %H:%M')
@@ -252,7 +245,6 @@ def calculate_daeun():
             
             # 양력으로 변환된 날짜로 업데이트
             birth_str = f"{result_conv['year']}-{str(result_conv['month']).zfill(2)}-{str(result_conv['day']).zfill(2)} {birth_dt.hour:02d}:{birth_dt.minute:02d}"
-            print(f"음력->양력 변환: {birth_str}\n")
         
         birth_dt = datetime.strptime(birth_str, '%Y-%m-%d %H:%M')
         
@@ -267,8 +259,6 @@ def calculate_daeun():
             lichun_dt = datetime.strptime(t['datetime_KST'], '%Y-%m-%d %H:%M:%S')
             if lichun_dt <= birth_dt:
                 saju_year = lichun_dt.year
-        
-        print(f"양력 생년: {birth_dt.year}, 사주 생년 (입춘 기준): {saju_year}")
         
         # 대운 계산 (사주 년도 사용)
         daeun_list = calc_daeun_python(
@@ -382,22 +372,11 @@ def calc_daeun_python(birth_year, birth_month, birth_day, birth_hour, birth_minu
         # 24절기 중 절기(홀수 번째)만 사용 - 대운 계산용
         # 절기: 입춘(1), 경칩(3), 청명(5), 입하(7), 망종(9), 소서(11)
         #       입추(13), 백로(15), 한로(17), 입동(19), 대설(21), 소한(23)
-        major_terms = [
+        # 성능 최적화: list를 set으로 변환하여 in 연산 속도 향상
+        major_terms = {
             '입춘', '경칩', '청명', '입하', '망종', '소서',
             '입추', '백로', '한로', '입동', '대설', '소한'
-        ]
-        
-        # 디버깅: 출생일 전후 절기 확인
-        print(f"\n=== 대운 계산 시작 ===")
-        print(f"출생: {birth_year}년 {birth_month}월 {birth_day}일 {birth_hour:02d}:{birth_minute:02d}")
-        print(f"생년 천간 인덱스: {year_stem_idx}, 양년생: {is_yang_year}")
-        print(f"성별: {gender}, 순행: {is_forward}")
-        print(f"\n출생일 전후 절기:")
-        for t in all_terms:
-            term_dt = datetime.strptime(t['datetime_KST'], '%Y-%m-%d %H:%M:%S')
-            if abs((term_dt - birth_dt).days) <= 30 and t['term'] in major_terms:
-                diff = (term_dt - birth_dt).days
-                print(f"  {t['term']}: {t['datetime_KST']} ({diff:+d}일)")
+        }
         
         # 출생일 이후의 첫 번째 절기 찾기 (순행)
         # 또는 출생일 이전의 마지막 절기 찾기 (역행)
@@ -430,28 +409,12 @@ def calc_daeun_python(birth_year, birth_month, birth_day, birth_hour, birth_minu
             # 3일 = 1년 환산 (반올림 처리)
             start_age = round(day_diff / 3)
             
-            # 디버깅 로그
-            print(f"\n=== 대운 시작 나이 최종 계산 ===")
-            print(f"기준 절기: {target_term['term']} ({target_term['datetime_KST']})")
-            print(f"출생 시각: {birth_dt.strftime('%Y-%m-%d %H:%M:%S')}")
-            print(f"시간 차이: {time_diff:.0f}초 = {day_diff:.4f}일")
-            print(f"계산: {day_diff:.4f}일 ÷ 3 = {day_diff/3:.4f}")
-            print(f"반올림 처리: round({day_diff/3:.4f}) = {start_age}세")
-            
             # 대운 시작이 0세가 될 수 있음 (절기 바로 근처 출생)
             if start_age < 1:
-                print(f"최소값 적용: {start_age}세 → 1세")
                 start_age = 1
-            
-            print(f"최종 대운 시작 나이: {start_age}세")
-            print(f"===================================\n")
         else:
-            print(f"경고: 대운 계산을 위한 절기를 찾지 못했습니다.")
             start_age = 3  # 기본값
     except Exception as e:
-        print(f"대운 시작 나이 계산 오류: {e}")
-        import traceback
-        traceback.print_exc()
         start_age = 3  # 오류 시 기본값
     
     # 151세까지 대운 생성 (16개 대운) - 0~9, 10~19, ... 150~159
@@ -504,19 +467,27 @@ def calc_wolun_python(target_year, json_path):
     
     wolun_list = []
     
+    # 성능 최적화: 연도별 절기 데이터 캐싱 (같은 연도는 재사용)
+    terms_cache = {}
+    
     for year_offset in [-1, 0, 1]:
         year = target_year + year_offset
+        
+        # 해당 연도의 절기 데이터 캐싱 (한 번만 로드)
+        if year not in terms_cache:
+            # 월 중간 날짜(15일)로 절기 데이터 로드
+            birth_dt_cache = datetime(year, 6, 15, 12, 0)
+            terms_cache[year] = get_all_terms(birth_dt_cache, json_path)
+        
+        cached_terms = terms_cache[year]
         
         for month in range(1, 13):
             # 각 월의 1일 정오를 기준으로 월주 계산
             birth_dt = datetime(year, month, 15, 12, 0)  # 월 중간 날짜 사용
             
             try:
-                # 절기 데이터 가져오기
-                all_terms = get_all_terms(birth_dt, json_path)
-                
-                # 정확한 월주 계산
-                month_ganzhi = calc_month_pillar(birth_dt, all_terms)
+                # 캐시된 절기 데이터 사용 (성능 최적화)
+                month_ganzhi = calc_month_pillar(birth_dt, cached_terms)
                 
                 if month_ganzhi and len(month_ganzhi) >= 2:
                     gan = month_ganzhi[0]
@@ -526,7 +497,6 @@ def calc_wolun_python(target_year, json_path):
                     gan = '?'
                     zhi = '?'
             except Exception as e:
-                print(f"월운 계산 오류 ({year}년 {month}월): {e}")
                 gan = '?'
                 zhi = '?'
             
