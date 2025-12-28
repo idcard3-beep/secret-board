@@ -10,3 +10,4 @@ lunarcalendar
 flask-cors
 ephem
 pytz
+pyOpenSSL  # 로컬 개발 환경에서 HTTPS 사용 시 필요 (선택사항)
