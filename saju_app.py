@@ -378,29 +378,34 @@ def calc_daeun_python(birth_year, birth_month, birth_day, birth_hour, birth_minu
             '입추', '백로', '한로', '입동', '대설', '소한'
         }
         
+        # 성능 최적화: 절기 데이터를 미리 파싱하여 datetime.strptime 반복 호출 방지
+        parsed_terms = []
+        for t in all_terms:
+            if t['term'] in major_terms:
+                term_dt = datetime.strptime(t['datetime_KST'], '%Y-%m-%d %H:%M:%S')
+                parsed_terms.append((t, term_dt))
+        
         # 출생일 이후의 첫 번째 절기 찾기 (순행)
         # 또는 출생일 이전의 마지막 절기 찾기 (역행)
         target_term = None
+        term_dt = None
         
         if is_forward:
             # 순행: 출생일 이후 첫 절기
-            for t in all_terms:
-                if t['term'] in major_terms:
-                    term_dt = datetime.strptime(t['datetime_KST'], '%Y-%m-%d %H:%M:%S')
-                    if term_dt > birth_dt:
-                        target_term = t
-                        break
+            for t, dt in parsed_terms:
+                if dt > birth_dt:
+                    target_term = t
+                    term_dt = dt
+                    break
         else:
             # 역행: 출생일 이전 마지막 절기
-            for t in reversed(all_terms):
-                if t['term'] in major_terms:
-                    term_dt = datetime.strptime(t['datetime_KST'], '%Y-%m-%d %H:%M:%S')
-                    if term_dt < birth_dt:
-                        target_term = t
-                        break
+            for t, dt in reversed(parsed_terms):
+                if dt < birth_dt:
+                    target_term = t
+                    term_dt = dt
+                    break
         
-        if target_term:
-            term_dt = datetime.strptime(target_term['datetime_KST'], '%Y-%m-%d %H:%M:%S')
+        if target_term and term_dt:
             
             # 정확한 시간 차이 계산 (abs 사용하여 항상 양수로)
             time_diff = abs((term_dt - birth_dt).total_seconds())
