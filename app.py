@@ -1,4 +1,5 @@
-from flask import Flask, render_template, session, send_from_directory
+from flask import Flask, render_template, session, send_from_directory, request
+from werkzeug.middleware.proxy_fix import ProxyFix
 import os
 
 # cloudtype.io 서버 정보를 가장 먼저 설정 (다른 모듈 import 전에)
@@ -43,6 +44,16 @@ from api.corpus import bp as corpus_bp
 from config.settings import UPLOAD_ROOT
 
 app = Flask(__name__, template_folder='web/secret/templates', static_folder='web/secret/static')
+
+# cloudtype.io 프록시 환경에서 HTTPS 감지를 위한 ProxyFix 미들웨어
+# X-Forwarded-Proto 헤더를 확인하여 실제 프로토콜 감지
+app.wsgi_app = ProxyFix(
+    app.wsgi_app,
+    x_for=1,  # X-Forwarded-For 헤더 신뢰
+    x_proto=1,  # X-Forwarded-Proto 헤더 신뢰 (HTTPS 감지)
+    x_host=1,  # X-Forwarded-Host 헤더 신뢰
+    x_port=1,  # X-Forwarded-Port 헤더 신뢰
+)
 
 # SECRET_KEY 설정 (환경 변수에서 읽거나 기본값 사용)
 app.secret_key = os.getenv("SECRET_KEY", "dev-secret-change-in-production")
