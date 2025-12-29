@@ -259,7 +259,7 @@ def manse_calendar():
         prev_year_terms = get_solar_terms_for_year(year - 1)
         term_dates.update(prev_year_terms)
 
-    # 24절기 json에서 이번달 절입/중기/다음달 절입 추출
+    # 24절기 json에서 이번달 절입/중기/다음달 절입 추출 (성능 최적화: 미리 파싱)
     year_str = str(year)
     jeolgi_entries = SOLAR_TERMS_DATA.get(year_str, [])
     # 1월인 경우 전년도 절기 엔트리도 포함
@@ -272,11 +272,21 @@ def manse_calendar():
         next_year_str = str(year + 1)
         next_year_entries = SOLAR_TERMS_DATA.get(next_year_str, [])
         jeolgi_entries = jeolgi_entries + next_year_entries
+    
+    # 성능 최적화: 절기 데이터를 미리 파싱하여 datetime 객체로 변환 (strptime 반복 호출 방지)
+    parsed_jeolgi_entries = []
+    for e in jeolgi_entries:
+        try:
+            dt = datetime.datetime.strptime(e['datetime_KST'], '%Y-%m-%d %H:%M:%S')
+            parsed_jeolgi_entries.append((e, dt))
+        except:
+            continue
+    
     # 이번달 절입/중기 (절입=홀수절기, 중기=짝수절기)
     # term_index_in_cycle: 1,3,5... = 절입(節入), 2,4,6... = 중기(中氣)
-    this_month_terms = [e for e in jeolgi_entries if datetime.datetime.strptime(e['datetime_KST'], '%Y-%m-%d %H:%M:%S').month == month]
+    this_month_terms = [e for e, dt in parsed_jeolgi_entries if dt.month == month]
     next_month = (month % 12) + 1
-    next_month_terms = [e for e in jeolgi_entries if datetime.datetime.strptime(e['datetime_KST'], '%Y-%m-%d %H:%M:%S').month == next_month]
+    next_month_terms = [e for e, dt in parsed_jeolgi_entries if dt.month == next_month]
     
     # 이번달 절입 (홀수 인덱스)
     jeolip = next((e for e in this_month_terms if e.get('term_index_in_cycle', 0) % 2 == 1), None)
@@ -284,11 +294,12 @@ def manse_calendar():
     junggi = next((e for e in this_month_terms if e.get('term_index_in_cycle', 0) % 2 == 0), None)
     # 다음달 절입 (홀수 인덱스)
     next_jeolip = next((e for e in next_month_terms if e.get('term_index_in_cycle', 0) % 2 == 1), None)
-    # JST 변환
-    def kst_to_jst(dt_str):
+    # JST 변환 (성능 최적화: datetime 객체를 받도록 수정)
+    def kst_to_jst(dt_obj):
         try:
-            dt = datetime.datetime.strptime(dt_str, '%Y-%m-%d %H:%M:%S')
-            dt_jst = dt - datetime.timedelta(minutes=30)
+            if isinstance(dt_obj, str):
+                dt_obj = datetime.datetime.strptime(dt_obj, '%Y-%m-%d %H:%M:%S')
+            dt_jst = dt_obj - datetime.timedelta(minutes=30)
             return dt_jst.strftime('%Y-%m-%d %H:%M')
         except:
             return None
@@ -345,10 +356,22 @@ def manse_calendar():
     current_hour_for_gz = now_dt.hour
     current_minute_for_gz = now_dt.minute
     
+    # 성능 최적화: entries를 루프 밖에서 한 번만 계산하고 미리 파싱
+    year_entries = SOLAR_TERMS_DATA.get(str(year), [])
+    prev_year_entries_for_loop = SOLAR_TERMS_DATA.get(str(year - 1), []) if month <= 2 else []
+    all_entries_for_loop = prev_year_entries_for_loop + year_entries
+    next_year_entries_for_loop = SOLAR_TERMS_DATA.get(str(year + 1), [])
+    all_entries_with_dt = []
+    for e in all_entries_for_loop + next_year_entries_for_loop:
+        try:
+            dt = datetime.datetime.strptime(e['datetime_KST'], '%Y-%m-%d %H:%M:%S')
+            all_entries_with_dt.append((e, dt))
+        except:
+            continue
+    
     for week in cal_data:
         week_data = []
         for day in week:
-            entries = SOLAR_TERMS_DATA.get(str(year), [])
             cell_info = {}
             if day == 0:
                 cell_info = {'day': None, 'lunar': None, 'gānzhī': None, 'term': None, 'is_today': False,
@@ -408,18 +431,13 @@ def manse_calendar():
                     
                 cell_info['gānzhī'] = cell_info['day_gz']
                 cell_info['term'] = term_dates.get(date_obj, None)
-                cell_info['is_today'] = (date_obj == today)
-                # 해당 일자가 속한 절기 정보 추출
-                # 1. solar_terms.json에서 해당 연도 절기 리스트 가져옴
-                entries = SOLAR_TERMS_DATA.get(str(year), [])
-                # 1월, 2월인 경우 전년도 절기도 포함 (입춘 이전 대비)
-                if month <= 2:
-                    prev_entries = SOLAR_TERMS_DATA.get(str(year - 1), [])
-                    entries = prev_entries + entries
-                # 2. 해당 일자 이전의 절기 중 가장 최근 절기 찾기
+                # 클라이언트 로컬 시간 기준으로 오늘 날짜 판단하므로 서버에서는 False로 설정
+                # JavaScript에서 클라이언트 시간 기준으로 today 클래스를 추가/제거함
+                cell_info['is_today'] = False
+                # 해당 일자가 속한 절기 정보 추출 (성능 최적화: 파싱된 데이터 사용)
+                # 해당 일자 이전의 절기 중 가장 최근 절기 찾기
                 term_for_day = None
-                for entry in entries:
-                    dt = datetime.datetime.strptime(entry['datetime_KST'], '%Y-%m-%d %H:%M:%S')
+                for entry, dt in all_entries_with_dt:
                     if dt.date() <= date_obj:
                         term_for_day = entry
                     else:
@@ -427,12 +445,16 @@ def manse_calendar():
                 if term_for_day:
                     cell_info['current_term_name'] = term_for_day['term']
                     cell_info['current_term_kst'] = term_for_day['datetime_KST']
-                    cell_info['current_term_jst'] = kst_to_jst(term_for_day['datetime_KST'])
+                    # 성능 최적화: datetime 객체 재사용
+                    term_dt = next((dt for e, dt in all_entries_with_dt if e == term_for_day), None)
+                    if term_dt:
+                        cell_info['current_term_jst'] = kst_to_jst(term_dt)
+                    else:
+                        cell_info['current_term_jst'] = kst_to_jst(term_for_day['datetime_KST'])
                 else:
                     # 절기 데이터가 없을 경우 전년도 마지막 절기 사용
-                    prev_year_entries = SOLAR_TERMS_DATA.get(str(year - 1), [])
-                    if prev_year_entries:
-                        last_term = prev_year_entries[-1]
+                    if prev_year_entries_for_loop:
+                        last_term = prev_year_entries_for_loop[-1]
                         cell_info['current_term_name'] = last_term['term']
                         cell_info['current_term_kst'] = last_term['datetime_KST']
                         cell_info['current_term_jst'] = kst_to_jst(last_term['datetime_KST'])
@@ -440,10 +462,9 @@ def manse_calendar():
                         cell_info['current_term_name'] = None
                         cell_info['current_term_kst'] = None
                         cell_info['current_term_jst'] = None
-                # 선택한 날짜 기준으로 같거나 큰 절기 3개 추출
+                # 선택한 날짜 기준으로 같거나 큰 절기 3개 추출 (성능 최적화: 파싱된 데이터 사용)
                 next_terms = []
-                for entry in entries:
-                    dt = datetime.datetime.strptime(entry['datetime_KST'], '%Y-%m-%d %H:%M:%S')
+                for entry, dt in all_entries_with_dt:
                     if dt.date() >= date_obj:
                         next_terms.append({'term': entry['term'], 'datetime_KST': entry['datetime_KST']})
                         if len(next_terms) == 3:
@@ -455,22 +476,7 @@ def manse_calendar():
                 cell_info['full_moon_kst'] = full_moon_kst.strftime('%Y-%m-%d %H:%M') if full_moon_kst else None
                 cell_info['full_moon_jst'] = full_moon_jst.strftime('%Y-%m-%d %H:%M') if full_moon_jst else None
 	            # 이번달 절입/중기/다음달 절입 정보 추출 (절입=홀수절기, 중기=짝수절기)
-                # 당해 연도와 다음 연도 데이터 모두 포함
-                current_year_entries = SOLAR_TERMS_DATA.get(str(year), [])
-                next_year_entries = SOLAR_TERMS_DATA.get(str(year + 1), [])
-                all_entries = current_year_entries + next_year_entries
-                
-                # 이번달 절기 (월만 비교 - 기존 방식)
-                this_month_terms = [e for e in all_entries 
-                                    if datetime.datetime.strptime(e['datetime_KST'], '%Y-%m-%d %H:%M:%S').month == month]
-                
-                # 다음달 절기 (12월이면 다음 연도 1월, 아니면 같은 연도 다음달)
-                next_month = (month % 12) + 1
-                next_year_for_next_month = year + 1 if month == 12 else year
-                next_month_terms = [e for e in all_entries 
-                                    if datetime.datetime.strptime(e['datetime_KST'], '%Y-%m-%d %H:%M:%S').year == next_year_for_next_month
-                                    and datetime.datetime.strptime(e['datetime_KST'], '%Y-%m-%d %H:%M:%S').month == next_month]
-                
+                # 성능 최적화: 이미 파싱된 데이터 사용 (루프 밖에서 계산된 this_month_terms, next_month_terms 재사용)
                 # 이번달 절입 (홀수 인덱스)
                 jeolip = next((e for e in this_month_terms if e.get('term_index_in_cycle', 0) % 2 == 1), None)
                 # 이번달 중기 (짝수 인덱스)
@@ -478,23 +484,27 @@ def manse_calendar():
                 # 다음달 절입 (홀수 인덱스)
                 next_jeolip = next((e for e in next_month_terms if e.get('term_index_in_cycle', 0) % 2 == 1), None)
                 cell_info['jeolip_kst'] = jeolip['datetime_KST'] if jeolip else None
-                cell_info['jeolip_jst'] = kst_to_jst(jeolip['datetime_KST']) if jeolip else None
+                # 성능 최적화: datetime 객체 재사용
+                if jeolip:
+                    jeolip_dt = next((dt for e, dt in parsed_jeolgi_entries if e == jeolip), None)
+                    cell_info['jeolip_jst'] = kst_to_jst(jeolip_dt) if jeolip_dt else kst_to_jst(jeolip['datetime_KST'])
+                else:
+                    cell_info['jeolip_jst'] = None
                 cell_info['jeolip_term'] = jeolip['term'] if jeolip else None
                 cell_info['junggi_kst'] = junggi['datetime_KST'] if junggi else None
-                cell_info['junggi_jst'] = kst_to_jst(junggi['datetime_KST']) if junggi else None
+                if junggi:
+                    junggi_dt = next((dt for e, dt in parsed_jeolgi_entries if e == junggi), None)
+                    cell_info['junggi_jst'] = kst_to_jst(junggi_dt) if junggi_dt else kst_to_jst(junggi['datetime_KST'])
+                else:
+                    cell_info['junggi_jst'] = None
                 cell_info['junggi_term'] = junggi['term'] if junggi else None
                 cell_info['next_jeolip_kst'] = next_jeolip['datetime_KST'] if next_jeolip else None
-                cell_info['next_jeolip_jst'] = kst_to_jst(next_jeolip['datetime_KST']) if next_jeolip else None
+                if next_jeolip:
+                    next_jeolip_dt = next((dt for e, dt in parsed_jeolgi_entries if e == next_jeolip), None)
+                    cell_info['next_jeolip_jst'] = kst_to_jst(next_jeolip_dt) if next_jeolip_dt else kst_to_jst(next_jeolip['datetime_KST'])
+                else:
+                    cell_info['next_jeolip_jst'] = None
                 cell_info['next_jeolip_term'] = next_jeolip['term'] if next_jeolip else None
-                # 선택한 날짜 기준으로 같거나 큰 절기 3개 추출
-                next_terms = []
-                for entry in entries:
-                    dt = datetime.datetime.strptime(entry['datetime_KST'], '%Y-%m-%d %H:%M:%S')
-                    if dt.date() >= date_obj:
-                        next_terms.append({'term': entry['term'], 'datetime_KST': entry['datetime_KST']})
-                        if len(next_terms) == 3:
-                            break
-                cell_info['next_3_terms'] = next_terms
             week_data.append(cell_info)
         calendar_weeks.append(week_data)
 
