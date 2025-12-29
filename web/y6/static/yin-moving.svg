@@ -1,4 +1,4 @@
-<svg width="20" height="30" xmlns="http://www.w3.org/2000/svg">
+<svg width="20" height="30" xmlns="https://www.w3.org/2000/svg">
   <!-- 상단 왼쪽 기둥 -->
   <rect x="5" y="3" width="3" height="10" fill="#dc2626"/>
   <!-- 상단 오른쪽 기둥 -->
