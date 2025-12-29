@@ -104,7 +104,7 @@ function goToNextMonth(){var form=document.querySelector('.calendar-nav-form');i
 function handleTouchStart(e){var touch=e.touches[0];touchStartX=touch.clientX;touchStartY=touch.clientY;}
 function handleTouchEnd(e){if(!touchStartX||!touchStartY)return;var touch=e.changedTouches[0];touchEndX=touch.clientX;touchEndY=touch.clientY;var deltaX=touchEndX-touchStartX;var deltaY=touchEndY-touchStartY;var absDeltaX=Math.abs(deltaX);var absDeltaY=Math.abs(deltaY);if(absDeltaY>maxVerticalDistance){touchStartX=0;touchStartY=0;return;}
 if(absDeltaX<minSwipeDistance){touchStartX=0;touchStartY=0;return;}
-if(absDeltaX>absDeltaY){e.preventDefault();if(deltaX>0){goToNextMonth();}else{goToPrevMonth();}}
+if(absDeltaX>absDeltaY){e.preventDefault();if(deltaX>0){goToPrevMonth();}else{goToNextMonth();}}
 touchStartX=0;touchStartY=0;}
 function initSwipeGesture(){var calendarTable=getCalendarTable();if(calendarTable){calendarTable.addEventListener('touchstart',handleTouchStart,{passive:true});calendarTable.addEventListener('touchend',handleTouchEnd,{passive:false});}}
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',initSwipeGesture);}else{initSwipeGesture();}
