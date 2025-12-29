@@ -314,76 +314,83 @@
     <!-- 클라이언트 로컬 시간 기준으로 오늘 날짜 하이라이트 및 "오늘" 버튼 시각 업데이트 -->
     <!-- calendar.js의 showGanziInfo 함수와 정확히 동일한 방식 사용 -->
     <script>
+      // 전역 함수로 선언하여 즉시 실행 가능하도록 함
+      function updateTodayButtonTime() {
+        // 팝업과 정확히 동일한 방식으로 시간 가져오기
+        var now = new Date();
+        var hour = now.getHours();
+        var minute = now.getMinutes();
+        
+        var timeElement = document.getElementById('kst-time');
+        if (timeElement) {
+          // 팝업과 동일한 포맷팅 방식: hour.toString().padStart(2, '0')
+          var hour_str = hour.toString().padStart(2, '0');
+          var minute_str = minute.toString().padStart(2, '0');
+          timeElement.innerHTML = now.getFullYear() + '년 ' + (now.getMonth() + 1) + '월 ' + now.getDate() + '일 ' +
+                                 hour_str + ':' + minute_str;
+        }
+        
+        // hidden input도 업데이트
+        var todayYearInput = document.getElementById('today-year');
+        var todayMonthInput = document.getElementById('today-month');
+        if (todayYearInput) todayYearInput.value = now.getFullYear();
+        if (todayMonthInput) todayMonthInput.value = now.getMonth() + 1;
+      }
+      
+      // 음력 정보를 "10.12" 형식으로 변환 (전역 함수)
+      function formatLunarInfo() {
+        var lunarElements = document.querySelectorAll('.lunar-info[data-lunar-full]');
+        if (lunarElements.length === 0) {
+          // 요소가 없으면 잠시 후 다시 시도
+          setTimeout(formatLunarInfo, 100);
+          return;
+        }
+        
+        lunarElements.forEach(function(element) {
+          var lunarFull = element.getAttribute('data-lunar-full');
+          if (lunarFull && lunarFull.trim() !== '') {
+            // "10월 12일 평달 대월" 형식에서 월과 일 추출
+            var match = lunarFull.match(/(\d+)월\s*(\d+)일/);
+            if (match) {
+              var month = match[1];
+              var day = match[2];
+              element.textContent = month + '.' + day;
+            } else {
+              // 매칭 실패 시 빈 문자열로 설정
+              element.textContent = '';
+            }
+          }
+        });
+      }
+      
+      // 클라이언트 로컬 시간 기준으로 오늘 날짜 표시
+      function updateTodayHighlight() {
+        // 팝업과 정확히 동일한 방식으로 시간 가져오기
+        var now = new Date();
+        var today = {
+          year: now.getFullYear(),
+          month: now.getMonth() + 1,
+          day: now.getDate()
+        };
+        
+        var dayCells = document.querySelectorAll('.day-cell');
+        dayCells.forEach(function(cell) {
+          var year = parseInt(cell.getAttribute('data-year'));
+          var month = parseInt(cell.getAttribute('data-month'));
+          var day = parseInt(cell.getAttribute('data-day'));
+          
+          // 서버에서 설정한 today 클래스 제거
+          cell.classList.remove('today');
+          
+          // 클라이언트 로컬 시간 기준으로 오늘인지 확인 (팝업과 정확히 동일한 방식)
+          if (year === today.year && month === today.month && day === today.day) {
+            cell.classList.add('today');
+          }
+        });
+      }
+      
       // DOM이 완전히 로드된 후 실행 (서버 환경 대응)
       function initCalendarScripts() {
-        // calendar.js의 showGanziInfo 함수와 정확히 동일한 방식으로 시간 가져오기
-        // var now = new Date();
-        // var hour = now.getHours();
-        // var minute = now.getMinutes();
-        function getTimeLikePopup() {
-          // 팝업과 정확히 동일한 방식
-          var now = new Date();
-          var hour = now.getHours();
-          var minute = now.getMinutes();
-          
-          return {
-            year: now.getFullYear(),
-            month: now.getMonth() + 1,
-            day: now.getDate(),
-            hour: hour,
-            minute: minute
-          };
-        }
-        
-        // "오늘" 버튼 시각 업데이트 (팝업과 정확히 동일한 방식)
-        function updateTodayButtonTime() {
-          // 팝업과 정확히 동일한 방식으로 시간 가져오기
-          var now = new Date();
-          var hour = now.getHours();
-          var minute = now.getMinutes();
-          
-          var timeElement = document.getElementById('kst-time');
-          if (timeElement) {
-            // 팝업과 동일한 포맷팅 방식: hour.toString().padStart(2, '0')
-            var hour_str = hour.toString().padStart(2, '0');
-            var minute_str = minute.toString().padStart(2, '0');
-            timeElement.innerHTML = now.getFullYear() + '년 ' + (now.getMonth() + 1) + '월 ' + now.getDate() + '일 ' +
-                                   hour_str + ':' + minute_str;
-          }
-          
-          // hidden input도 업데이트
-          var todayYearInput = document.getElementById('today-year');
-          var todayMonthInput = document.getElementById('today-month');
-          if (todayYearInput) todayYearInput.value = now.getFullYear();
-          if (todayMonthInput) todayMonthInput.value = now.getMonth() + 1;
-        }
-        
-        // 클라이언트 로컬 시간 기준으로 오늘 날짜 표시 (팝업과 정확히 동일한 방식)
-        function updateTodayHighlight() {
-          // 팝업과 정확히 동일한 방식으로 시간 가져오기
-          var now = new Date();
-          var today = {
-            year: now.getFullYear(),
-            month: now.getMonth() + 1,
-            day: now.getDate()
-          };
-          
-          var dayCells = document.querySelectorAll('.day-cell');
-          dayCells.forEach(function(cell) {
-            var year = parseInt(cell.getAttribute('data-year'));
-            var month = parseInt(cell.getAttribute('data-month'));
-            var day = parseInt(cell.getAttribute('data-day'));
-            
-            // 서버에서 설정한 today 클래스 제거
-            cell.classList.remove('today');
-            
-            // 클라이언트 로컬 시간 기준으로 오늘인지 확인 (팝업과 정확히 동일한 방식)
-            if (year === today.year && month === today.month && day === today.day) {
-              cell.classList.add('today');
-            }
-          });
-        }
-        
         // "오늘" 버튼 클릭 이벤트 (팝업과 정확히 동일한 방식)
         var todayBtn = document.getElementById('today-btn');
         if (todayBtn) {
@@ -410,26 +417,6 @@
           });
         }
         
-        // 음력 정보를 "10.12" 형식으로 변환
-        function formatLunarInfo() {
-          var lunarElements = document.querySelectorAll('.lunar-info[data-lunar-full]');
-          lunarElements.forEach(function(element) {
-            var lunarFull = element.getAttribute('data-lunar-full');
-            if (lunarFull && lunarFull.trim() !== '') {
-              // "10월 12일 평달 대월" 형식에서 월과 일 추출
-              var match = lunarFull.match(/(\d+)월\s*(\d+)일/);
-              if (match) {
-                var month = match[1];
-                var day = match[2];
-                element.textContent = month + '.' + day;
-              } else {
-                // 매칭 실패 시 빈 문자열로 설정
-                element.textContent = '';
-              }
-            }
-          });
-        }
-        
         // 초기 실행
         updateTodayButtonTime();
         updateTodayHighlight();
@@ -442,13 +429,35 @@
         setInterval(updateTodayHighlight, 60000);
       }
       
+      // 즉시 실행: "로딩 중..." 텍스트를 빠르게 업데이트
+      (function() {
+        // DOM이 준비되면 즉시 실행
+        if (document.getElementById('kst-time')) {
+          updateTodayButtonTime();
+        }
+      })();
+      
       // DOM 로드 완료 후 실행 (서버 환경 대응)
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initCalendarScripts);
+        document.addEventListener('DOMContentLoaded', function() {
+          initCalendarScripts();
+          // 추가로 음력 정보 포맷팅 재시도
+          setTimeout(formatLunarInfo, 200);
+          setTimeout(formatLunarInfo, 500);
+        });
       } else {
         // 이미 로드된 경우 즉시 실행
         initCalendarScripts();
+        // 추가로 음력 정보 포맷팅 재시도
+        setTimeout(formatLunarInfo, 200);
+        setTimeout(formatLunarInfo, 500);
       }
+      
+      // window.onload도 추가하여 모든 리소스 로드 후 실행
+      window.addEventListener('load', function() {
+        updateTodayButtonTime();
+        formatLunarInfo();
+      });
     </script>
 
 
