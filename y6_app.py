@@ -586,7 +586,8 @@ def analyze_changing_yao_detailed(yao_input, palace, palace_element, month_branc
             # 변효의 정보 (변괘 기준) 
             changing_branch = changing_branches[yao_index]
             changing_branch_element = FIVE_ELEMENTS_BRANCH[changing_branch]
-            changing_six_kin = calculate_six_kin(changing_palace_element, changing_branch_element)
+            # 본괘의 궁 오행 기준으로 육친 계산 (가장 중요!)
+            changing_six_kin = calculate_six_kin(palace_element, changing_branch_element)
             
             # 변효의 왕쇠 (현재 월건 기준)
             changing_wang_shuai = calculate_wang_shuai(month_branch, changing_branch_element)
@@ -949,8 +950,8 @@ def calculate_najia():
                 yao_index = 5 - i  # 상효부터 초효까지의 인덱스 (메인 계산과 동일)
                 changing_branch = changing_branches[yao_index]
                 changing_branch_element = FIVE_ELEMENTS_BRANCH[changing_branch]
-                # 변괘의 궁 오행 기준으로 육친 계산
-                changing_kin = calculate_six_kin(changing_palace_element, changing_branch_element)
+                # 본괘의 궁 오행 기준으로 육친 계산 (가장 중요!)
+                changing_kin = calculate_six_kin(palace_element, changing_branch_element)
                 changing_yao_results.append({
                     '효위_idx': yao_index,
                     '변지': changing_branch,
@@ -1003,7 +1004,8 @@ def calculate_najia():
                 if not found_changing:
                     changing_branch = changing_branches[yao_index]
                     changing_branch_element = FIVE_ELEMENTS_BRANCH[changing_branch]
-                    changing_kin = calculate_six_kin(changing_palace_element, changing_branch_element)
+                    # 본괘의 궁 오행 기준으로 육친 계산 (가장 중요!)
+                    changing_kin = calculate_six_kin(palace_element, changing_branch_element)
                     changing_info_str = f"-> {changing_branch}({changing_kin})"
             else:
                 changing_info_str = "靜爻"

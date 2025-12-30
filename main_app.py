@@ -3,7 +3,7 @@
 6개의 독립 앱을 하나로 통합하여 포트 5000에서 실행
 """
 
-from flask import Flask, render_template, redirect, url_for, jsonify
+from flask import Flask, render_template, redirect, url_for, jsonify, send_from_directory
 from werkzeug.middleware.dispatcher import DispatcherMiddleware
 from werkzeug.middleware.proxy_fix import ProxyFix
 from werkzeug.serving import run_simple
@@ -92,6 +92,12 @@ main_app.wsgi_app = ProxyFix(
     x_host=1,  # X-Forwarded-Host 헤더 신뢰
     x_port=1,  # X-Forwarded-Port 헤더 신뢰
 )
+
+@main_app.route('/favicon.ico')
+def favicon():
+    """favicon.ico 요청 처리 - 404 오류 방지"""
+    # favicon 파일이 없어도 204 No Content로 응답하여 콘솔 오류 방지
+    return '', 204
 
 @main_app.route('/health')
 def health_check():
