@@ -655,18 +655,21 @@ def get_changing_yao_meaning(original_yao, original_kin, changing_kin):
     return f"{yao_type} - {kin_meaning}"
 
 def calculate_gua_shen(palace, day_branch, hexagram_yao):
-    """괘신 계산"""
+    """괘신 계산 - 일진 지지와 육합하는 지지가 괘에 있으면 그 효가 괘신"""
     try:
+        # 일진 지지 검증
+        if not day_branch or day_branch not in SIX_HARMONY:
+            return None
+        
         # 일진 지지와 육합하는 지지 찾기
         harmony_branch = SIX_HARMONY.get(day_branch)
         if not harmony_branch:
             return None
         
-        # 괘에서 해당 지지를 가진 효 찾기
-        palace_element = PALACE_INFO.get(palace, {'오행': '金'})['오행']
-        
+        # 괘에서 해당 지지를 가진 효 찾기 (정확한 매칭)
         for yao in hexagram_yao:
-            if yao['branch'] == harmony_branch:
+            # branch 필드가 정확히 일치하는지 확인
+            if yao.get('branch') == harmony_branch:
                 return {
                     '괘신지지': harmony_branch,
                     '괘신효위': yao['yao_pos'],
@@ -676,10 +679,12 @@ def calculate_gua_shen(palace, day_branch, hexagram_yao):
                     '괘신작용': analyze_gua_shen_effect(yao['six_kin'], yao['wang_shuai'])
                 }
         
-        # 해당 지지가 없으면 None 반환
+        # 해당 지지가 괘에 없으면 None 반환 (괘신 없음)
         return None
         
     except Exception as e:
+        # 에러 발생 시 로그 출력 (디버깅용)
+        print(f"괘신 계산 오류: {e}, 일진: {day_branch}")
         return None
 
 def get_gua_shen_meaning(six_kin):
@@ -915,6 +920,19 @@ def calculate_najia():
         changing_info = HEXAGRAMS.get(changing_code, hexagram_info)
         changing_display_palace = PALACE_DISPLAY_MAP.get(changing_info['궁'], changing_info['궁'])
         
+        # 변괘의 궁 정보 (본괘와 동일한 구조)
+        changing_palace = changing_info['궁']
+        changing_palace1 = changing_info.get('궁1', changing_palace)
+        changing_palace2 = changing_info.get('궁2', changing_palace)
+        
+        # 변괘의 납갑 지지 (본괘와 동일한 규칙 적용)
+        changing_branches1 = NAJIA_BRANCHES.get(changing_palace1, NAJIA_BRANCHES['乾宮'])
+        changing_branches2 = NAJIA_BRANCHES.get(changing_palace2, NAJIA_BRANCHES['乾宮'])
+        changing_branches = changing_branches1[:3] + changing_branches2[3:]
+        
+        # 변괘의 궁 오행 (변괘 자체의 궁 기준)
+        changing_palace_element = PALACE_INFO.get(changing_palace, {'오행': '金'})['오행']
+        
         # 육신 배정
         start_spirit = SIX_SPIRITS.get(ri_gan, '青龍')
         spirit_order = ['青龍', '朱雀', '勾陈', '螣蛇', '白虎', '玄武']
@@ -923,18 +941,18 @@ def calculate_najia():
         for i in range(6):
             six_spirits_assigned.append(spirit_order[(spirit_start_index + i) % 6])
         
-        # 변효의 육친 계산
+        # 변효의 육친 계산 (정확한 변괘 납갑 지지 사용)
         changing_yao_results = []
-        changing_palace = changing_info['궁']
-        changing_branches = NAJIA_BRANCHES.get(changing_palace, branches)
         
         for i in range(6):
-            if yao_input[i] in [6, 9]:
-                changing_branch = changing_branches[i]
+            if yao_input[i] in [6, 9]:  # 동효만 처리
+                yao_index = 5 - i  # 상효부터 초효까지의 인덱스 (메인 계산과 동일)
+                changing_branch = changing_branches[yao_index]
                 changing_branch_element = FIVE_ELEMENTS_BRANCH[changing_branch]
-                changing_kin = calculate_six_kin(palace_element, changing_branch_element)
+                # 변괘의 궁 오행 기준으로 육친 계산
+                changing_kin = calculate_six_kin(changing_palace_element, changing_branch_element)
                 changing_yao_results.append({
-                    '효위_idx': i,
+                    '효위_idx': yao_index,
                     '변지': changing_branch,
                     '변육친': changing_kin
                 })
@@ -970,13 +988,23 @@ def calculate_najia():
             if status in [6, 9]:
                 note += '動'
             
-            # 변효 정보
+            # 변효 정보 (정확한 변괘 납갑 지지와 육친 사용)
             changing_info_str = ""
-            if status in [6, 9]:
+            if status in [6, 9]:  # 동효인 경우
+                # changing_yao_results에서 해당 효 찾기
+                found_changing = False
                 for change in changing_yao_results:
                     if change['효위_idx'] == yao_index:
+                        # 변괘의 납갑 지지와 육친 표시
                         changing_info_str = f"-> {change['변지']}({change['변육친']})"
+                        found_changing = True
                         break
+                # 매칭되는 변효 정보가 없으면 변괘의 납갑 지지 직접 계산
+                if not found_changing:
+                    changing_branch = changing_branches[yao_index]
+                    changing_branch_element = FIVE_ELEMENTS_BRANCH[changing_branch]
+                    changing_kin = calculate_six_kin(changing_palace_element, changing_branch_element)
+                    changing_info_str = f"-> {changing_branch}({changing_kin})"
             else:
                 changing_info_str = "靜爻"
             
