@@ -21,14 +21,16 @@ el.innerHTML='<div class="inner"><div class="back"><span>TAROT</span></div><div 
 getCardSVG(card)+'<div class="title">#'+
 (card.id+1)+' '+
 card.kr+'</div><div class="subtitle">('+
-card.en+')</div></div></div><div class="badge">#</div>';el.addEventListener('click',()=>onPick(el,card));spread.appendChild(el);});}
+card.en+')</div></div></div><div class="badge">#</div>';el.addEventListener('click',()=>onPick(el,card));el.addEventListener('keydown',(e)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onPick(el,card);}});spread.appendChild(el);});}
 function spreadDeck(){shuffleDeck();renderSpread(false);spread.classList.remove('deck-mode');const deckStack=document.getElementById('deckStack');if(deckStack){deckStack.remove();}
 toast('✨ 78장의 카드가 무작위로 펼쳐졌습니다!');}
 function collectDeck(){spread.classList.add('deck-mode');const existingDeck=document.getElementById('deckStack');if(existingDeck){existingDeck.remove();}
 const deckStack=document.createElement('div');deckStack.id='deckStack';deckStack.className='deck-stack';deckStack.innerHTML='<div class="deck-prompt"><div class="deck-text">🎴 클릭하여 카드 펼치기</div></div>';deckStack.addEventListener('click',spreadDeck);spread.insertBefore(deckStack,spread.firstChild);}
 function initializeDeck(){const initialDeckStack=document.getElementById('deckStack');if(initialDeckStack){initialDeckStack.addEventListener('click',spreadDeck);}}
 function onPick(el,card){if(locked)return;const i=picked.findIndex((p)=>p.id===card.id);if(i>=0){picked.splice(i,1);el.classList.remove('flipped','selected');el.style.transform='';el.querySelector('.badge').textContent='#';updateSelectedUI();return;}
-const maxCount=parseInt(maxCountInput.value,10);if(picked.length>=maxCount)return;const reversed=Math.random()<0.5;el.style.transition='transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)';setTimeout(()=>{el.classList.add('flipped','selected');if(reversed){el.style.transform='rotate(180deg)';}},50);const kw=getKeywords(card,reversed);picked.push({id:card.id,en:card.en,kr:card.kr,reversed,kw});el.querySelector('.badge').textContent='#'+picked.length;updateSelectedUI();if(picked.length===maxCount){locked=true;}}
+const maxCount=parseInt(maxCountInput.value,10);if(picked.length>=maxCount)return;const reversed=Math.random()<0.5;const inner=el.querySelector('.inner');if(inner){inner.style.transition='none';}
+el.classList.add('flipped','selected');if(reversed){el.style.transform='rotate(180deg)';}else{el.style.transform='';}
+requestAnimationFrame(()=>{if(inner){inner.style.transition='';}});const kw=getKeywords(card,reversed);picked.push({id:card.id,en:card.en,kr:card.kr,reversed,kw});el.querySelector('.badge').textContent='#'+picked.length;updateSelectedUI();if(picked.length===maxCount){locked=true;}}
 function updateSelectedUI(){const maxCount=parseInt(maxCountInput.value,10);(document.getElementById('status')||{innerHTML:''}).innerHTML='진행: <b>'+
 picked.length+' / '+
 maxCount+'</b>'+
