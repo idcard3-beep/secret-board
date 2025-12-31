@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, render_template
 from datetime import datetime, timedelta
 import json
 import os
+import sys
 
 # 시간대 처리를 위한 import
 try:
@@ -40,7 +41,7 @@ NAJIA_BRANCHES = {
 PALACE_INFO = {
     '乾宮': {'오행': '金'}, '兌宮': {'오행': '金'}, '離宮': {'오행': '火'}, 
     '震宮': {'오행': '木'}, '巽宮': {'오행': '木'}, '坎宮': {'오행': '水'}, 
-    '艮宫': {'오행': '土'}, '坤宮': {'오행': '土'}
+    '艮宮': {'오행': '土'}, '坤宮': {'오행': '土'}
 }
 
 # 궁명 매핑 (표시용)
@@ -566,27 +567,27 @@ def analyze_changing_yao_detailed(yao_input, palace, palace_element, month_branc
     # 변괘의 납갑 지지 (정확한 규칙)
     changing_branches1 = NAJIA_BRANCHES.get(changing_palace1, NAJIA_BRANCHES['乾宮'])
     changing_branches2 = NAJIA_BRANCHES.get(changing_palace2, NAJIA_BRANCHES['乾宮']) 
-    changing_branches = changing_branches1[:3] + changing_branches2[3:]
+    changing_branches = changing_branches1[:3] + changing_branches2[3:]  # 초효부터 상효까지 순서 (배열 그대로 유지)
     
-    # 변괘의 궁 오행 (변괘 자체의 궁 기준)
-    changing_palace_element = PALACE_INFO.get(changing_palace, {'오행': '金'})['오행']
+    # 육친 계산은 본괘의 궁 오행(palace_element)으로만 한다 (변괘의 궁 오행은 사용하지 않음)
     
     for i in range(6):
         if yao_input[i] in [6, 9]:  # 동효만 분석
-            yao_pos = 6 - i  # 효위 (1~6)
+            yao_pos = i + 1  # 효위 (1~6, 초효부터 상효 순서)
             
             # 메인 계산과 동일한 방식으로 인덱스 계산
-            yao_index = 5 - i  # 메인 계산과 동일한 인덱스
+            yao_index = i  # 메인 계산과 동일한 인덱스 (초효부터 상효 순서)
             
             # 원효의 정보 (본괘 기준) - 메인 계산에서 전달받은 branches 사용
             original_branch = original_branches[yao_index]
             original_branch_element = FIVE_ELEMENTS_BRANCH[original_branch]
+            # 본괘의 육친: 본괘의 궁 오행(palace_element)과 본괘의 납갑지지(original_branch_element)로 산출
             original_six_kin = calculate_six_kin(palace_element, original_branch_element)
             
             # 변효의 정보 (변괘 기준) 
             changing_branch = changing_branches[yao_index]
             changing_branch_element = FIVE_ELEMENTS_BRANCH[changing_branch]
-            # 본괘의 궁 오행 기준으로 육친 계산 (가장 중요!)
+            # 변괘의 육친: 본괘의 궁 오행(palace_element)과 변괘의 납갑지지(changing_branch_element)로 산출
             changing_six_kin = calculate_six_kin(palace_element, changing_branch_element)
             
             # 변효의 왕쇠 (현재 월건 기준)
@@ -684,8 +685,6 @@ def calculate_gua_shen(palace, day_branch, hexagram_yao):
         return None
         
     except Exception as e:
-        # 에러 발생 시 로그 출력 (디버깅용)
-        print(f"괘신 계산 오류: {e}, 일진: {day_branch}")
         return None
 
 def get_gua_shen_meaning(six_kin):
@@ -747,7 +746,10 @@ def get_changing_hexagram(yao_input):
     return get_hexagram_code(changing_yao)
 
 def calculate_six_kin(palace_element, branch_element):
-    """육친 계산"""
+    """육친 계산
+    - palace_element: 본괘의 궁 오행 (육친 계산 기준)
+    - branch_element: 납갑지지의 오행 (본괘 또는 변괘의 납갑지지)
+    """
     if palace_element == branch_element:
         return '兄弟'
     
@@ -909,10 +911,11 @@ def calculate_najia():
         display_palace = PALACE_DISPLAY_MAP.get(palace, palace)
         
         # 정확한 납갑 지지 계산 (기존 구조 사용)
-        palace_element = PALACE_INFO.get(palace, {'오행': '金'})['오행']  # palace 사용 (수정)
+        # 육친 계산은 본괘의 궁 오행으로만 한다
+        palace_element = PALACE_INFO.get(palace, {'오행': '金'})['오행']  # 본괘의 궁 오행 (육친 계산 기준)
         branches1 = NAJIA_BRANCHES.get(palace1, NAJIA_BRANCHES['乾宮'])
         branches2 = NAJIA_BRANCHES.get(palace2, NAJIA_BRANCHES['乾宮'])
-        branches = branches1[:3] + branches2[3:]
+        branches = branches1[:3] + branches2[3:]  # 초효부터 상효까지 순서 (배열 그대로 유지)
         
         se_yao_pos = hexagram_info['세효']
         
@@ -929,10 +932,9 @@ def calculate_najia():
         # 변괘의 납갑 지지 (본괘와 동일한 규칙 적용)
         changing_branches1 = NAJIA_BRANCHES.get(changing_palace1, NAJIA_BRANCHES['乾宮'])
         changing_branches2 = NAJIA_BRANCHES.get(changing_palace2, NAJIA_BRANCHES['乾宮'])
-        changing_branches = changing_branches1[:3] + changing_branches2[3:]
+        changing_branches = changing_branches1[:3] + changing_branches2[3:]  # 초효부터 상효까지 순서 (배열 그대로 유지)
         
-        # 변괘의 궁 오행 (변괘 자체의 궁 기준)
-        changing_palace_element = PALACE_INFO.get(changing_palace, {'오행': '金'})['오행']
+        # 육친 계산은 본괘의 궁 오행(palace_element)으로만 한다 (변괘의 궁 오행은 사용하지 않음)
         
         # 육신 배정
         start_spirit = SIX_SPIRITS.get(ri_gan, '青龍')
@@ -947,10 +949,10 @@ def calculate_najia():
         
         for i in range(6):
             if yao_input[i] in [6, 9]:  # 동효만 처리
-                yao_index = 5 - i  # 상효부터 초효까지의 인덱스 (메인 계산과 동일)
+                yao_index = i  # 초효부터 상효까지의 인덱스 (메인 계산과 동일)
                 changing_branch = changing_branches[yao_index]
                 changing_branch_element = FIVE_ELEMENTS_BRANCH[changing_branch]
-                # 본괘의 궁 오행 기준으로 육친 계산 (가장 중요!)
+                # 변괘의 육친: 본괘의 궁 오행(palace_element)과 변괘의 납갑지지(changing_branch_element)로 산출
                 changing_kin = calculate_six_kin(palace_element, changing_branch_element)
                 changing_yao_results.append({
                     '효위_idx': yao_index,
@@ -958,12 +960,12 @@ def calculate_najia():
                     '변육친': changing_kin
                 })
         
-        # 최종 결과 생성
+        # 최종 결과 생성 (초효부터 상효 순서)
         final_hexagram = []
         
         for i in range(6):
-            yao_index = 5 - i  # 상효부터 초효까지
-            yao_pos = 6 - i    # 6효부터 1효까지
+            yao_index = i  # 초효부터 상효까지
+            yao_pos = i + 1    # 1효부터 6효까지
             
             status = yao_input[yao_index]
             branch = branches[yao_index]
@@ -971,6 +973,7 @@ def calculate_najia():
             
             wang_shuai = calculate_wang_shuai(yue_jian, branch_element)
             day_relation = calculate_day_relation(ri_chen, branch)
+            # 본괘의 육친: 본괘의 궁 오행(palace_element)과 본괘의 납갑지지(branch_element)로 산출
             six_kin = calculate_six_kin(palace_element, branch_element)
             
             # 비고 (세효, 응효, 동효)
@@ -1004,7 +1007,7 @@ def calculate_najia():
                 if not found_changing:
                     changing_branch = changing_branches[yao_index]
                     changing_branch_element = FIVE_ELEMENTS_BRANCH[changing_branch]
-                    # 본괘의 궁 오행 기준으로 육친 계산 (가장 중요!)
+                    # 변괘의 육친: 본괘의 궁 오행(palace_element)과 변괘의 납갑지지(changing_branch_element)로 산출
                     changing_kin = calculate_six_kin(palace_element, changing_branch_element)
                     changing_info_str = f"-> {changing_branch}({changing_kin})"
             else:
