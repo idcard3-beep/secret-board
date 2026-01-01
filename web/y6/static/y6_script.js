@@ -36,7 +36,7 @@ getConsultationInfo(){this.consultationInfo={questionType:document.getElementByI
 displayNajiaResult(){if(this._displayNajiaResultExecuting){console.log('displayNajiaResult: 이미 실행 중, 중복 실행 방지');return;}
 this._displayNajiaResultExecuting=true;document.getElementById('hexagramName').textContent=this.najiaResult.main_info;document.getElementById('hexagramMeaning').textContent=`점시: 월건 ${this.najiaResult.base_info['월건']}, 일진 ${this.najiaResult.base_info['일진']}, 세효: ${this.najiaResult.base_info['세효']}효`;const hexagramContainer=document.querySelector('.hexagram-container');if(hexagramContainer){const h3Element=hexagramContainer.querySelector('h3');if(h3Element){const mainInfoWithRed=this.najiaResult.main_info.replace(/\(([^)]+)\)/g,'<span style="color: #dc2626; font-weight: 700; font-size: 1.4rem;">($1)</span>');h3Element.innerHTML=`
           <div class="base-info" style="text-align: center; padding: 1rem; background: var(--surface); border-radius: var(--radius-md); margin: 0;">
-            <p><strong>괘명:</strong> ${mainInfoWithRed}</p>
+            <p> ${mainInfoWithRed}</p>
           </div>
         `;}}
 const resultContainer=document.getElementById('najiaResultContainer');const mainInfoWithRed=this.najiaResult.main_info.replace(/\(([^)]+)\)/g,'<span style="color: #dc2626; font-weight: 700; font-size: 1.4rem;">($1)</span>');resultContainer.innerHTML=`
