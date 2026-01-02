@@ -267,11 +267,16 @@ def manse_calendar():
         prev_year_str = str(year - 1)
         prev_year_entries = SOLAR_TERMS_DATA.get(prev_year_str, [])
         jeolgi_entries = prev_year_entries + jeolgi_entries
-    # 12월인 경우 다음 연도 절기도 포함 (다음달이 1월이므로)
-    if month == 12:
+    # 다음달이 다음 연도인 경우 (12월 -> 1월) 다음 연도 절기도 포함
+    next_month = (month % 12) + 1
+    if next_month == 1:  # 다음달이 1월이면 다음 연도
         next_year_str = str(year + 1)
         next_year_entries = SOLAR_TERMS_DATA.get(next_year_str, [])
-        jeolgi_entries = jeolgi_entries + next_year_entries
+        if next_year_entries:
+            # 중복 제거를 위해 이미 포함되어 있는지 확인 (datetime_KST의 연도로 확인)
+            has_next_year = any(e['datetime_KST'].startswith(next_year_str) for e in jeolgi_entries)
+            if not has_next_year:
+                jeolgi_entries = jeolgi_entries + next_year_entries
     
     # 성능 최적화: 절기 데이터를 미리 파싱하여 datetime 객체로 변환 (strptime 반복 호출 방지)
     parsed_jeolgi_entries = []
@@ -284,9 +289,10 @@ def manse_calendar():
     
     # 이번달 절입/중기 (절입=홀수절기, 중기=짝수절기)
     # term_index_in_cycle: 1,3,5... = 절입(節入), 2,4,6... = 중기(中氣)
-    this_month_terms = [e for e, dt in parsed_jeolgi_entries if dt.month == month]
+    this_month_terms = [e for e, dt in parsed_jeolgi_entries if dt.month == month and dt.year == year]
     next_month = (month % 12) + 1
-    next_month_terms = [e for e, dt in parsed_jeolgi_entries if dt.month == next_month]
+    next_month_year = year if next_month > month else year + 1  # 다음달이 1월이면 연도 +1
+    next_month_terms = [e for e, dt in parsed_jeolgi_entries if dt.month == next_month and dt.year == next_month_year]
     
     # 이번달 절입 (홀수 인덱스)
     jeolip = next((e for e in this_month_terms if e.get('term_index_in_cycle', 0) % 2 == 1), None)
