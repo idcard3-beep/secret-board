@@ -78,7 +78,7 @@ print("="*60 + "\n")
 
 # 메인 앱 생성 (메뉴 페이지용)
 main_app = Flask(__name__, 
-                 template_folder='web/templates',
+                 template_folder='web/common/templates',
                  static_folder='static')
 
 main_app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev-secret-change-in-production')
@@ -112,6 +112,13 @@ def health_check():
 def main_index_redirect():
     """main_index.html을 /secret/main_index.html로 리다이렉트"""
     return redirect('/secret/main_index.html')
+
+@main_app.route('/common/static/<path:filename>')
+def common_static(filename):
+    """공통 static 파일 서빙 (member_session.js, admin_session.js 등)"""
+    import os
+    common_static_path = os.path.join(os.path.dirname(__file__), 'web', 'common', 'static')
+    return send_from_directory(common_static_path, filename)
 
 @main_app.route('/')
 def index():

@@ -246,6 +246,8 @@ class PostgreSQLRepo:
             'birth_year': ticket_data.get('birth_year'),
             'snsgu': ticket_data.get('snsgu', 'A0001'),  # 기본값 추가
             'smember_id': ticket_data.get('smember_id') or ticket_data.get('sMember_id'),  # 회원 ID 추가 (대소문자 모두 지원)
+            'admin_id': ticket_data.get('admin_id'),  # 관리자 ID 추가
+            'ti_role': ticket_data.get('ti_role'),  # 관리자 role 추가
             'choice1': ticket_data.get('choice1', 0),
             'choice2': ticket_data.get('choice2', 0),
             'choice3': ticket_data.get('choice3', 0),
@@ -261,6 +263,12 @@ class PostgreSQLRepo:
             'agreement': ticket_data.get('agreement', 0),
             'time_input_type': ticket_data.get('time_input_type', 'time')  # 스키마에 NOT NULL이므로 기본값 필요
         }
+        
+        # 디버깅: kwargs에 포함된 값 확인
+        print(f"📊 create_ticket kwargs 준비 완료")
+        print(f"   smember_id: {kwargs.get('smember_id')}")
+        print(f"   admin_id: {kwargs.get('admin_id')}")
+        print(f"   ti_role: {kwargs.get('ti_role')}")
         
         return self._create_ticket_internal(title, content, password_hash, **kwargs)
     
@@ -387,6 +395,8 @@ class PostgreSQLRepo:
                         'birth_year': kwargs.get('birth_year'),
                         'snsgu': kwargs.get('snsgu', 'A0001'),  # 기본값 추가
                         'smember_id': kwargs.get('smember_id') or kwargs.get('sMember_id'),  # 회원 ID 추가 (대소문자 모두 지원)
+                        'admin_id': kwargs.get('admin_id'),  # 관리자 ID 추가
+                        'ti_role': kwargs.get('ti_role'),  # 관리자 role 추가
                         'choice1': kwargs.get('choice1', 0),
                         'choice2': kwargs.get('choice2', 0),
                         'choice3': kwargs.get('choice3', 0),
@@ -405,6 +415,8 @@ class PostgreSQLRepo:
                     
                     print(f"📊 ticket_data 준비 완료")
                     print(f"   smember_id: {ticket_data.get('smember_id')}")
+                    print(f"   admin_id: {ticket_data.get('admin_id')}")
+                    print(f"   ti_role: {ticket_data.get('ti_role')}")
                     print(f"   snsgu: {ticket_data.get('snsgu')}")
                     print(f"   agreement: {ticket_data.get('agreement')}")
                     
@@ -414,7 +426,7 @@ class PostgreSQLRepo:
                             title_masked, content_enc, post_pwd_hash,
                             author_name, author_nickname, author_contact,
                             author_phone, author_mobile, author_email, author_gender,
-                            birth_year, snsgu, smember_id,
+                            birth_year, snsgu, smember_id, admin_id, ti_role,
                             choice1, choice2, choice3, choice4,
                             choice5, choice6, choice7, choice8,
                             choice9, choice10, choice11, choice12,
@@ -423,7 +435,7 @@ class PostgreSQLRepo:
                             %(title_masked)s, %(content_enc)s, %(post_pwd_hash)s,
                             %(author_name)s, %(author_nickname)s, %(author_contact)s,
                             %(author_phone)s, %(author_mobile)s, %(author_email)s, %(author_gender)s,
-                            %(birth_year)s, %(snsgu)s, %(smember_id)s,
+                            %(birth_year)s, %(snsgu)s, %(smember_id)s, %(admin_id)s, %(ti_role)s,
                             %(choice1)s, %(choice2)s, %(choice3)s, %(choice4)s,
                             %(choice5)s, %(choice6)s, %(choice7)s, %(choice8)s,
                             %(choice9)s, %(choice10)s, %(choice11)s, %(choice12)s,

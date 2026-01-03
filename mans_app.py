@@ -1,6 +1,6 @@
 import json
 import os
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session
 from lunarcalendar import Converter, Solar, Lunar
 import datetime
 import calendar
@@ -13,6 +13,47 @@ from typing import Tuple, Dict, Any
 
 #app = Flask(__name__, template_folder='templates')
 app = Flask(__name__, template_folder='web/mans/templates', static_folder='web/mans/static')
+
+# 공통 static 파일 서빙 라우트 추가
+@app.route('/common/static/<path:filename>')
+def common_static(filename):
+    """공통 static 파일 서빙 (member_session.js, admin_session.js, security.js, security.css 등)"""
+    from flask import send_from_directory
+    import os
+    # mans_app.py는 프로젝트 루트에 있으므로 직접 경로 사용
+    common_static_path = os.path.join(os.path.dirname(__file__), 'web', 'common', 'static')
+    return send_from_directory(common_static_path, filename)
+
+# 세션 데이터를 모든 템플릿에 전역으로 전달하는 context processor
+@app.context_processor
+def inject_session_data():
+    """모든 템플릿에서 사용할 수 있는 세션 데이터 전달"""
+    member_data = None
+    admin_data = None
+    
+    # 회원 세션 데이터
+    if session.get('member_logged_in', False):
+        member_data = {
+            'sMem_id': session.get('sMem_id'),
+            'sMem_name': session.get('sMem_name'),
+            'sMem_nickname': session.get('sMem_nickname'),
+            'sMem_status': session.get('sMem_status'),
+            'adviser_role': session.get('adviser_role'),
+        }
+    
+    # 관리자 세션 데이터
+    if session.get('admin_logged_in', False):
+        admin_data = {
+            'admin_id': session.get('admin_id'),
+            'username': session.get('username'),
+            'role': session.get('admin_role'),
+        }
+    
+    return {
+        'member_session': member_data,
+        'admin_session': admin_data,
+    }
+
 # ...existing code...
 
 @app.route('/saju')
@@ -244,13 +285,13 @@ def manse_calendar():
     # 캘린더 데이터 생성
     calendar.setfirstweekday(calendar.SUNDAY)
     cal_data = calendar.monthcalendar(year, month)
-    
-    # 해당 월의 대표 월주를 표시합니다.
+    # 헤더 표시용 년주 계산 (매년 2월 15일 기준, 팝업 로직과 동일한 함수 사용)
+    # 헤더 표시용 월주 계산 (매월 15일 기준, 팝업 로직과 동일한 함수 사용)
     try:
-        representative_date = datetime.date(year, month, 1)
+        representative_date = datetime.date(year, month, 15)
         month_gānzhī_display = get_month_gānzhī(representative_date.year, representative_date.month, representative_date.day)
     except:
-         month_gānzhī_display = "N/A"
+        month_gānzhī_display = "N/A"
     
     # 절기 목록 가져오기 (달력 표시용)
     term_dates = get_solar_terms_for_year(year)

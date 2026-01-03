@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify, render_template, session
 from datetime import datetime, timedelta
 import json
 import os
@@ -19,6 +19,46 @@ from mainpillar import calc_saju
 app = Flask(__name__, 
             template_folder='web/y6/templates',
             static_folder='web/y6/static')
+
+# 공통 static 파일 서빙 라우트 추가
+@app.route('/common/static/<path:filename>')
+def common_static(filename):
+    """공통 static 파일 서빙 (member_session.js, admin_session.js, security.js, security.css 등)"""
+    from flask import send_from_directory
+    import os
+    # y6_app.py는 프로젝트 루트에 있으므로 직접 경로 사용
+    common_static_path = os.path.join(os.path.dirname(__file__), 'web', 'common', 'static')
+    return send_from_directory(common_static_path, filename)
+
+# 세션 데이터를 모든 템플릿에 전역으로 전달하는 context processor
+@app.context_processor
+def inject_session_data():
+    """모든 템플릿에서 사용할 수 있는 세션 데이터 전달"""
+    member_data = None
+    admin_data = None
+    
+    # 회원 세션 데이터
+    if session.get('member_logged_in', False):
+        member_data = {
+            'sMem_id': session.get('sMem_id'),
+            'sMem_name': session.get('sMem_name'),
+            'sMem_nickname': session.get('sMem_nickname'),
+            'sMem_status': session.get('sMem_status'),
+            'adviser_role': session.get('adviser_role'),
+        }
+    
+    # 관리자 세션 데이터
+    if session.get('admin_logged_in', False):
+        admin_data = {
+            'admin_id': session.get('admin_id'),
+            'username': session.get('username'),
+            'role': session.get('admin_role'),
+        }
+    
+    return {
+        'member_session': member_data,
+        'admin_session': admin_data,
+    }
 
 # 납갑 시스템 데이터 (기존 정확한 구조 유지)
 FIVE_ELEMENTS_BRANCH = {

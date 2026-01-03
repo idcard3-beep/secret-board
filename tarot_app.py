@@ -2,7 +2,7 @@ import random
 import json
 import os
 #from flask import Flask, jsonify, request, abort, send_from_directory, render_template
-from flask import Flask, jsonify, request, abort, render_template
+from flask import Flask, jsonify, request, abort, render_template, session
 from werkzeug.exceptions import HTTPException
 from flask_cors import CORS 
 
@@ -11,6 +11,45 @@ from flask_cors import CORS
 # 클라이언트와의 통신을 위해 CORS를 허용합니다.
 app = Flask(__name__, template_folder='web/tarot/templates', static_folder='web/tarot/static')
 
+# 공통 static 파일 서빙 라우트 추가
+@app.route('/common/static/<path:filename>')
+def common_static(filename):
+    """공통 static 파일 서빙 (member_session.js, admin_session.js, security.js, security.css 등)"""
+    from flask import send_from_directory
+    import os
+    # tarot_app.py는 프로젝트 루트에 있으므로 직접 경로 사용
+    common_static_path = os.path.join(os.path.dirname(__file__), 'web', 'common', 'static')
+    return send_from_directory(common_static_path, filename)
+
+# 세션 데이터를 모든 템플릿에 전역으로 전달하는 context processor
+@app.context_processor
+def inject_session_data():
+    """모든 템플릿에서 사용할 수 있는 세션 데이터 전달"""
+    member_data = None
+    admin_data = None
+    
+    # 회원 세션 데이터
+    if session.get('member_logged_in', False):
+        member_data = {
+            'sMem_id': session.get('sMem_id'),
+            'sMem_name': session.get('sMem_name'),
+            'sMem_nickname': session.get('sMem_nickname'),
+            'sMem_status': session.get('sMem_status'),
+            'adviser_role': session.get('adviser_role'),
+        }
+    
+    # 관리자 세션 데이터
+    if session.get('admin_logged_in', False):
+        admin_data = {
+            'admin_id': session.get('admin_id'),
+            'username': session.get('username'),
+            'role': session.get('admin_role'),
+        }
+    
+    return {
+        'member_session': member_data,
+        'admin_session': admin_data,
+    }
 
 CORS(app)
 

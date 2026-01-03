@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, make_response
+from flask import Blueprint, request, jsonify, make_response, session
 from adapters.repository_factory import get_repository
 from core.security import issue_view_token, verify_view_token
 import bcrypt, uuid
@@ -139,9 +139,32 @@ def create_ticket():
         snsgu = d.get('snsgu', 'A0001')
         print(f"🏢 snsgu 값: {snsgu}")
         
-        # sMember_id 값 처리 (전역변수에서 받은 회원 ID)
-        sMember_id = d.get('sMember_id', None)
-        print(f"👤 sMember_id 값: {sMember_id}")
+        # sMember_id 값 처리 (전역변수에서 받은 회원 ID 또는 서버 세션에서)
+        sMember_id = d.get('sMember_id') or d.get('smember_id')  # 대소문자 모두 지원
+        if sMember_id == 'null' or sMember_id == '':
+            sMember_id = None
+        # 클라이언트에서 전달되지 않은 경우 서버 세션에서 확인
+        if not sMember_id and session.get('member_logged_in', False):
+            sMember_id = session.get('sMem_id')
+        print(f"👤 sMember_id 값: {sMember_id} (타입: {type(sMember_id)})")
+        
+        # admin_id 값 처리 (전역변수에서 받은 관리자 ID 또는 서버 세션에서)
+        admin_id = d.get('admin_id')
+        if admin_id == 'null' or admin_id == '':
+            admin_id = None
+        # 클라이언트에서 전달되지 않은 경우 서버 세션에서 확인
+        if not admin_id and session.get('admin_logged_in', False):
+            admin_id = session.get('admin_id')
+        print(f"👨‍💼 admin_id 값: {admin_id} (타입: {type(admin_id)})")
+        
+        # ti_role 값 처리 (전역변수에서 받은 관리자 role 또는 서버 세션에서)
+        ti_role = d.get('ti_role')
+        if ti_role == 'null' or ti_role == '':
+            ti_role = None
+        # 클라이언트에서 전달되지 않은 경우 서버 세션에서 확인
+        if not ti_role and session.get('admin_logged_in', False):
+            ti_role = session.get('admin_role')
+        print(f"👨‍💼 ti_role 값: {ti_role} (타입: {type(ti_role)})")
         
         # 딕셔너리 형태로 티켓 데이터 구성
         ticket = {
@@ -153,7 +176,9 @@ def create_ticket():
             'post_pwd_hash': hashed,
             'agreement': agreement,
             'snsgu': snsgu,
-            'sMember_id': sMember_id  # 회원 ID 추가
+            'sMember_id': sMember_id,  # 회원 ID 추가
+            'admin_id': admin_id,  # 관리자 ID 추가
+            'ti_role': ti_role  # 관리자 role 추가
         }
         
         print(f"🔄 Repository로 티켓 생성 시작")
