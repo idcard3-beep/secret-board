@@ -120,6 +120,77 @@ def common_static(filename):
     common_static_path = os.path.join(os.path.dirname(__file__), 'web', 'common', 'static')
     return send_from_directory(common_static_path, filename)
 
+########################################################
+# SEO 설정
+########################################################
+@main_app.route('/robots.txt')
+def robots_txt():
+    """robots.txt 파일 서빙"""
+    import os
+    robots_path = os.path.join(os.path.dirname(__file__), 'robots.txt')
+    if os.path.exists(robots_path):
+        return send_from_directory(os.path.dirname(__file__), 'robots.txt')
+    else:
+        # 기본 robots.txt 내용 반환
+        return """User-agent: *
+Allow: /
+Sitemap: https://naratt.kr/sitemap.xml
+""", 200, {'Content-Type': 'text/plain'}
+
+@main_app.route('/sitemap.xml')
+def sitemap_xml():
+    """sitemap.xml 파일 서빙"""
+    import os
+    sitemap_path = os.path.join(os.path.dirname(__file__), 'sitemap.xml')
+    if os.path.exists(sitemap_path):
+        return send_from_directory(os.path.dirname(__file__), 'sitemap.xml'), 200, {'Content-Type': 'application/xml'}
+    else:
+        # 기본 sitemap.xml 내용 반환
+        from flask import request
+        base_url = request.scheme + '://' + request.host
+        return f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>{base_url}/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>{base_url}/secret/</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>{base_url}/mans/</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>{base_url}/y6/</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>{base_url}/tarot/</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>{base_url}/toj/</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>{base_url}/saju/</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>
+""", 200, {'Content-Type': 'application/xml'}
+
+########################################################
+# 메인 메뉴 페이지
+########################################################    
 @main_app.route('/')
 def index():
     """메인 메뉴 페이지"""

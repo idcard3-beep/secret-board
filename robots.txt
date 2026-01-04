@@ -1,0 +1,13 @@
+User-agent: *
+Disallow: /secret/
+Disallow: /admin/
+Disallow: /login/
+Disallow: /join/
+Disallow: /mypage/
+Disallow: /common/
+Disallow: /favicon.ico
+
+
+Allow: /
+
+Sitemap: https://www.naratt.kr/sitemap.xml
