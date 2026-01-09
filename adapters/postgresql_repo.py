@@ -220,9 +220,9 @@ class PostgreSQLRepo:
     # 기존 인터페이스 호환 메서드들 (웹 애플리케이션용)
     # ===========================================
     
-    def list_tickets(self):
+    def list_tickets(self, snsgu=None, smember_id=None):
         """기존 인터페이스 호환: 티켓 목록 조회"""
-        return self.get_tickets()
+        return self.get_tickets(snsgu=snsgu, smember_id=smember_id)
     
     def create_ticket(self, ticket_data):
         """기존 인터페이스 호환: 딕셔너리 형태의 티켓 데이터를 받아서 처리"""
@@ -244,6 +244,13 @@ class PostgreSQLRepo:
             'author_email': ticket_data.get('author_email'),
             'author_gender': ticket_data.get('author_gender'),
             'birth_year': ticket_data.get('birth_year'),
+            'birth_datetime': ticket_data.get('birth_datetime'),  # 생년월일시 추가
+            'birth_hour': ticket_data.get('birth_hour'),  # 출생 시간 추가
+            'birth_minute': ticket_data.get('birth_minute'),  # 출생 분 추가
+            'calendar_type': ticket_data.get('calendar_type'),  # 역법 추가
+            'yundal': ticket_data.get('yundal'),  # 윤달 추가
+            'hour_ji': ticket_data.get('hour_ji'),  # 시주 추가
+            'content_enc': ticket_data.get('content_enc'),  # 암호화된 내용 추가
             'snsgu': ticket_data.get('snsgu', 'A0001'),  # 기본값 추가
             'smember_id': ticket_data.get('smember_id') or ticket_data.get('sMember_id'),  # 회원 ID 추가 (대소문자 모두 지원)
             'admin_id': ticket_data.get('admin_id'),  # 관리자 ID 추가
@@ -279,11 +286,8 @@ class PostgreSQLRepo:
     def update_ticket(self, ticket_id, data):
         """기존 인터페이스 호환: 딕셔너리 형태의 data를 받아서 처리"""
         if isinstance(data, dict):
-            title = data.get('title', '')
-            content = data.get('content', '')
-            author_name = data.get('author_name', '')
-            author_contact = data.get('author_contact', '')
-            return self._update_ticket_internal(ticket_id, title, content, author_name, author_contact)
+            # 모든 필드를 kwargs로 전달
+            return self._update_ticket_internal(ticket_id, **data)
         else:
             raise ValueError("update_ticket에는 딕셔너리 형태의 data가 필요합니다")
     
@@ -383,7 +387,7 @@ class PostgreSQLRepo:
                     # 기본 필드들
                     ticket_data = {
                         'title_masked': title,
-                        'content_enc': content,
+                        'content_enc': kwargs.get('content_enc') or content,  # content_enc 우선 사용
                         'post_pwd_hash': password_hash,
                         'author_name': kwargs.get('author_name'),
                         'author_nickname': kwargs.get('author_nickname'),
@@ -393,6 +397,12 @@ class PostgreSQLRepo:
                         'author_email': kwargs.get('author_email'),
                         'author_gender': kwargs.get('author_gender'),
                         'birth_year': kwargs.get('birth_year'),
+                        'birth_datetime': kwargs.get('birth_datetime'),  # 생년월일시 추가
+                        'birth_hour': kwargs.get('birth_hour'),  # 출생 시간 추가
+                        'birth_minute': kwargs.get('birth_minute'),  # 출생 분 추가
+                        'calendar_type': kwargs.get('calendar_type'),  # 역법 추가
+                        'yundal': kwargs.get('yundal'),  # 윤달 추가
+                        'hour_ji': kwargs.get('hour_ji'),  # 시주 추가
                         'snsgu': kwargs.get('snsgu', 'A0001'),  # 기본값 추가
                         'smember_id': kwargs.get('smember_id') or kwargs.get('sMember_id'),  # 회원 ID 추가 (대소문자 모두 지원)
                         'admin_id': kwargs.get('admin_id'),  # 관리자 ID 추가
@@ -419,6 +429,12 @@ class PostgreSQLRepo:
                     print(f"   ti_role: {ticket_data.get('ti_role')}")
                     print(f"   snsgu: {ticket_data.get('snsgu')}")
                     print(f"   agreement: {ticket_data.get('agreement')}")
+                    print(f"   birth_datetime: {ticket_data.get('birth_datetime')}")
+                    print(f"   birth_hour: {ticket_data.get('birth_hour')}")
+                    print(f"   birth_minute: {ticket_data.get('birth_minute')}")
+                    print(f"   calendar_type: {ticket_data.get('calendar_type')}")
+                    print(f"   yundal: {ticket_data.get('yundal')}")
+                    print(f"   hour_ji: {ticket_data.get('hour_ji')}")
                     
                     print(f"📝 SQL INSERT 실행 중...")
                     cursor.execute("""
@@ -426,7 +442,9 @@ class PostgreSQLRepo:
                             title_masked, content_enc, post_pwd_hash,
                             author_name, author_nickname, author_contact,
                             author_phone, author_mobile, author_email, author_gender,
-                            birth_year, snsgu, smember_id, admin_id, ti_role,
+                            birth_year, birth_datetime, birth_hour, birth_minute,
+                            calendar_type, yundal, hour_ji,
+                            snsgu, smember_id, admin_id, ti_role,
                             choice1, choice2, choice3, choice4,
                             choice5, choice6, choice7, choice8,
                             choice9, choice10, choice11, choice12,
@@ -435,7 +453,9 @@ class PostgreSQLRepo:
                             %(title_masked)s, %(content_enc)s, %(post_pwd_hash)s,
                             %(author_name)s, %(author_nickname)s, %(author_contact)s,
                             %(author_phone)s, %(author_mobile)s, %(author_email)s, %(author_gender)s,
-                            %(birth_year)s, %(snsgu)s, %(smember_id)s, %(admin_id)s, %(ti_role)s,
+                            %(birth_year)s, %(birth_datetime)s, %(birth_hour)s, %(birth_minute)s,
+                            %(calendar_type)s, %(yundal)s, %(hour_ji)s,
+                            %(snsgu)s, %(smember_id)s, %(admin_id)s, %(ti_role)s,
                             %(choice1)s, %(choice2)s, %(choice3)s, %(choice4)s,
                             %(choice5)s, %(choice6)s, %(choice7)s, %(choice8)s,
                             %(choice9)s, %(choice10)s, %(choice11)s, %(choice12)s,
@@ -462,63 +482,63 @@ class PostgreSQLRepo:
             traceback.print_exc()
             raise
     
-    def get_tickets(self, limit=50, offset=0):
+    def get_tickets(self, limit=50, offset=0, snsgu=None, smember_id=None):
         """티켓 목록 조회"""
         try:
-            print(f"🔍 get_tickets 호출 - limit: {limit}, offset: {offset}")
+            # 성능 최적화: 필수 로그만 출력
+            if snsgu or smember_id:
+                print(f"🔍 get_tickets - snsgu: {snsgu}, smember_id: {smember_id}")
             
             if not self._ensure_tables_exist():
-                print("⚠️ 테이블이 존재하지 않습니다.")
                 return []
             
-            print(f"🔗 데이터베이스 연결 시도...")
             with self._get_connection() as conn:
                 with conn.cursor(cursor_factory=psycopg2.extras.DictCursor) as cursor:
-                    print(f"📝 SQL 쿼리 실행 중...")
-                    cursor.execute("""
-                        SELECT 
-                            ticket_id::text as id,
-                            title_masked as title,
-                            content_enc,
-                            author_name,
-                            author_nickname,
-                            author_contact,
-                            author_phone,
-                            author_mobile,
-                            author_email,
-                            author_gender,
-                            birth_year,
-                            snsgu,
-                            smember_id,
-                            post_pwd_hash,
-                            created_at,
-                            updated_at,
-                            status,
-                            has_admin_reply,
-                            agreement
+                    
+                    # 필터 조건 추가
+                    where_clause = "WHERE status != 'DELETED'"
+                    params = []
+                    
+                    if snsgu:
+                        where_clause += " AND snsgu = %s"
+                        params.append(snsgu)
+                    
+                    if smember_id:
+                        where_clause += " AND smember_id = %s"
+                        params.append(smember_id)
+                    
+                    params.extend([limit, offset])
+                    
+                    query = f"""
+                        SELECT *
                         FROM tickets
-                        WHERE status != 'DELETED'
+                        {where_clause}
                         ORDER BY created_at DESC
                         LIMIT %s OFFSET %s
-                    """, (limit, offset))
+                    """
                     
-                    print(f"✅ 쿼리 실행 완료, 결과 가져오는 중...")
+                    cursor.execute(query, tuple(params))
                     rows = cursor.fetchall()
-                    print(f"📊 조회된 행 수: {len(rows)}")
+                    
+                    # 성능 최적화: 조회 결과만 간단히 로그
+                    if len(rows) > 0:
+                        print(f"✅ {len(rows)}건 조회 완료")
                     
                     tickets = []
                     for row in rows:
                         try:
                             ticket = dict(row)
-                            # 하위 호환성을 위해 view_count 추가
+                            # 하위 호환성을 위해 필요한 별칭 추가
+                            ticket['id'] = str(ticket.get('ticket_id', ''))
+                            ticket['title'] = ticket.get('title_masked', '')
+                            ticket['content'] = ticket.get('content_enc', '')
+                            ticket['password_hash'] = ticket.get('post_pwd_hash', '')
                             ticket['view_count'] = 0
                             tickets.append(ticket)
                         except Exception as row_error:
-                            print(f"❌ 행 변환 중 오류: {row_error}")
-                            print(f"   행 데이터: {row}")
+                            print(f"❌ 행 변환 오류: {row_error}")
                             continue
                     
-                    print(f"✅ get_tickets 완료 - {len(tickets)}개 티켓 반환")
                     return tickets
                     
         except psycopg2.Error as db_error:
@@ -547,26 +567,7 @@ class PostgreSQLRepo:
                         return None
                 
                 cursor.execute("""
-                    SELECT 
-                        ticket_id::text as id,
-                        title_masked as title,
-                        content_enc as content,
-                        post_pwd_hash as password_hash,
-                        created_at,
-                        updated_at,
-                        status,
-                        has_admin_reply,
-                        author_name,
-                        author_nickname,
-                        author_contact,
-                        author_phone,
-                        author_mobile,
-                        author_email,
-                        author_gender,
-                        birth_year,
-                        snsgu,
-                        smember_id,
-                        agreement
+                    SELECT *
                     FROM tickets
                     WHERE ticket_id = %s AND status != 'DELETED'
                 """, (ticket_id,))
@@ -574,7 +575,11 @@ class PostgreSQLRepo:
                 row = cursor.fetchone()
                 if row:
                     ticket = dict(row)
-                    # 하위 호환성을 위해 view_count 추가
+                    # 하위 호환성을 위해 필요한 별칭 추가
+                    ticket['id'] = str(ticket.get('ticket_id', ''))
+                    ticket['title'] = ticket.get('title_masked', '')
+                    ticket['content'] = ticket.get('content_enc', '')
+                    ticket['password_hash'] = ticket.get('post_pwd_hash', '')
                     ticket['view_count'] = 0
                     return ticket
                 return None
@@ -595,16 +600,93 @@ class PostgreSQLRepo:
                 """, (ticket_id,))
                 conn.commit()
     
-    def _update_ticket_internal(self, ticket_id, title, content, author_name='', author_contact=''):
-        """내부용 티켓 수정 메서드"""
+    def _update_ticket_internal(self, ticket_id, **kwargs):
+        """내부용 티켓 수정 메서드 - 모든 필드 지원"""
+        print(f"🔄 _update_ticket_internal 시작: ticket_id={ticket_id}")
+        print(f"📊 업데이트할 데이터: {kwargs}")
+        
         with self._get_connection() as conn:
             with conn.cursor() as cursor:
-                cursor.execute("""
+                # 업데이트할 필드와 값 준비
+                update_fields = []
+                update_values = []
+                
+                # 기본 필드
+                if 'title' in kwargs or 'title_masked' in kwargs:
+                    update_fields.append("title_masked = %s")
+                    update_values.append(kwargs.get('title_masked') or kwargs.get('title', ''))
+                
+                if 'content' in kwargs or 'content_enc' in kwargs:
+                    update_fields.append("content_enc = %s")
+                    update_values.append(kwargs.get('content_enc') or kwargs.get('content', ''))
+                
+                # 작성자 정보
+                if 'author_name' in kwargs:
+                    update_fields.append("author_name = %s")
+                    update_values.append(kwargs.get('author_name', ''))
+                
+                if 'author_contact' in kwargs:
+                    update_fields.append("author_contact = %s")
+                    update_values.append(kwargs.get('author_contact', ''))
+                
+                if 'author_gender' in kwargs:
+                    update_fields.append("author_gender = %s")
+                    update_values.append(kwargs.get('author_gender', ''))
+                
+                # 사주 필드들
+                if 'birth_year' in kwargs:
+                    update_fields.append("birth_year = %s")
+                    update_values.append(kwargs.get('birth_year'))
+                
+                if 'birth_datetime' in kwargs:
+                    update_fields.append("birth_datetime = %s")
+                    update_values.append(kwargs.get('birth_datetime'))
+                
+                if 'birth_hour' in kwargs:
+                    update_fields.append("birth_hour = %s")
+                    update_values.append(kwargs.get('birth_hour'))
+                
+                if 'birth_minute' in kwargs:
+                    update_fields.append("birth_minute = %s")
+                    update_values.append(kwargs.get('birth_minute'))
+                
+                if 'calendar_type' in kwargs:
+                    update_fields.append("calendar_type = %s")
+                    update_values.append(kwargs.get('calendar_type', ''))
+                
+                if 'yundal' in kwargs:
+                    update_fields.append("yundal = %s")
+                    update_values.append(kwargs.get('yundal', 'N'))
+                
+                if 'hour_ji' in kwargs:
+                    update_fields.append("hour_ji = %s")
+                    update_values.append(kwargs.get('hour_ji', ''))
+                
+                # 항상 updated_at 갱신
+                update_fields.append("updated_at = CURRENT_TIMESTAMP")
+                
+                if not update_fields:
+                    print("⚠️ 업데이트할 필드가 없습니다")
+                    return
+                
+                # ticket_id를 마지막에 추가
+                update_values.append(ticket_id)
+                
+                sql = f"""
                     UPDATE tickets 
-                    SET title_masked = %s, content_enc = %s, author_name = %s, author_contact = %s, updated_at = CURRENT_TIMESTAMP
+                    SET {', '.join(update_fields)}
                     WHERE ticket_id = %s AND status != 'DELETED'
-                """, (title, content, author_name, author_contact, ticket_id))
+                """
+                
+                print(f"📝 SQL: {sql}")
+                print(f"📊 Values: {update_values}")
+                
+                cursor.execute(sql, tuple(update_values))
+                rows_affected = cursor.rowcount
+                print(f"✅ {rows_affected}개 행 업데이트됨")
+                
                 conn.commit()
+                print(f"✅ COMMIT 완료")
     
     def delete_ticket(self, ticket_id):
         """티켓 삭제 (soft delete)"""

@@ -68,11 +68,11 @@ except Exception as e:
 # 6. 사주
 try:
     from saju_app import app as saju_app
-    app_list.append(('saju', saju_app, '사주팔자'))
-    print("✅ 사주팔자 앱 로드 완료")
+    app_list.append(('saju', saju_app, '사주보기'))
+    print("✅ 사주보기 앱 로드 완료")
 except Exception as e:
     saju_app = None
-    print(f"⚠️  사주팔자 앱 로드 실패: {e}")
+    print(f"⚠️  사주보기 앱 로드 실패: {e}")
 
 print("="*60 + "\n")
 
@@ -257,7 +257,7 @@ def index():
             'path': 'toj'
         },
         {
-            'name': '사주팔자', 
+            'name': '사주보기', 
             'url': '/saju/', 
             'icon': '🌟', 
             'desc': '생년월일시 운명 분석', 
@@ -428,7 +428,7 @@ if __name__ == '__main__':
     if toj_app:
         print(f"📖 토정비결: {base_url}/toj/")
     if saju_app:
-        print(f"✨ 사주팔자: {base_url}/saju/")
+        print(f"✨ 사주보기: {base_url}/saju/")
     
     print("="*60)
     print("🔒 HTTPS 전용 서버 (HTTP 사용 불가)")
