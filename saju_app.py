@@ -53,10 +53,10 @@ def inject_session_data():
     # 회원 세션 데이터
     if session.get('member_logged_in', False):
         member_data = {
-            'sMem_id': session.get('sMem_id'),
-            'sMem_name': session.get('sMem_name'),
-            'sMem_nickname': session.get('sMem_nickname'),
-            'sMem_status': session.get('sMem_status'),
+            'smem_id': session.get('smem_id'),
+            'smem_name': session.get('smem_name'),
+            'smem_nickname': session.get('smem_nickname'),
+            'smem_status': session.get('smem_status'),
             'adviser_role': session.get('adviser_role'),
         }
     

@@ -81,7 +81,7 @@ def list_tickets():
                     "yundal": r.get('yundal', False),
                     "hour_ji": r.get('hour_ji', ''),
                     "snsgu": r.get('snsgu', ''),
-                    "sMember_id": r.get('smember_id', ''),  # PostgreSQL 소문자 컬럼명에서 가져옴
+                    "smember_id": r.get('smember_id', ''),  # PostgreSQL 소문자 컬럼명에서 가져옴
                     "status": r.get('status', 'OPEN'),
                     "created_at": created_at_str,
                     "updated_at": updated_at_str,
@@ -153,14 +153,14 @@ def create_ticket():
         snsgu = d.get('snsgu', 'A0001')
         print(f"🏢 snsgu 값: {snsgu}")
         
-        # sMember_id 값 처리 (전역변수에서 받은 회원 ID 또는 서버 세션에서)
-        sMember_id = d.get('sMember_id') or d.get('smember_id')  # 대소문자 모두 지원
-        if sMember_id == 'null' or sMember_id == '':
-            sMember_id = None
+        # smember_id 값 처리 (전역변수에서 받은 회원 ID 또는 서버 세션에서)
+        smember_id = d.get('smember_id') or d.get('smember_id')  # 대소문자 모두 지원
+        if smember_id == 'null' or smember_id == '':
+            smember_id = None
         # 클라이언트에서 전달되지 않은 경우 서버 세션에서 확인
-        if not sMember_id and session.get('member_logged_in', False):
-            sMember_id = session.get('sMem_id')
-        print(f"👤 sMember_id 값: {sMember_id} (타입: {type(sMember_id)})")
+        if not smember_id and session.get('member_logged_in', False):
+            smember_id = session.get('smem_id')
+        print(f"👤 smember_id 값: {smember_id} (타입: {type(smember_id)})")
         
         # admin_id 값 처리 (전역변수에서 받은 관리자 ID 또는 서버 세션에서)
         admin_id = d.get('admin_id')
@@ -190,7 +190,7 @@ def create_ticket():
             'post_pwd_hash': hashed,
             'agreement': agreement,
             'snsgu': snsgu,
-            'sMember_id': sMember_id,  # 회원 ID 추가
+            'smember_id': smember_id,  # 회원 ID 추가
             'admin_id': admin_id,  # 관리자 ID 추가
             'ti_role': ti_role,  # 관리자 role 추가
             # 사주 관련 필드 추가

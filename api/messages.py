@@ -97,3 +97,83 @@ def create_user_message(ticket_id):
         'created_at': datetime.now().isoformat()
     })
     return jsonify({'ok': True})
+
+@bp.put('/<msg_id>')
+def update_message(msg_id):
+    """메시지 수정 (관리자 전용)"""
+    print(f"🔄 메시지 수정 API 호출: msg_id={msg_id}")
+    
+    if not require_admin():
+        print("❌ 관리자 인증 실패")
+        return jsonify({'error': '권한이 없습니다.'}), 403
+    
+    try:
+        d = request.get_json() or {}
+        content = (d.get('content') or '').strip()
+        role = (d.get('role') or 'admin').strip()
+        
+        if len(content) < 1:
+            return jsonify({'ok': False, 'error': '내용이 비었습니다.'}), 400
+        
+        import psycopg2.extras
+        
+        with get_repo()._get_connection() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                cursor.execute("""
+                    UPDATE thread_messages
+                    SET content_enc = %s, role = %s
+                    WHERE msg_id = %s
+                    RETURNING msg_id
+                """, (content, role, msg_id))
+                
+                result = cursor.fetchone()
+                conn.commit()
+                
+                if result:
+                    print(f"✅ 메시지 수정 완료: msg_id={msg_id}")
+                    return jsonify({'ok': True, 'message': '메시지가 수정되었습니다.'})
+                else:
+                    print(f"❌ 메시지를 찾을 수 없음: msg_id={msg_id}")
+                    return jsonify({'ok': False, 'error': '메시지를 찾을 수 없습니다.'}), 404
+                
+    except Exception as e:
+        print(f"❌ 메시지 수정 오류: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'ok': False, 'error': str(e)}), 500
+
+@bp.delete('/<msg_id>')
+def delete_message(msg_id):
+    """메시지 삭제 (관리자 전용)"""
+    print(f"🔄 메시지 삭제 API 호출: msg_id={msg_id}")
+    
+    if not require_admin():
+        print("❌ 관리자 인증 실패")
+        return jsonify({'error': '권한이 없습니다.'}), 403
+    
+    try:
+        import psycopg2.extras
+        
+        with get_repo()._get_connection() as conn:
+            with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                cursor.execute("""
+                    DELETE FROM thread_messages
+                    WHERE msg_id = %s
+                    RETURNING msg_id
+                """, (msg_id,))
+                
+                result = cursor.fetchone()
+                conn.commit()
+                
+                if result:
+                    print(f"✅ 메시지 삭제 완료: msg_id={msg_id}")
+                    return jsonify({'ok': True, 'message': '메시지가 삭제되었습니다.'})
+                else:
+                    print(f"❌ 메시지를 찾을 수 없음: msg_id={msg_id}")
+                    return jsonify({'ok': False, 'error': '메시지를 찾을 수 없습니다.'}), 404
+                
+    except Exception as e:
+        print(f"❌ 메시지 삭제 오류: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'ok': False, 'error': str(e)}), 500

@@ -79,7 +79,7 @@ def upload_signature():
                 'error': f'디렉토리 생성 권한 오류: 디렉토리 쓰기 권한 없음: {sign_folder}. 경로: {sign_folder}'
             }), 500
         
-        # 파일명 확인 (sMem_id_sMem_name.png 형식)
+        # 파일명 확인 (smem_id_smem_name.png 형식)
         filename = f.filename
         if not filename:
             return jsonify({'ok': False, 'error': '파일명이 없습니다.'}), 400
