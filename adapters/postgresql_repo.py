@@ -669,24 +669,39 @@ class PostgreSQLRepo:
                     print("⚠️ 업데이트할 필드가 없습니다")
                     return
                 
-                # ticket_id를 마지막에 추가
-                update_values.append(ticket_id)
+                # ticket_id를 마지막에 추가 (문자열로 변환)
+                update_values.append(str(ticket_id))
                 
                 sql = f"""
                     UPDATE tickets 
                     SET {', '.join(update_fields)}
-                    WHERE ticket_id = %s AND status != 'DELETED'
+                    WHERE ticket_id = %s::uuid AND status != 'DELETED'
                 """
                 
                 print(f"📝 SQL: {sql}")
                 print(f"📊 Values: {update_values}")
                 
-                cursor.execute(sql, tuple(update_values))
-                rows_affected = cursor.rowcount
-                print(f"✅ {rows_affected}개 행 업데이트됨")
-                
-                conn.commit()
-                print(f"✅ COMMIT 완료")
+                try:
+                    cursor.execute(sql, tuple(update_values))
+                    rows_affected = cursor.rowcount
+                    print(f"✅ {rows_affected}개 행 업데이트됨")
+                    
+                    if rows_affected == 0:
+                        print(f"⚠️ 업데이트된 행이 없습니다. ticket_id '{ticket_id}' 확인 필요")
+                    
+                    conn.commit()
+                    print(f"✅ COMMIT 완료")
+                except psycopg2.Error as db_error:
+                    print(f"❌ PostgreSQL 오류: {db_error}")
+                    print(f"   오류 코드: {db_error.pgcode}")
+                    if hasattr(db_error, 'pgerror'):
+                        print(f"   오류 상세: {db_error.pgerror}")
+                    conn.rollback()
+                    raise
+                except Exception as e:
+                    print(f"❌ 예상치 못한 오류: {e}")
+                    conn.rollback()
+                    raise
     
     def delete_ticket(self, ticket_id):
         """티켓 삭제 (soft delete)"""

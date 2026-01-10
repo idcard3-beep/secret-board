@@ -318,23 +318,42 @@ def update_ticket(ticket_id):
     
     try:
         # Repository를 통한 수정 (딕셔너리 형태로 전달)
-        update_data = {
-            'title': d['title'],
-            'content': d['content'],
-            'author_name': d.get('author_name', ''),
-            'author_contact': d.get('author_contact', ''),
-            # 사주 관련 필드 추가
-            'author_gender': d.get('author_gender', ''),
-            'birth_year': d.get('birth_year'),
-            'birth_datetime': d.get('birth_datetime'),
-            'birth_hour': d.get('birth_hour'),
-            'birth_minute': d.get('birth_minute'),
-            'calendar_type': d.get('calendar_type', ''),
-            'yundal': d.get('yundal', 'N'),
-            'hour_ji': d.get('hour_ji', ''),
-            'content_enc': d.get('content_enc', ''),
-            'title_masked': d.get('title_masked', d['title'])
-        }
+        # 클라이언트에서 전송한 필드만 업데이트 (기존 데이터 보호)
+        update_data = {}
+        
+        # 필수 필드 (항상 업데이트)
+        update_data['title'] = d['title']
+        update_data['content'] = d['content']
+        
+        # 선택적 필드 (클라이언트에서 전송한 경우만 업데이트)
+        if 'author_name' in d:
+            update_data['author_name'] = d['author_name']
+        if 'author_contact' in d:
+            update_data['author_contact'] = d['author_contact']
+        
+        # 사주 관련 필드 (클라이언트에서 전송한 경우만 업데이트)
+        if 'author_gender' in d:
+            update_data['author_gender'] = d['author_gender']
+        if 'birth_year' in d:
+            update_data['birth_year'] = d['birth_year']
+        if 'birth_datetime' in d:
+            update_data['birth_datetime'] = d['birth_datetime']
+        if 'birth_hour' in d:
+            update_data['birth_hour'] = d['birth_hour']
+        if 'birth_minute' in d:
+            update_data['birth_minute'] = d['birth_minute']
+        if 'calendar_type' in d:
+            update_data['calendar_type'] = d['calendar_type']
+        if 'yundal' in d:
+            update_data['yundal'] = d['yundal']
+        if 'hour_ji' in d:
+            update_data['hour_ji'] = d['hour_ji']
+        if 'content_enc' in d:
+            update_data['content_enc'] = d['content_enc']
+        if 'title_masked' in d:
+            update_data['title_masked'] = d['title_masked']
+        
+        print(f"📊 최종 업데이트 데이터: {update_data}")
         get_repo().update_ticket(ticket_id, update_data)
         
         print(f"✅ Updated ticket {ticket_id}: title='{d['title']}', author_name='{d.get('author_name', '')}'")
@@ -343,7 +362,13 @@ def update_ticket(ticket_id):
         
     except Exception as e:
         print(f"❌ Update error: {e}")
-        return jsonify({'ok': False, 'error': f'수정 중 오류가 발생했습니다: {str(e)}'}), 500
+        import traceback
+        traceback.print_exc()
+        error_detail = str(e)
+        # PostgreSQL 에러 메시지 추출
+        if hasattr(e, 'pgerror'):
+            error_detail = f"{error_detail} (DB: {e.pgerror})"
+        return jsonify({'ok': False, 'error': f'수정 중 오류가 발생했습니다: {error_detail}'}), 500
 
 @bp.get('/<ticket_id>')
 def detail(ticket_id):
