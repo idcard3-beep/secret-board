@@ -80,6 +80,7 @@ def list_tickets():
                     "calendar_type": r.get('calendar_type', ''),
                     "yundal": r.get('yundal', False),
                     "hour_ji": r.get('hour_ji', ''),
+                    "timeInputType": r.get('time_input_type', 'time'),  # ✅ snake_case → camelCase 변환
                     "snsgu": r.get('snsgu', ''),
                     "smember_id": r.get('smember_id', ''),  # PostgreSQL 소문자 컬럼명에서 가져옴
                     "status": r.get('status', 'OPEN'),
@@ -202,6 +203,7 @@ def create_ticket():
             'calendar_type': d.get('calendar_type', ''),
             'yundal': d.get('yundal', 'N'),
             'hour_ji': d.get('hour_ji', ''),
+            'time_input_type': d.get('timeInputType', 'time'),  # ✅ camelCase → snake_case 변환
             'content_enc': d.get('content_enc', ''),
             'title_masked': d.get('title_masked', d['title'])
         }
@@ -348,6 +350,8 @@ def update_ticket(ticket_id):
             update_data['yundal'] = d['yundal']
         if 'hour_ji' in d:
             update_data['hour_ji'] = d['hour_ji']
+        if 'timeInputType' in d:
+            update_data['time_input_type'] = d['timeInputType']  # ✅ camelCase → snake_case 변환
         if 'content_enc' in d:
             update_data['content_enc'] = d['content_enc']
         if 'title_masked' in d:

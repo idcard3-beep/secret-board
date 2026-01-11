@@ -662,6 +662,10 @@ class PostgreSQLRepo:
                     update_fields.append("hour_ji = %s")
                     update_values.append(kwargs.get('hour_ji', ''))
                 
+                if 'time_input_type' in kwargs:
+                    update_fields.append("time_input_type = %s")
+                    update_values.append(kwargs.get('time_input_type', 'time'))
+                
                 # 항상 updated_at 갱신
                 update_fields.append("updated_at = CURRENT_TIMESTAMP")
                 
