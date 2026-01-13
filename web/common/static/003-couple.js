@@ -1,0 +1,1 @@
+document.addEventListener('DOMContentLoaded',function(){console.log('궁합 리포트 로딩 완료');});
