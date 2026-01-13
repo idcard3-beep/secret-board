@@ -267,6 +267,31 @@ def index():
     ]
     return render_template('main_menu.html', services=services)
 
+@main_app.route('/001_lifegraph.html')
+def lifegraph():
+    """AI사주 교육 페이지"""
+    return render_template('001_lifegraph.html')
+
+@main_app.route('/002_welltodofam.html')
+def welltodofam():
+    """상담자 인생 운세 리포트 페이지"""
+    return render_template('002_welltodofam.html')
+
+@main_app.route('/003-couple.html')
+def couple():
+    """사주 궁합 분석 리포트 페이지"""
+    return render_template('003-couple.html')
+
+@main_app.route('/templates/<template_name>')
+def render_template_page(template_name):
+    """동적 템플릿 렌더링 (001_lifegraph.html 등)"""
+    # 보안을 위해 허용된 템플릿만 렌더링
+    allowed_templates = ['001_lifegraph.html', '002_welltodofam.html', '003-couple.html']
+    if template_name in allowed_templates:
+        return render_template(template_name)
+    else:
+        return "Template not found", 404
+
 @main_app.errorhandler(404)
 def not_found(error):
     """404 에러 페이지"""

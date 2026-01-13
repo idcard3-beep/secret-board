@@ -20,6 +20,13 @@ ADMIN_SESSION_KEY = 'admin_logged_in'
 def require_admin():
     return bool(session.get(ADMIN_SESSION_KEY))
 
+def require_superadmin():
+    """SUPERADMIN 권한 체크"""
+    if not session.get(ADMIN_SESSION_KEY):
+        return False
+    admin_role = session.get('admin_role', '').upper()
+    return admin_role == 'SUPERADMIN'
+
 @bp.get('/check-role')
 def check_role():
     """현재 세션의 role 확인"""
@@ -708,3 +715,77 @@ def delete_admin_user_endpoint(admin_id):
         import traceback
         print(f"❌ 스택 트레이스: {traceback.format_exc()}")
         return jsonify({'error': f'계정 삭제 중 오류가 발생했습니다: {str(e)}'}), 500
+
+# ====================================
+# 상담 전문가 관리 API
+# ====================================
+
+@bp.get('/couns-experts')
+def list_couns_experts():
+    """상담 전문가 목록 조회"""
+    try:
+        experts = get_repo().list_couns_experts()
+        return jsonify(experts)
+    except Exception as e:
+        print(f"❌ 전문가 목록 조회 오류: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@bp.get('/couns-experts/<int:expert_id>')
+def get_couns_expert(expert_id):
+    """상담 전문가 단일 조회"""
+    try:
+        expert = get_repo().get_couns_expert(expert_id)
+        if expert:
+            return jsonify(expert)
+        else:
+            return jsonify({'error': '전문가를 찾을 수 없습니다.'}), 404
+    except Exception as e:
+        print(f"❌ 전문가 조회 오류: {e}")
+        return jsonify({'error': str(e)}), 500
+
+@bp.post('/couns-experts')
+def create_couns_expert():
+    """상담 전문가 추가"""
+    if not require_superadmin():
+        return jsonify({'ok': False, 'error': 'SUPERADMIN 권한이 필요합니다.'}), 401
+    
+    try:
+        data = request.get_json() or {}
+        new_expert = get_repo().create_couns_expert(data)
+        return jsonify({'ok': True, 'expert': new_expert})
+    except Exception as e:
+        print(f"❌ 전문가 추가 오류: {e}")
+        return jsonify({'ok': False, 'error': str(e)}), 500
+
+@bp.put('/couns-experts/<int:expert_id>')
+def update_couns_expert(expert_id):
+    """상담 전문가 수정"""
+    if not require_superadmin():
+        return jsonify({'ok': False, 'error': 'SUPERADMIN 권한이 필요합니다.'}), 401
+    
+    try:
+        data = request.get_json() or {}
+        updated_expert = get_repo().update_couns_expert(expert_id, data)
+        if updated_expert:
+            return jsonify({'ok': True, 'expert': updated_expert})
+        else:
+            return jsonify({'ok': False, 'error': '전문가를 찾을 수 없습니다.'}), 404
+    except Exception as e:
+        print(f"❌ 전문가 수정 오류: {e}")
+        return jsonify({'ok': False, 'error': str(e)}), 500
+
+@bp.delete('/couns-experts/<int:expert_id>')
+def delete_couns_expert(expert_id):
+    """상담 전문가 삭제"""
+    if not require_superadmin():
+        return jsonify({'ok': False, 'error': 'SUPERADMIN 권한이 필요합니다.'}), 401
+    
+    try:
+        success = get_repo().delete_couns_expert(expert_id)
+        if success:
+            return jsonify({'ok': True, 'message': '삭제되었습니다.'})
+        else:
+            return jsonify({'ok': False, 'error': '전문가를 찾을 수 없습니다.'}), 404
+    except Exception as e:
+        print(f"❌ 전문가 삭제 오류: {e}")
+        return jsonify({'ok': False, 'error': str(e)}), 500

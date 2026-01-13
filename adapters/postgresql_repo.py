@@ -1387,3 +1387,145 @@ class PostgreSQLRepo:
             import traceback
             print(f"❌ 스택 트레이스: {traceback.format_exc()}")
             raise
+
+    # ====================================
+    # 상담 전문가 관리 (couns_expert)
+    # ====================================
+    
+    def list_couns_experts(self):
+        """상담 전문가 목록 조회 (expertorder 순으로 정렬)"""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                    cursor.execute("""
+                        SELECT id, expertname, experttitle, expertphoto, expertintro, 
+                               expertdetail, experttags, expertcontact, expertorder, created_at
+                        FROM couns_expert
+                        ORDER BY expertorder ASC, id ASC
+                    """)
+                    rows = cursor.fetchall()
+                    print(f"✅ 전문가 목록 조회 완료: {len(rows)}건")
+                    return [dict(row) for row in rows]
+        except Exception as e:
+            print(f"❌ 전문가 목록 조회 실패: {e}")
+            import traceback
+            print(f"❌ 스택 트레이스: {traceback.format_exc()}")
+            raise
+
+    def get_couns_expert(self, expert_id):
+        """상담 전문가 단일 조회"""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                    cursor.execute("""
+                        SELECT id, expertname, experttitle, expertphoto, expertintro, 
+                               expertdetail, experttags, expertcontact, expertorder, created_at
+                        FROM couns_expert
+                        WHERE id = %s
+                    """, (expert_id,))
+                    row = cursor.fetchone()
+                    if row:
+                        print(f"✅ 전문가 조회 완료: {expert_id}")
+                        return dict(row)
+                    else:
+                        print(f"⚠️ 전문가를 찾을 수 없음: {expert_id}")
+                        return None
+        except Exception as e:
+            print(f"❌ 전문가 조회 실패: {e}")
+            import traceback
+            print(f"❌ 스택 트레이스: {traceback.format_exc()}")
+            raise
+
+    def create_couns_expert(self, data):
+        """상담 전문가 추가"""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                    cursor.execute("""
+                        INSERT INTO couns_expert 
+                        (expertname, experttitle, expertphoto, expertintro, expertdetail, 
+                         experttags, expertcontact, expertorder)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                        RETURNING id, expertname, experttitle, expertphoto, expertintro, 
+                                  expertdetail, experttags, expertcontact, expertorder, created_at
+                    """, (
+                        data.get('expertName'),
+                        data.get('expertTitle'),
+                        data.get('expertPhoto'),
+                        data.get('expertIntro'),
+                        data.get('expertDetail'),
+                        data.get('expertTags'),
+                        data.get('expertContact'),
+                        data.get('expertOrder', 0)
+                    ))
+                    new_expert = cursor.fetchone()
+                    conn.commit()
+                    print(f"✅ 전문가 추가 완료: {new_expert['id']}")
+                    return dict(new_expert)
+        except Exception as e:
+            print(f"❌ 전문가 추가 실패: {e}")
+            import traceback
+            print(f"❌ 스택 트레이스: {traceback.format_exc()}")
+            raise
+
+    def update_couns_expert(self, expert_id, data):
+        """상담 전문가 수정"""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                    cursor.execute("""
+                        UPDATE couns_expert
+                        SET expertname = %s, experttitle = %s, expertphoto = %s, 
+                            expertintro = %s, expertdetail = %s, experttags = %s, 
+                            expertcontact = %s, expertorder = %s
+                        WHERE id = %s
+                        RETURNING id, expertname, experttitle, expertphoto, expertintro, 
+                                  expertdetail, experttags, expertcontact, expertorder, created_at
+                    """, (
+                        data.get('expertName'),
+                        data.get('expertTitle'),
+                        data.get('expertPhoto'),
+                        data.get('expertIntro'),
+                        data.get('expertDetail'),
+                        data.get('expertTags'),
+                        data.get('expertContact'),
+                        data.get('expertOrder', 0),
+                        expert_id
+                    ))
+                    updated_expert = cursor.fetchone()
+                    conn.commit()
+                    
+                    if updated_expert:
+                        print(f"✅ 전문가 수정 완료: {expert_id}")
+                        return dict(updated_expert)
+                    else:
+                        print(f"⚠️ 수정할 전문가를 찾을 수 없음: {expert_id}")
+                        return None
+        except Exception as e:
+            print(f"❌ 전문가 수정 실패: {e}")
+            import traceback
+            print(f"❌ 스택 트레이스: {traceback.format_exc()}")
+            raise
+
+    def delete_couns_expert(self, expert_id):
+        """상담 전문가 삭제"""
+        try:
+            with self._get_connection() as conn:
+                with conn.cursor() as cursor:
+                    cursor.execute("""
+                        DELETE FROM couns_expert WHERE id = %s
+                    """, (expert_id,))
+                    rows_affected = cursor.rowcount
+                    conn.commit()
+                    
+                    if rows_affected > 0:
+                        print(f"✅ 전문가 삭제 완료: {expert_id}")
+                        return True
+                    else:
+                        print(f"⚠️ 삭제할 전문가를 찾을 수 없음: {expert_id}")
+                        return False
+        except Exception as e:
+            print(f"❌ 전문가 삭제 실패: {e}")
+            import traceback
+            print(f"❌ 스택 트레이스: {traceback.format_exc()}")
+            raise
