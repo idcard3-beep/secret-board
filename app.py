@@ -145,10 +145,6 @@ def page_admin_view(): return render_template("admin_view.html")
 @app.route("/test_messages_api")
 def page_test_messages_api(): return render_template("test_messages_api.html")
 
-@app.route("/tickboard")
-def page_tickboard(): 
-    return render_template("tickboard.html")
-
 # 추가 Pages - 회원가입, 로그인, 비밀번호 변경, 회원 탈퇴, 회원 정보 수정, 회원 정보 조회
 #@app.route("/main_index")
 #def page_main_index(): return render_template("main_index.html")

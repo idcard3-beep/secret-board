@@ -4,6 +4,9 @@ import json
 import os
 import sys
 
+# tickets API Blueprint 임포트
+from api.tickets import bp as tickets_bp
+
 # 시간대 처리를 위한 import
 try:
     from zoneinfo import ZoneInfo  # Python 3.9+
@@ -19,6 +22,13 @@ from mainpillar import calc_saju
 app = Flask(__name__, 
             template_folder='web/y6/templates',
             static_folder='web/y6/static')
+
+# SECRET_KEY 설정 (세션 사용을 위해 필요)
+app.secret_key = os.getenv("SECRET_KEY", "dev-secret-change-in-production")
+
+# tickets API Blueprint 등록 (육효 전용 경로)
+app.register_blueprint(tickets_bp, url_prefix="/api/v1/y6_tickets")
+print("✅ y6_tickets API Blueprint 등록 완료")
 
 # 공통 static 파일 서빙 라우트 추가
 @app.route('/common/static/<path:filename>')
@@ -863,6 +873,10 @@ def calculate_day_relation(day_branch, branch):
 @app.route('/')
 def index():
     return render_template('y6_exec.html')
+
+@app.route("/y6_tickboard")
+def page_y6_tickboard(): 
+    return render_template("y6_tickboard.html")
 
 @app.route('/current-saju')
 def current_saju():

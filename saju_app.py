@@ -9,6 +9,9 @@ import json
 from datetime import datetime
 import os
 
+# tickets API Blueprint 임포트
+from api.tickets import bp as tickets_bp
+
 # mainpillar.py 함수들 임포트
 from mainpillar import (
     calc_saju, 
@@ -28,11 +31,18 @@ from mainpillar import (
 #app = Flask(__name__, static_folder='.', template_folder='.')
 app = Flask(__name__, template_folder='web/saju/templates', static_folder='web/saju/static')
 
+# SECRET_KEY 설정 (세션 사용을 위해 필요)
+app.secret_key = os.getenv("SECRET_KEY", "dev-secret-change-in-production")
+
 # 템플릿 캐시 비활성화 (개발 환경)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 CORS(app)  # CORS 허용
+
+# tickets API Blueprint 등록 (사주 전용 경로)
+app.register_blueprint(tickets_bp, url_prefix="/api/v1/saju_tickets")
+print("✅ saju_tickets API Blueprint 등록 완료")
 
 # 공통 static 파일 서빙 라우트 추가
 @app.route('/common/static/<path:filename>')
@@ -84,6 +94,10 @@ def index():
     
     #return render_template('final-test.html')
 
+@app.route("/saju_tickboard")
+def page_saju_tickboard(): 
+    return render_template("saju_tickboard.html")
+
 @app.route('/api/solar-terms/<int:year>', methods=['GET'])
 def get_solar_terms_by_year(year):
     """특정 연도의 절기 데이터 반환"""
@@ -99,6 +113,37 @@ def get_solar_terms_by_year(year):
             'success': False,
             'error': str(e)
         }), 400
+
+@app.route('/saju/current', methods=['GET'])
+def get_current_saju():
+    """
+    현재 시각의 사주 계산 API (육효 시스템용)
+    GET /saju/current
+    """
+    try:
+        # 현재 시각 가져오기
+        now = datetime.now()
+        birth_str = now.strftime('%Y-%m-%d %H:%M')
+        
+        # 사주 계산
+        result = calc_saju(birth_str, SOLAR_TERMS_PATH, 'normal')
+        
+        return jsonify({
+            'success': True,
+            'saju': result['saju'],
+            'formatted_time': now.strftime('%Y년 %m월 %d일 %H시 %M분')
+        })
+        
+    except Exception as e:
+        import traceback
+        error_trace = traceback.format_exc()
+        print(f"\n❌ 현재 사주 계산 오류 발생:")
+        print(f"   에러 메시지: {str(e)}")
+        print(f"   상세 정보:\n{error_trace}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 @app.route('/api/calc-saju', methods=['POST'])
 def calculate_saju():

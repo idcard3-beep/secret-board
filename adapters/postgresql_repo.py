@@ -268,7 +268,11 @@ class PostgreSQLRepo:
             'choice11': ticket_data.get('choice11', 0),
             'choice12': ticket_data.get('choice12', 0),
             'agreement': ticket_data.get('agreement', 0),
-            'time_input_type': ticket_data.get('time_input_type', 'time')  # 스키마에 NOT NULL이므로 기본값 필요
+            'time_input_type': ticket_data.get('time_input_type', 'time'),  # 스키마에 NOT NULL이므로 기본값 필요
+            # 육효 전용 필드 추가
+            'gwdate_time': ticket_data.get('gwdate_time'),  # 사주 시각
+            'upper_hand': ticket_data.get('upper_hand'),  # 본괘
+            'lower_hand': ticket_data.get('lower_hand')   # 변괘
         }
         
         # 디버깅: kwargs에 포함된 값 확인
@@ -403,6 +407,10 @@ class PostgreSQLRepo:
                         'calendar_type': kwargs.get('calendar_type'),  # 역법 추가
                         'yundal': kwargs.get('yundal'),  # 윤달 추가
                         'hour_ji': kwargs.get('hour_ji'),  # 시주 추가
+                        # 육효 전용 필드 추가
+                        'gwdate_time': kwargs.get('gwdate_time'),  # 사주 시각
+                        'upper_hand': kwargs.get('upper_hand'),  # 본괘
+                        'lower_hand': kwargs.get('lower_hand'),  # 변괘
                         'snsgu': kwargs.get('snsgu', 'A0001'),  # 기본값 추가
                         'smember_id': kwargs.get('smember_id') or kwargs.get('smember_id'),  # 회원 ID 추가 (대소문자 모두 지원)
                         'admin_id': kwargs.get('admin_id'),  # 관리자 ID 추가
@@ -435,6 +443,10 @@ class PostgreSQLRepo:
                     print(f"   calendar_type: {ticket_data.get('calendar_type')}")
                     print(f"   yundal: {ticket_data.get('yundal')}")
                     print(f"   hour_ji: {ticket_data.get('hour_ji')}")
+                    print(f"   🔍 육효 전용 필드:")
+                    print(f"   gwdate_time: {ticket_data.get('gwdate_time')}")
+                    print(f"   upper_hand: {ticket_data.get('upper_hand')}")
+                    print(f"   lower_hand: {ticket_data.get('lower_hand')}")
                     
                     print(f"📝 SQL INSERT 실행 중...")
                     cursor.execute("""
@@ -444,6 +456,7 @@ class PostgreSQLRepo:
                             author_phone, author_mobile, author_email, author_gender,
                             birth_year, birth_datetime, birth_hour, birth_minute,
                             calendar_type, yundal, hour_ji,
+                            gwdate_time, upper_hand, lower_hand,
                             snsgu, smember_id, admin_id, ti_role,
                             choice1, choice2, choice3, choice4,
                             choice5, choice6, choice7, choice8,
@@ -455,6 +468,7 @@ class PostgreSQLRepo:
                             %(author_phone)s, %(author_mobile)s, %(author_email)s, %(author_gender)s,
                             %(birth_year)s, %(birth_datetime)s, %(birth_hour)s, %(birth_minute)s,
                             %(calendar_type)s, %(yundal)s, %(hour_ji)s,
+                            %(gwdate_time)s, %(upper_hand)s, %(lower_hand)s,
                             %(snsgu)s, %(smember_id)s, %(admin_id)s, %(ti_role)s,
                             %(choice1)s, %(choice2)s, %(choice3)s, %(choice4)s,
                             %(choice5)s, %(choice6)s, %(choice7)s, %(choice8)s,
@@ -519,10 +533,6 @@ class PostgreSQLRepo:
                     
                     cursor.execute(query, tuple(params))
                     rows = cursor.fetchall()
-                    
-                    # 성능 최적화: 조회 결과만 간단히 로그
-                    if len(rows) > 0:
-                        print(f"✅ {len(rows)}건 조회 완료")
                     
                     tickets = []
                     for row in rows:
@@ -665,6 +675,39 @@ class PostgreSQLRepo:
                 if 'time_input_type' in kwargs:
                     update_fields.append("time_input_type = %s")
                     update_values.append(kwargs.get('time_input_type', 'time'))
+                
+                # 육효 전용 필드
+                if 'gwdate_time' in kwargs:
+                    update_fields.append("gwdate_time = %s")
+                    update_values.append(kwargs.get('gwdate_time'))
+                
+                if 'upper_hand' in kwargs:
+                    update_fields.append("upper_hand = %s")
+                    update_values.append(kwargs.get('upper_hand'))
+                
+                if 'lower_hand' in kwargs:
+                    update_fields.append("lower_hand = %s")
+                    update_values.append(kwargs.get('lower_hand'))
+                
+                # 6효 동전 선택 정보
+                if 'choice1' in kwargs:
+                    update_fields.append("choice1 = %s")
+                    update_values.append(kwargs.get('choice1'))
+                if 'choice2' in kwargs:
+                    update_fields.append("choice2 = %s")
+                    update_values.append(kwargs.get('choice2'))
+                if 'choice3' in kwargs:
+                    update_fields.append("choice3 = %s")
+                    update_values.append(kwargs.get('choice3'))
+                if 'choice4' in kwargs:
+                    update_fields.append("choice4 = %s")
+                    update_values.append(kwargs.get('choice4'))
+                if 'choice5' in kwargs:
+                    update_fields.append("choice5 = %s")
+                    update_values.append(kwargs.get('choice5'))
+                if 'choice6' in kwargs:
+                    update_fields.append("choice6 = %s")
+                    update_values.append(kwargs.get('choice6'))
                 
                 # 항상 updated_at 갱신
                 update_fields.append("updated_at = CURRENT_TIMESTAMP")

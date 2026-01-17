@@ -81,6 +81,9 @@ def list_tickets():
                     "yundal": r.get('yundal', False),
                     "hour_ji": r.get('hour_ji', ''),
                     "timeInputType": r.get('time_input_type', 'time'),  # ✅ snake_case → camelCase 변환
+                    "gwdate_time": r.get('gwdate_time', ''),  # 육효 사주 시각
+                    "upper_hand": r.get('upper_hand', ''),  # 육효 본괘
+                    "lower_hand": r.get('lower_hand', ''),  # 육효 변괘
                     "snsgu": r.get('snsgu', ''),
                     "smember_id": r.get('smember_id', ''),  # PostgreSQL 소문자 컬럼명에서 가져옴
                     "status": r.get('status', 'OPEN'),
@@ -96,16 +99,6 @@ def list_tickets():
                 import traceback
                 traceback.print_exc()
                 continue  # 다음 항목 계속 처리
-        
-        print(f"📊 API 응답 - 총 {len(items)}건")
-        if items:
-            print(f"📊 첫 번째 티켓 샘플:")
-            print(f"   - ticket_id: {items[0].get('ticket_id')}")
-            print(f"   - title_masked: {items[0].get('title_masked')}")
-            print(f"   - content_enc: {items[0].get('content_enc')[:50] if items[0].get('content_enc') else '(비어있음)'}...")
-            print(f"   - author_name: {items[0].get('author_name')}")
-            print(f"   - author_contact: {items[0].get('author_contact')}")
-            print(f"   - snsgu: {items[0].get('snsgu')}")
         
         return jsonify(items)
         
@@ -181,7 +174,7 @@ def create_ticket():
             ti_role = session.get('admin_role')
         print(f"👨‍💼 ti_role 값: {ti_role} (타입: {type(ti_role)})")
         
-        # 딕셔너리 형태로 티켓 데이터 구성
+        # 육효 전용 필드 추가
         ticket = {
             'title': d['title'],
             'content': d['content'],
@@ -205,8 +198,18 @@ def create_ticket():
             'hour_ji': d.get('hour_ji', ''),
             'time_input_type': d.get('timeInputType', 'time'),  # ✅ camelCase → snake_case 변환
             'content_enc': d.get('content_enc', ''),
-            'title_masked': d.get('title_masked', d['title'])
+            'title_masked': d.get('title_masked', d['title']),
+            # 육효 전용 필드 추가
+            'gwdate_time': d.get('gwdate_time'),  # 사주 시각 (TIMESTAMP 또는 문자열)
+            'upper_hand': d.get('upper_hand'),  # 본괘 (문자열)
+            'lower_hand': d.get('lower_hand'),  # 변괘 (문자열)
         }
+        
+        # 육효 필드 디버깅
+        print(f"🔍 서버에서 받은 육효 필드:")
+        print(f"   gwdate_time: '{ticket.get('gwdate_time')}' (타입: {type(ticket.get('gwdate_time'))})")
+        print(f"   upper_hand: '{ticket.get('upper_hand')}' (타입: {type(ticket.get('upper_hand'))})")
+        print(f"   lower_hand: '{ticket.get('lower_hand')}' (타입: {type(ticket.get('lower_hand'))})")
         
         print(f"🔄 Repository로 티켓 생성 시작")
         print(f"📊 ticket 타입: {type(ticket)}")
@@ -357,12 +360,40 @@ def update_ticket(ticket_id):
         if 'title_masked' in d:
             update_data['title_masked'] = d['title_masked']
         
+        # 육효 전용 필드 추가
+        if 'gwdate_time' in d:
+            update_data['gwdate_time'] = d['gwdate_time']
+        if 'upper_hand' in d:
+            update_data['upper_hand'] = d['upper_hand']
+        if 'lower_hand' in d:
+            update_data['lower_hand'] = d['lower_hand']
+        
+        # 육효 필드 디버깅 (UPDATE)
+        if 'upper_hand' in d or 'lower_hand' in d:
+            print(f"🔍 서버에서 받은 육효 필드 (UPDATE):")
+            print(f"   upper_hand: '{update_data.get('upper_hand')}' (타입: {type(update_data.get('upper_hand'))})")
+            print(f"   lower_hand: '{update_data.get('lower_hand')}' (타입: {type(update_data.get('lower_hand'))})")
+        
+        # 6효 동전 선택 정보
+        if 'choice1' in d:
+            update_data['choice1'] = d['choice1']
+        if 'choice2' in d:
+            update_data['choice2'] = d['choice2']
+        if 'choice3' in d:
+            update_data['choice3'] = d['choice3']
+        if 'choice4' in d:
+            update_data['choice4'] = d['choice4']
+        if 'choice5' in d:
+            update_data['choice5'] = d['choice5']
+        if 'choice6' in d:
+            update_data['choice6'] = d['choice6']
+        
         print(f"📊 최종 업데이트 데이터: {update_data}")
         get_repo().update_ticket(ticket_id, update_data)
         
         print(f"✅ Updated ticket {ticket_id}: title='{d['title']}', author_name='{d.get('author_name', '')}'")
         
-        return jsonify({'ok': True, 'message': '게시글이 성공적으로 수정되었습니다'})
+        return jsonify({'ok': True, 'ticket_id': ticket_id, 'message': '게시글이 성공적으로 수정되었습니다'})
         
     except Exception as e:
         print(f"❌ Update error: {e}")
@@ -449,6 +480,17 @@ def detail(ticket_id):
             'hour_ji': r.get('hour_ji', ''),
             'snsgu': r.get('snsgu', ''),
             'smember_id': r.get('smember_id', ''),
+            # 육효 전용 필드 추가
+            'gwdate_time': r.get('gwdate_time'),  # VARCHAR로 저장되므로 그대로 반환
+            'upper_hand': r.get('upper_hand'),
+            'lower_hand': r.get('lower_hand'),
+            # 6효 동전 선택 정보
+            'choice1': r.get('choice1'),
+            'choice2': r.get('choice2'),
+            'choice3': r.get('choice3'),
+            'choice4': r.get('choice4'),
+            'choice5': r.get('choice5'),
+            'choice6': r.get('choice6'),
             'created_at': r.get('created_at').isoformat() if r.get('created_at') else None,
             'updated_at': r.get('updated_at').isoformat() if r.get('updated_at') else None,
             'is_noticed': r.get('is_noticed', False),
