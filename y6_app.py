@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, render_template, session
+from werkzeug.middleware.proxy_fix import ProxyFix
 from datetime import datetime, timedelta
 import json
 import os
@@ -25,6 +26,16 @@ app = Flask(__name__,
 
 # SECRET_KEY 설정 (세션 사용을 위해 필요)
 app.secret_key = os.getenv("SECRET_KEY", "dev-secret-change-in-production")
+
+# cloudtype.io 프록시 환경에서 HTTPS 감지를 위한 ProxyFix 미들웨어
+# X-Forwarded-Proto 헤더를 확인하여 실제 프로토콜 감지
+app.wsgi_app = ProxyFix(
+    app.wsgi_app,
+    x_for=1,  # X-Forwarded-For 헤더 신뢰
+    x_proto=1,  # X-Forwarded-Proto 헤더 신뢰 (HTTPS 감지)
+    x_host=1,  # X-Forwarded-Host 헤더 신뢰
+    x_port=1,  # X-Forwarded-Port 헤더 신뢰
+)
 
 # tickets API Blueprint 등록 (육효 전용 경로)
 app.register_blueprint(tickets_bp, url_prefix="/api/v1/y6_tickets")

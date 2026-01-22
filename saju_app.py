@@ -4,6 +4,7 @@ Python mainpillar.py 함수를 REST API로 제공
 """
 
 from flask import Flask, request, jsonify, send_from_directory, render_template, session
+from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_cors import CORS
 import json
 from datetime import datetime
@@ -37,6 +38,16 @@ app.secret_key = os.getenv("SECRET_KEY", "dev-secret-change-in-production")
 # 템플릿 캐시 비활성화 (개발 환경)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+
+# cloudtype.io 프록시 환경에서 HTTPS 감지를 위한 ProxyFix 미들웨어
+# X-Forwarded-Proto 헤더를 확인하여 실제 프로토콜 감지
+app.wsgi_app = ProxyFix(
+    app.wsgi_app,
+    x_for=1,  # X-Forwarded-For 헤더 신뢰
+    x_proto=1,  # X-Forwarded-Proto 헤더 신뢰 (HTTPS 감지)
+    x_host=1,  # X-Forwarded-Host 헤더 신뢰
+    x_port=1,  # X-Forwarded-Port 헤더 신뢰
+)
 
 CORS(app)  # CORS 허용
 
